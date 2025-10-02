@@ -5,22 +5,19 @@ interface LoadingSpinnerProps {
   className?: string;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ size = "md", className = "" }) => {
-  const sizeClasses = {
-    sm: "h-4 w-4",
-    md: "h-8 w-8",
-    lg: "h-12 w-12",
-  };
-
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ className = "" }) => {
   return (
-    <div className={`flex justify-center items-center ${className}`}>
-      <div
-        className={`${sizeClasses[size]} animate-spin rounded-full border-2 border-gray-300 border-t-primary-600`}
-        role="status"
-        aria-label="Loading"
+    <div className={`flex justify-center items-center ${className}`} role="status" aria-label="Loading">
+      <svg
+        className="animate-spin h-10 w-10 text-blue-600 mb-4"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
       >
-        <span className="sr-only">Loading...</span>
-      </div>
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+      </svg>
+      <span className="sr-only">Loading...</span>
     </div>
   );
 };

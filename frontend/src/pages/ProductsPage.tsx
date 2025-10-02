@@ -368,11 +368,24 @@ const ProductsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Products List */}
-        <div className="bg-white rounded-lg shadow p-6">
+        {/* Products List or Loading */}
+        <div className="bg-white rounded-lg shadow p-6 min-h-[300px]">
           <h2 className="text-xl font-semibold mb-4">Products ({filteredProducts.length})</h2>
 
-          {filteredProducts.length === 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <svg
+                className="animate-spin h-10 w-10 text-blue-600 mb-4"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+              <p className="text-gray-500">Loading products...</p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12">
               <p className="text-gray-500 mb-4">No products found. Try adjusting your search or filters.</p>
               <button
