@@ -8,11 +8,7 @@ interface SalesRangeCardProps {
   endDate: string;
 }
 
-export const SalesRangeCard: React.FC<SalesRangeCardProps> = ({
-  salesRange,
-  startDate,
-  endDate,
-}) => {
+export const SalesRangeCard: React.FC<SalesRangeCardProps> = ({ salesRange, startDate, endDate }) => {
   return (
     <div className="bg-white shadow-lg rounded-xl p-8 mb-10 border border-blue-100">
       <div className="flex justify-between items-center mb-4">
@@ -69,21 +65,15 @@ export const SalesRangeCard: React.FC<SalesRangeCardProps> = ({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-6">
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Total Sales</div>
-          <div className="text-2xl font-bold text-blue-900">
-            {formatCurrency(salesRange.summary?.totalSales ?? 0)}
-          </div>
+          <div className="text-2xl font-bold text-blue-900">{formatCurrency(salesRange.summary?.totalSales ?? 0)}</div>
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Transactions</div>
-          <div className="text-2xl font-bold text-blue-900">
-            {salesRange.summary?.totalTransactions ?? 0}
-          </div>
+          <div className="text-2xl font-bold text-blue-900">{salesRange.summary?.totalTransactions ?? 0}</div>
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Tax</div>
-          <div className="text-2xl font-bold text-blue-900">
-            {formatCurrency(salesRange.summary?.totalTax ?? 0)}
-          </div>
+          <div className="text-2xl font-bold text-blue-900">{formatCurrency(salesRange.summary?.totalTax ?? 0)}</div>
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Discount</div>

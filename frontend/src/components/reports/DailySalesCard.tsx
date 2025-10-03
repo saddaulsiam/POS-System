@@ -21,12 +21,7 @@ export const DailySalesCard: React.FC<DailySalesCardProps> = ({ daily }) => {
               exportTableToPDF({
                 title: `Daily Sales - ${daily.date}`,
                 columns: ["Product", "Sold"],
-                data: daily.topProducts
-                  .slice(0, 5)
-                  .map((p) => [
-                    p.product?.name || `#${p.productId}`,
-                    p._sum.quantity,
-                  ]),
+                data: daily.topProducts.slice(0, 5).map((p) => [p.product?.name || `#${p.productId}`, p._sum.quantity]),
                 filename: `daily-sales-${daily.date}.pdf`,
               })
             }
@@ -38,12 +33,7 @@ export const DailySalesCard: React.FC<DailySalesCardProps> = ({ daily }) => {
             onClick={() =>
               exportTableToCSV({
                 columns: ["Product", "Sold"],
-                data: daily.topProducts
-                  .slice(0, 5)
-                  .map((p) => [
-                    p.product?.name || `#${p.productId}`,
-                    p._sum.quantity,
-                  ]),
+                data: daily.topProducts.slice(0, 5).map((p) => [p.product?.name || `#${p.productId}`, p._sum.quantity]),
                 sheetName: `Daily Sales ${daily.date}`,
               })
             }
@@ -57,27 +47,19 @@ export const DailySalesCard: React.FC<DailySalesCardProps> = ({ daily }) => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-6">
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Total Sales</div>
-          <div className="text-2xl font-bold text-blue-900">
-            {formatCurrency(daily.summary.totalSales)}
-          </div>
+          <div className="text-2xl font-bold text-blue-900">{formatCurrency(daily.summary.totalSales)}</div>
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Transactions</div>
-          <div className="text-2xl font-bold text-blue-900">
-            {daily.summary.totalTransactions}
-          </div>
+          <div className="text-2xl font-bold text-blue-900">{daily.summary.totalTransactions}</div>
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Tax</div>
-          <div className="text-2xl font-bold text-blue-900">
-            {formatCurrency(daily.summary.totalTax)}
-          </div>
+          <div className="text-2xl font-bold text-blue-900">{formatCurrency(daily.summary.totalTax)}</div>
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Discount</div>
-          <div className="text-2xl font-bold text-blue-900">
-            {formatCurrency(daily.summary.totalDiscount)}
-          </div>
+          <div className="text-2xl font-bold text-blue-900">{formatCurrency(daily.summary.totalDiscount)}</div>
         </div>
       </div>
 
@@ -95,16 +77,12 @@ export const DailySalesCard: React.FC<DailySalesCardProps> = ({ daily }) => {
           </ul>
         </div>
         <div>
-          <h3 className="font-semibold mb-2 text-blue-700">
-            Sales by Payment Method
-          </h3>
+          <h3 className="font-semibold mb-2 text-blue-700">Sales by Payment Method</h3>
           <ul className="divide-y">
             {daily.salesByPaymentMethod.map((pm) => (
               <li key={pm.paymentMethod} className="py-1 flex justify-between">
                 <span>{pm.paymentMethod}</span>
-                <span className="text-gray-700">
-                  {formatCurrency(pm._sum.finalAmount)}
-                </span>
+                <span className="text-gray-700">{formatCurrency(pm._sum.finalAmount)}</span>
               </li>
             ))}
           </ul>
