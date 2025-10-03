@@ -42,7 +42,7 @@ const SalesPage: React.FC = () => {
       });
       const { data = [], pagination } = response || {};
       setSales(data);
-      setTotalPages(pagination?.pages || 1);
+      setTotalPages(pagination?.totalPages || 1);
     } catch (error: any) {
       console.error("Error loading sales:", error);
       toast.error(error?.response?.data?.error || "Failed to load sales");

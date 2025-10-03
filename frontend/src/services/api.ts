@@ -141,7 +141,7 @@ export const productsAPI = {
     search?: string;
     categoryId?: number;
     isActive?: boolean;
-  }): Promise<PaginatedResponse<Product[]>> => {
+  }): Promise<PaginatedResponse<Product>> => {
     const response = await api.get("/products", { params });
     return response.data;
   },
@@ -204,7 +204,7 @@ export const customersAPI = {
     page?: number;
     limit?: number;
     search?: string;
-  }): Promise<PaginatedResponse<Customer[]>> => {
+  }): Promise<PaginatedResponse<Customer>> => {
     const response = await api.get("/customers", { params });
     return response.data;
   },
@@ -243,7 +243,7 @@ export const salesAPI = {
     endDate?: string;
     employeeId?: number;
     customerId?: number;
-  }): Promise<PaginatedResponse<Sale[]>> => {
+  }): Promise<PaginatedResponse<Sale>> => {
     const response = await api.get("/sales", { params });
     return response.data;
   },
