@@ -28,9 +28,7 @@ const Navbar: React.FC = () => {
           </span>
 
           {/* User Name */}
-          <span className="hidden md:inline-flex text-sm font-medium text-gray-700">
-            {user?.name}
-          </span>
+          <span className="hidden md:inline-flex text-sm font-medium text-gray-700">{user?.name}</span>
 
           {/* Desktop Actions */}
           <div className="hidden sm:flex items-center gap-2">

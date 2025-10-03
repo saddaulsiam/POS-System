@@ -54,11 +54,11 @@ const App: React.FC = () => {
   return (
     <>
       {isAdminPath && <Navbar />}
-      
+
       <div className="flex">
         {isAdminPath && <Sidebar />}
-        
-        <main className={`flex-1 ${isAdminPath ? 'pt-16' : ''} min-h-screen bg-gray-50`}>
+
+        <main className={`flex-1 ${isAdminPath ? "pt-16" : ""} min-h-screen bg-gray-50`}>
           <Routes>
             {/* POS Interface - Main cashier interface */}
             <Route path="/" element={<POSPage />} />

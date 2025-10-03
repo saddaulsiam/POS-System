@@ -200,11 +200,7 @@ export const categoriesAPI = {
 
 // Customers API
 export const customersAPI = {
-  getAll: async (params?: {
-    page?: number;
-    limit?: number;
-    search?: string;
-  }): Promise<PaginatedResponse<Customer>> => {
+  getAll: async (params?: { page?: number; limit?: number; search?: string }): Promise<PaginatedResponse<Customer>> => {
     const response = await api.get("/customers", { params });
     return response.data;
   },
