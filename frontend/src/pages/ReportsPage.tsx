@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { DailySalesCard } from "../components/reports/DailySalesCard";
-import { DateRangeFilter } from "../components/reports/DateRangeFilter";
-import { EmployeePerformanceCard } from "../components/reports/EmployeePerformanceCard";
-import { InventorySummaryCard } from "../components/reports/InventorySummaryCard";
-import { ProductPerformanceCard } from "../components/reports/ProductPerformanceCard";
-import { SalesRangeCard } from "../components/reports/SalesRangeCard";
 import { reportsAPI } from "../services/api";
 import {
   DailySalesReport,
   EmployeePerformanceReport,
-  InventoryReport,
   ProductPerformanceReport,
+  InventoryReport,
 } from "../types";
 import { formatDate } from "../utils/reportUtils";
+import { DateRangeFilter } from "../components/reports/DateRangeFilter";
+import { DailySalesCard } from "../components/reports/DailySalesCard";
+import { SalesRangeCard } from "../components/reports/SalesRangeCard";
+import { EmployeePerformanceCard } from "../components/reports/EmployeePerformanceCard";
+import { ProductPerformanceCard } from "../components/reports/ProductPerformanceCard";
+import { InventorySummaryCard } from "../components/reports/InventorySummaryCard";
 
 const ReportsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
