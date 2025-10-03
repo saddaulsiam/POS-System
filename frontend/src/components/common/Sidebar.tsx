@@ -7,6 +7,7 @@ const navLinks = [
   { to: "/profile", label: "Profile", icon: "🙍", roles: ["ADMIN", "MANAGER", "CASHIER", "STAFF"] },
   { to: "/products", label: "Products", icon: "📦", roles: ["ADMIN", "MANAGER", "CASHIER", "STAFF"] },
   { to: "/categories", label: "Categories", icon: "🗂️", roles: ["ADMIN", "MANAGER"] },
+  { to: "/suppliers", label: "Suppliers", icon: "🏪", roles: ["ADMIN", "MANAGER"] },
   { to: "/inventory", label: "Inventory", icon: "📋", roles: ["ADMIN", "MANAGER", "STAFF"] },
   { to: "/sales", label: "Sales", icon: "💰", roles: ["ADMIN", "MANAGER", "CASHIER"] },
   { to: "/reports", label: "Reports", icon: "📊", roles: ["ADMIN", "MANAGER"] },

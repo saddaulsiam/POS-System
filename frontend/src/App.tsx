@@ -19,11 +19,13 @@ import ReportsPage from "./pages/ReportsPage";
 import SalesPage from "./pages/SalesPage";
 import ProfilePage from "./pages/ProfilePage";
 import AuditLogsPage from "./pages/AuditLogsPage";
+import SuppliersPage from "./pages/SuppliersPage";
 
 const adminPaths = [
   "/admin",
   "/products",
   "/categories",
+  "/suppliers",
   "/customers",
   "/sales",
   "/reports",
@@ -74,6 +76,7 @@ const App: React.FC = () => {
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/products/new" element={<NewProductPage />} />
                 <Route path="/categories" element={<CategoriesPage />} />
+                <Route path="/suppliers" element={<SuppliersPage />} />
                 <Route path="/employees" element={<EmployeesPage />} />
                 <Route path="/customers" element={<CustomersPage />} />
                 <Route path="/sales" element={<SalesPage />} />

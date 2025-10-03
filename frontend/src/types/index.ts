@@ -273,6 +273,16 @@ export interface UpdateProductRequest extends Partial<CreateProductRequest> {
   isActive?: boolean;
 }
 
+export interface CreateSupplierRequest {
+  name: string;
+  contactName?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+}
+
+export interface UpdateSupplierRequest extends Partial<CreateSupplierRequest> {}
+
 export interface CreateCustomerRequest {
   name: string;
   phoneNumber?: string;

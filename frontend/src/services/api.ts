@@ -6,11 +6,14 @@ import {
   Product,
   Category,
   Customer,
+  Supplier,
   Sale,
   Employee,
   PaginatedResponse,
   CreateProductRequest,
   UpdateProductRequest,
+  CreateSupplierRequest,
+  UpdateSupplierRequest,
   CreateCustomerRequest,
   UpdateCustomerRequest,
   CreateSaleRequest,
@@ -170,8 +173,63 @@ export const productsAPI = {
     await api.delete(`/products/${id}`);
   },
 
+  uploadImage: async (id: number, formData: FormData): Promise<Product> => {
+    const response = await api.post(`/products/${id}/image`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  },
+
+  deleteImage: async (id: number): Promise<Product> => {
+    const response = await api.delete(`/products/${id}/image`);
+    return response.data;
+  },
+
   getLowStock: async (): Promise<Product[]> => {
     const response = await api.get("/products/alerts/low-stock");
+    return response.data;
+  },
+
+  exportCSV: async (): Promise<Blob> => {
+    const response = await api.get("/products/export", {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  downloadTemplate: async (): Promise<Blob> => {
+    const response = await api.get("/products/import/template", {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  importCSV: async (
+    file: File
+  ): Promise<{
+    message: string;
+    imported: number;
+    skipped: number;
+    invalid?: Array<{ row: number; data: any; errors: string[] }>;
+  }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post("/products/import", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  },
+
+  getBarcodeImage: (id: number): string => {
+    return `/api/products/${id}/barcode`;
+  },
+
+  regenerateBarcode: async (id: number): Promise<Product> => {
+    const response = await api.post(`/products/${id}/barcode/regenerate`);
     return response.data;
   },
 };
@@ -195,6 +253,33 @@ export const categoriesAPI = {
 
   delete: async (id: number): Promise<void> => {
     await api.delete(`/categories/${id}`);
+  },
+};
+
+// Suppliers API
+export const suppliersAPI = {
+  getAll: async (params?: { page?: number; limit?: number; search?: string }): Promise<PaginatedResponse<Supplier>> => {
+    const response = await api.get("/suppliers", { params });
+    return response.data;
+  },
+
+  getById: async (id: number): Promise<Supplier> => {
+    const response = await api.get(`/suppliers/${id}`);
+    return response.data;
+  },
+
+  create: async (data: CreateSupplierRequest): Promise<Supplier> => {
+    const response = await api.post("/suppliers", data);
+    return response.data;
+  },
+
+  update: async (id: number, data: UpdateSupplierRequest): Promise<Supplier> => {
+    const response = await api.put(`/suppliers/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/suppliers/${id}`);
   },
 };
 

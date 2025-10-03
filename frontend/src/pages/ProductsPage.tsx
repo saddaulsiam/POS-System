@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { productsAPI, categoriesAPI } from "../services/api";
-import { Product, Category } from "../types";
+import { productsAPI, categoriesAPI, suppliersAPI } from "../services/api";
+import { Product, Category, Supplier } from "../types";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
@@ -9,17 +9,27 @@ const ProductsPage: React.FC = () => {
   const canWrite = user?.role === "ADMIN" || user?.role === "MANAGER";
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [printProduct, setPrintProduct] = useState<Product | null>(null);
+  const [printCopies, setPrintCopies] = useState(1);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [form, setForm] = useState({
     name: "",
     sku: "",
     categoryId: "",
+    supplierId: "",
     purchasePrice: "",
     sellingPrice: "",
     stockQuantity: "",
@@ -35,6 +45,7 @@ const ProductsPage: React.FC = () => {
   useEffect(() => {
     loadData();
     loadCategories();
+    loadSuppliers();
   }, []);
 
   const loadData = async () => {
@@ -59,6 +70,16 @@ const ProductsPage: React.FC = () => {
     }
   };
 
+  const loadSuppliers = async () => {
+    try {
+      const response = await suppliersAPI.getAll({ limit: 1000 });
+      setSuppliers(response.data);
+    } catch (error) {
+      console.error("Error loading suppliers:", error);
+      setSuppliers([]);
+    }
+  };
+
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     if (type === "checkbox") {
@@ -79,6 +100,7 @@ const ProductsPage: React.FC = () => {
         name: form.name,
         sku: form.sku,
         categoryId: parseInt(form.categoryId),
+        supplierId: form.supplierId ? parseInt(form.supplierId) : undefined,
         purchasePrice: parseFloat(form.purchasePrice),
         sellingPrice: parseFloat(form.sellingPrice),
         stockQuantity: parseFloat(form.stockQuantity),
@@ -86,14 +108,26 @@ const ProductsPage: React.FC = () => {
         isActive: form.isActive,
         isWeighted: form.isWeighted,
         taxRate: parseFloat(form.taxRate),
-        image: form.image || undefined,
       };
-      await productsAPI.create(payload);
+      const product = await productsAPI.create(payload);
+
+      // Upload image if selected
+      if (imageFile && product.id) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        try {
+          await productsAPI.uploadImage(product.id, formData);
+        } catch (error) {
+          toast.error("Product created but image upload failed");
+        }
+      }
+
       toast.success("Product added successfully");
       setForm({
         name: "",
         sku: "",
         categoryId: "",
+        supplierId: "",
         purchasePrice: "",
         sellingPrice: "",
         stockQuantity: "",
@@ -103,6 +137,9 @@ const ProductsPage: React.FC = () => {
         taxRate: "0",
         image: "",
       });
+      setImageFile(null);
+      setImagePreview("");
+      setShowAddModal(false);
       loadData();
     } catch (error: any) {
       toast.error(error?.response?.data?.error || "Failed to add product");
@@ -127,6 +164,306 @@ const ProductsPage: React.FC = () => {
     } finally {
       setShowDeleteConfirm(false);
       setDeletingId(null);
+    }
+  };
+
+  const handleExportCSV = async () => {
+    try {
+      const blob = await productsAPI.exportCSV();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `products_export_${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Products exported successfully");
+    } catch (error: any) {
+      toast.error("Failed to export products");
+    }
+  };
+
+  const handleDownloadTemplate = async () => {
+    try {
+      const blob = await productsAPI.downloadTemplate();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "products_import_template.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Template downloaded successfully");
+    } catch (error: any) {
+      toast.error("Failed to download template");
+    }
+  };
+
+  const handleImportCSV = async () => {
+    if (!importFile) {
+      toast.error("Please select a file to import");
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      const result = await productsAPI.importCSV(importFile);
+
+      if (result.invalid && result.invalid.length > 0) {
+        const errorMessage = `Imported ${result.imported} products. ${result.skipped} rows had errors.`;
+        toast.success(errorMessage);
+        console.warn("Import validation errors:", result.invalid);
+      } else {
+        toast.success(`Successfully imported ${result.imported} products`);
+      }
+
+      setShowImportModal(false);
+      setImportFile(null);
+      loadData();
+    } catch (error: any) {
+      const errorData = error?.response?.data;
+      if (errorData?.existingSkus) {
+        toast.error(`Some SKUs already exist: ${errorData.existingSkus.join(", ")}`);
+      } else if (errorData?.invalidCategoryIds) {
+        toast.error(`Invalid category IDs: ${errorData.invalidCategoryIds.join(", ")}`);
+      } else if (errorData?.invalidSupplierIds) {
+        toast.error(`Invalid supplier IDs: ${errorData.invalidSupplierIds.join(", ")}`);
+      } else if (errorData?.duplicates) {
+        toast.error(`Duplicate SKUs in file: ${errorData.duplicates.join(", ")}`);
+      } else {
+        toast.error(errorData?.error || "Failed to import products");
+      }
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const printBarcodeLabel = (product: Product, copies: number = 1) => {
+    const printWindow = window.open("", "_blank");
+    if (printWindow) {
+      const labels = Array(copies)
+        .fill(null)
+        .map(
+          () => `
+        <div class="barcode-label">
+          <div class="label-header">
+            <h3>${product.name}</h3>
+          </div>
+          <div class="label-info">
+            <div class="info-row">
+              <span class="label">SKU:</span>
+              <span class="value">${product.sku}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Price:</span>
+              <span class="value price">$${product.sellingPrice.toFixed(2)}</span>
+            </div>
+          </div>
+          <div class="barcode-container">
+            <img src="${productsAPI.getBarcodeImage(product.id)}" alt="Barcode" class="barcode-image"/>
+          </div>
+          <div class="barcode-text">${product.barcode}</div>
+        </div>
+      `
+        )
+        .join("");
+
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Print Barcode Labels - ${product.name}</title>
+            <style>
+              * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+              }
+
+              body {
+                font-family: 'Arial', sans-serif;
+                padding: 8mm;
+                background: white;
+              }
+
+              .labels-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4mm;
+                justify-content: flex-start;
+                align-content: flex-start;
+              }
+
+              .barcode-label {
+                width: 60mm;
+                height: 42mm;
+                border: 1.5px solid #333;
+                padding: 2mm;
+                background: white;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                page-break-inside: avoid;
+              }
+
+              .label-header {
+                text-align: center;
+                border-bottom: 1px solid #333;
+                padding-bottom: 1mm;
+                margin-bottom: 1mm;
+              }
+
+              .label-header h3 {
+                font-size: 9pt;
+                font-weight: bold;
+                color: #333;
+                text-transform: uppercase;
+                word-wrap: break-word;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+
+              .label-info {
+                margin-bottom: 1mm;
+              }
+
+              .info-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 0.5mm 0;
+                font-size: 8pt;
+              }
+
+              .info-row .label {
+                font-weight: bold;
+                color: #666;
+              }
+
+              .info-row .value {
+                color: #333;
+              }
+
+              .info-row .price {
+                font-weight: bold;
+                font-size: 9pt;
+                color: #000;
+              }
+
+              .barcode-container {
+                text-align: center;
+                padding: 1mm 0;
+                background: white;
+                flex-grow: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
+
+              .barcode-image {
+                max-width: 100%;
+                max-height: 100%;
+                height: auto;
+              }
+
+              .barcode-text {
+                text-align: center;
+                font-family: 'Courier New', monospace;
+                font-size: 7pt;
+                font-weight: bold;
+                letter-spacing: 0.5px;
+                color: #333;
+                margin-top: 0.5mm;
+              }
+
+              @media print {
+                @page {
+                  size: A4;
+                  margin: 8mm;
+                }
+
+                body {
+                  padding: 0;
+                  background: white;
+                }
+
+                .labels-container {
+                  gap: 4mm;
+                }
+
+                .barcode-label {
+                  border: 1.5px solid #000;
+                  page-break-inside: avoid;
+                }
+
+                .labels-container {
+                  gap: 5mm;
+                }
+              }
+
+              @page {
+                size: A4;
+                margin: 10mm;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="labels-container">
+              ${labels}
+            </div>
+            <script>
+              window.onload = function() {
+                const images = document.getElementsByTagName('img');
+                let loaded = 0;
+                const total = images.length;
+                
+                if (total === 0) {
+                  setTimeout(() => {
+                    window.print();
+                    setTimeout(() => window.close(), 100);
+                  }, 250);
+                  return;
+                }
+
+                for (let i = 0; i < total; i++) {
+                  if (images[i].complete) {
+                    loaded++;
+                  } else {
+                    images[i].onload = function() {
+                      loaded++;
+                      if (loaded === total) {
+                        setTimeout(() => {
+                          window.print();
+                          setTimeout(() => window.close(), 100);
+                        }, 250);
+                      }
+                    };
+                    images[i].onerror = function() {
+                      loaded++;
+                      if (loaded === total) {
+                        setTimeout(() => {
+                          window.print();
+                          setTimeout(() => window.close(), 100);
+                        }, 250);
+                      }
+                    };
+                  }
+                }
+
+                if (loaded === total) {
+                  setTimeout(() => {
+                    window.print();
+                    setTimeout(() => window.close(), 100);
+                  }, 250);
+                }
+              }
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
     }
   };
 
@@ -166,79 +503,257 @@ const ProductsPage: React.FC = () => {
             </select>
           </div>
           {canWrite && (
-            <button
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 font-semibold tracking-wide"
-              onClick={() => setShowAddModal(true)}
-            >
-              Add New Product
-            </button>
+            <div className="flex gap-2">
+              <button
+                className="bg-green-600 text-white px-4 py-2 rounded-lg shadow transition-all duration-150 hover:bg-green-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 font-semibold"
+                onClick={handleExportCSV}
+                title="Export products to CSV"
+              >
+                📥 Export
+              </button>
+              <button
+                className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow transition-all duration-150 hover:bg-purple-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 font-semibold"
+                onClick={() => setShowImportModal(true)}
+                title="Import products from CSV"
+              >
+                📤 Import
+              </button>
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 font-semibold tracking-wide"
+                onClick={() => setShowAddModal(true)}
+              >
+                Add New Product
+              </button>
+            </div>
           )}
         </div>
 
-        {/* Add Product Modal */}
-        {showAddModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
+        {/* Print Barcode Modal */}
+        {showPrintModal && printProduct && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
               <button
                 className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
-                onClick={() => setShowAddModal(false)}
+                onClick={() => {
+                  setShowPrintModal(false);
+                  setPrintProduct(null);
+                  setPrintCopies(1);
+                }}
                 aria-label="Close"
               >
                 &times;
               </button>
-              <h2 className="text-2xl font-bold mb-2 text-blue-700">Add New Product</h2>
-              <p className="mb-4 text-gray-500 text-sm">
+              <h2 className="text-2xl font-bold mb-4 text-purple-700 text-center">Print Barcode Labels</h2>
+              <p className="mb-4 text-gray-600 text-sm text-center">
+                Print barcode labels for: <strong>{printProduct.name}</strong>
+              </p>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-2">Number of Labels</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="500"
+                  value={printCopies}
+                  onChange={(e) => setPrintCopies(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-purple-400"
+                />
+              </div>
+
+              <div className="mb-6">
+                <p className="text-xs text-gray-500 mb-2">Quick Select:</p>
+                <div className="grid grid-cols-5 gap-2">
+                  {[1, 5, 10, 20, 50].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => setPrintCopies(num)}
+                      className={`px-3 py-2 rounded-lg border transition-all duration-150 ${
+                        printCopies === num
+                          ? "bg-purple-600 text-white border-purple-600"
+                          : "bg-white text-gray-700 border-gray-300 hover:bg-purple-50 hover:border-purple-300"
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-4">
+                <p className="text-xs text-blue-800">
+                  <strong>Note:</strong> Labels will be arranged on A4 paper. 18 labels will fit per page (3 columns × 6
+                  rows).
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowPrintModal(false);
+                    setPrintProduct(null);
+                    setPrintCopies(1);
+                  }}
+                  className="flex-1 bg-gray-100 text-gray-700 px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-200 transition-all duration-150 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    printBarcodeLabel(printProduct, printCopies);
+                    setShowPrintModal(false);
+                    setPrintProduct(null);
+                    setPrintCopies(1);
+                  }}
+                  className="flex-1 bg-purple-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-purple-700 hover:shadow-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
+                >
+                  🖨️ Print
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Import Modal */}
+        {showImportModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+              <button
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
+                onClick={() => {
+                  setShowImportModal(false);
+                  setImportFile(null);
+                }}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <h2 className="text-2xl font-bold mb-4 text-purple-700 text-center">Import Products</h2>
+              <p className="mb-4 text-gray-600 text-sm">
+                Upload a CSV file to import multiple products at once. Make sure your CSV follows the correct format.
+              </p>
+
+              <div className="mb-4">
+                <button
+                  className="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-200 transition-all duration-150 font-medium mb-2"
+                  onClick={handleDownloadTemplate}
+                >
+                  📄 Download Template CSV
+                </button>
+                <p className="text-xs text-gray-500">
+                  Download a template file to see the correct format for importing products.
+                </p>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">Select CSV File</label>
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                />
+                {importFile && <p className="text-sm text-gray-600 mt-2">Selected: {importFile.name}</p>}
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-4">
+                <p className="text-xs text-blue-800 font-semibold mb-1">Important Notes:</p>
+                <ul className="text-xs text-blue-700 list-disc list-inside space-y-1">
+                  <li>SKUs must be unique</li>
+                  <li>Category IDs must exist in your database</li>
+                  <li>Supplier IDs are optional but must exist if provided</li>
+                  <li>All prices must be positive numbers</li>
+                </ul>
+              </div>
+
+              <button
+                onClick={handleImportCSV}
+                disabled={!importFile || isImporting}
+                className="w-full bg-purple-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-purple-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
+              >
+                {isImporting ? "Importing..." : "Import Products"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Add Product Modal */}
+        {showAddModal && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
+              <button
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
+                onClick={() => {
+                  setShowAddModal(false);
+                  setImageFile(null);
+                  setImagePreview("");
+                }}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <h2 className="text-2xl font-bold mb-2 text-blue-700 text-center">Add New Product</h2>
+              <p className="mb-4 text-gray-500 text-sm text-center">
                 Fill in the details below to add a new product to your inventory.
               </p>
               <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleAddProduct}>
-                <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Image Upload */}
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium mb-1">Product Image</label>
+                {/* Image Upload */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium mb-2">Product Image</label>
+                  <div className="flex items-center gap-4">
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={async (e) => {
+                      onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          if (file.size > 5 * 1024 * 1024) {
+                            toast.error("Image size must be less than 5MB");
+                            return;
+                          }
+                          setImageFile(file);
                           const reader = new FileReader();
                           reader.onloadend = () => {
-                            setForm((prev) => ({ ...prev, image: reader.result as string }));
+                            setImagePreview(reader.result as string);
                           };
                           reader.readAsDataURL(file);
                         }
                       }}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                     />
-                    {form.image && (
-                      <img src={form.image} alt="Preview" className="mt-2 w-24 h-24 object-cover rounded border" />
+                    {imagePreview && (
+                      <img src={imagePreview} alt="Preview" className="h-20 w-20 object-cover rounded border" />
                     )}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      name="name"
-                      value={form.name}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                      placeholder="e.g. Coca Cola 500ml"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      SKU <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      name="sku"
-                      value={form.sku}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                      placeholder="e.g. CC500ML"
-                    />
-                  </div>
+                  <span className="text-xs text-gray-400 mt-1 block">
+                    Supported formats: JPEG, PNG, GIF, WebP. Max size: 5MB
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                    placeholder="e.g. Coca Cola 500ml"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    SKU <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="sku"
+                    value={form.sku}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                    placeholder="e.g. CC500ML"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
@@ -255,6 +770,22 @@ const ProductsPage: React.FC = () => {
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Supplier</label>
+                  <select
+                    name="supplierId"
+                    value={form.supplierId}
+                    onChange={handleFormChange}
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  >
+                    <option value="">Select supplier (optional)</option>
+                    {suppliers.map((supplier) => (
+                      <option key={supplier.id} value={supplier.id}>
+                        {supplier.name}
                       </option>
                     ))}
                   </select>
@@ -339,25 +870,27 @@ const ProductsPage: React.FC = () => {
                   />
                   <span className="text-xs text-gray-400">Leave 0 if not applicable.</span>
                 </div>
-                <div className="flex items-center mt-2">
-                  <input
-                    name="isWeighted"
-                    type="checkbox"
-                    checked={form.isWeighted}
-                    onChange={handleFormChange}
-                    className="mr-2"
-                  />
-                  <label className="text-sm font-medium">Weighted Product</label>
-                </div>
-                <div className="flex items-center mt-6">
-                  <input
-                    name="isActive"
-                    type="checkbox"
-                    checked={form.isActive}
-                    onChange={handleFormChange}
-                    className="mr-2"
-                  />
-                  <label className="text-sm font-medium">Active</label>
+                <div className="flex space-x-10">
+                  <div className="flex items-center mt-2">
+                    <input
+                      name="isWeighted"
+                      type="checkbox"
+                      checked={form.isWeighted}
+                      onChange={handleFormChange}
+                      className="mr-2"
+                    />
+                    <label className="text-sm font-medium">Weighted Product</label>
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <input
+                      name="isActive"
+                      type="checkbox"
+                      checked={form.isActive}
+                      onChange={handleFormChange}
+                      className="mr-2"
+                    />
+                    <label className="text-sm font-medium">Active</label>
+                  </div>
                 </div>
                 <div className="md:col-span-2 mt-2">
                   <button
@@ -420,14 +953,48 @@ const ProductsPage: React.FC = () => {
                     <h3 className="font-semibold text-lg text-gray-900 mb-1">{product.name}</h3>
                     <div className="flex flex-wrap gap-2 text-xs text-gray-600 mb-1">
                       <span>SKU: {product.sku}</span>
+                      {product.barcode && <span>Barcode: {product.barcode}</span>}
                       <span>Category: {categories.find((c) => c.id === product.categoryId)?.name || "-"}</span>
                     </div>
                     <div className="flex flex-wrap gap-2 text-xs text-gray-600 mb-1">
                       <span>Price: ${product.sellingPrice}</span>
                       <span>Stock: {product.stockQuantity}</span>
                     </div>
+                    {product.barcode && (
+                      <div className="mt-2">
+                        <img
+                          src={productsAPI.getBarcodeImage(product.id)}
+                          alt={`Barcode ${product.barcode}`}
+                          className="h-12 border rounded bg-white"
+                          title="Click to print barcode"
+                          style={{ cursor: "pointer" }}
+                          onError={(e) => {
+                            console.error("Failed to load barcode image for product:", product.id);
+                            e.currentTarget.style.display = "none";
+                          }}
+                          onClick={() => {
+                            setPrintProduct(product);
+                            setPrintCopies(1);
+                            setShowPrintModal(true);
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-col items-end gap-2">
+                    {product.barcode && (
+                      <button
+                        className="text-gray-600 hover:bg-gray-50 hover:underline text-xs rounded-lg px-2 py-1 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                        onClick={() => {
+                          setPrintProduct(product);
+                          setPrintCopies(1);
+                          setShowPrintModal(true);
+                        }}
+                        title="Print barcode label"
+                      >
+                        🖨️ Print
+                      </button>
+                    )}
                     <button
                       className={`px-2 py-1 rounded-lg text-xs font-semibold shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                         product.isActive
@@ -457,6 +1024,7 @@ const ProductsPage: React.FC = () => {
                           name: product.name,
                           sku: product.sku,
                           categoryId: product.categoryId.toString(),
+                          supplierId: product.supplierId?.toString() || "",
                           purchasePrice: product.purchasePrice.toString(),
                           sellingPrice: product.sellingPrice.toString(),
                           stockQuantity: product.stockQuantity.toString(),
@@ -466,6 +1034,7 @@ const ProductsPage: React.FC = () => {
                           taxRate: product.taxRate.toString(),
                           image: product.image || "",
                         });
+                        setImagePreview(product.image || "");
                         setShowEditModal(true);
                       }}
                     >
