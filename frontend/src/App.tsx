@@ -5,17 +5,27 @@ import LoadingSpinner from "./components/common/LoadingSpinner";
 import Navbar from "./components/common/Navbar";
 import { useAuth } from "./context/AuthContext";
 import AdminDashboard from "./pages/AdminDashboard";
+import CategoriesPage from "./pages/CategoriesPage";
 import CustomersPage from "./pages/CustomersPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import InventoryPage from "./pages/InventoryPage";
 import LoginPage from "./pages/LoginPage";
+import NewProductPage from "./pages/NewProductPage";
 import POSPage from "./pages/POSPage";
 import ProductsPage from "./pages/ProductsPage";
 import ReportsPage from "./pages/ReportsPage";
 import SalesPage from "./pages/SalesPage";
-import NewProductPage from "./pages/NewProductPage";
 
-const adminPaths = ["/admin", "/products", "/customers", "/sales", "/reports", "/inventory", "/employees"];
+const adminPaths = [
+  "/admin",
+  "/products",
+  "/categories",
+  "/customers",
+  "/sales",
+  "/reports",
+  "/inventory",
+  "/employees",
+];
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -36,7 +46,7 @@ const App: React.FC = () => {
   return (
     <>
       {(user?.role === "ADMIN" || user?.role === "MANAGER") &&
-        adminPaths.some((p) => location.pathname.startsWith(p)) && <Navbar />}
+        adminPaths.some((p) => location.pathname === p || location.pathname.startsWith(p + "/")) && <Navbar />}
 
       <Routes>
         {/* POS Interface - Main cashier interface */}
@@ -49,6 +59,8 @@ const App: React.FC = () => {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/products/new" element={<NewProductPage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/employees" element={<EmployeesPage />} />
             <Route path="/customers" element={<CustomersPage />} />
             <Route path="/sales" element={<SalesPage />} />
             <Route path="/reports" element={<ReportsPage />} />
@@ -57,11 +69,11 @@ const App: React.FC = () => {
         )}
 
         {/* Admin Only Routes */}
-        {user?.role === "ADMIN" && (
+        {/* {user?.role === "ADMIN" && (
           <>
             <Route path="/employees" element={<EmployeesPage />} />
           </>
-        )}
+        )} */}
 
         {/* Redirect any unknown routes to home */}
         <Route path="*" element={<Navigate to="/" replace />} />

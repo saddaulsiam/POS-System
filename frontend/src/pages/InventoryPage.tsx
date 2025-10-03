@@ -134,18 +134,29 @@ const InventoryPage: React.FC = () => {
           ) : filteredProducts.length === 0 ? (
             <p className="text-gray-500">No products found</p>
           ) : (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
+            <table className="min-w-full rounded-lg overflow-hidden border border-gray-200">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">SKU</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase w-16">Image</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase min-w-[120px]">
+                    Name
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase min-w-[80px]">
+                    SKU
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase min-w-[60px]">
+                    Stock
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase min-w-[90px]">
+                    Status
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-600 uppercase min-w-[120px]">
+                    Actions
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredProducts.map((product) => {
+              <tbody>
+                {filteredProducts.map((product, idx) => {
                   let status = "In Stock";
                   let statusClass = "bg-green-100 text-green-800";
                   if (product.stockQuantity <= 0) {
@@ -156,26 +167,55 @@ const InventoryPage: React.FC = () => {
                     statusClass = "bg-yellow-100 text-yellow-800";
                   }
                   return (
-                    <tr key={product.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-2 font-medium text-gray-900">{product.name}</td>
-                      <td className="px-4 py-2 text-gray-600">{product.sku}</td>
-                      <td className="px-4 py-2 text-gray-900">{product.stockQuantity}</td>
-                      <td className="px-4 py-2">
+                    <tr
+                      key={product.id}
+                      className={`align-middle transition-colors ${
+                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-blue-50`}
+                    >
+                      <td className="px-3 py-2">
+                        {product.image ? (
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-12 h-12 object-cover rounded border"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 flex items-center justify-center bg-gray-100 text-gray-400 rounded border">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-6 w-6"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 font-medium text-gray-900 min-w-[120px]">{product.name}</td>
+                      <td className="px-3 py-2 text-gray-600 min-w-[80px]">{product.sku}</td>
+                      <td className="px-3 py-2 text-gray-900 min-w-[60px]">{product.stockQuantity}</td>
+                      <td className="px-3 py-2 min-w-[90px]">
                         <span className={`px-2 py-1 rounded text-xs font-semibold ${statusClass}`}>{status}</span>
                       </td>
-                      <td className="px-4 py-2 flex gap-2">
-                        <button
-                          className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-xs"
-                          onClick={() => openAdjustModal(product)}
-                        >
-                          Adjust Stock
-                        </button>
-                        <button
-                          className="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 text-xs"
-                          onClick={() => openHistoryModal(product)}
-                        >
-                          History
-                        </button>
+                      <td className="px-3 py-2 min-w-[120px]">
+                        <div className="flex items-center justify-center gap-2 w-full">
+                          <button
+                            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-xs"
+                            onClick={() => openAdjustModal(product)}
+                          >
+                            Adjust Stock
+                          </button>
+                          <button
+                            className="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 text-xs"
+                            onClick={() => openHistoryModal(product)}
+                          >
+                            History
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -188,7 +228,7 @@ const InventoryPage: React.FC = () => {
         {/* Adjust Stock Modal */}
         {showAdjustModal && selectedProduct && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
               <button
                 className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
                 onClick={() => setShowAdjustModal(false)}
@@ -253,7 +293,7 @@ const InventoryPage: React.FC = () => {
         {/* Stock History Modal */}
         {showHistoryModal && selectedProduct && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative max-h-[80vh] overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative max-h-[80vh] overflow-y-auto">
               <button
                 className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
                 onClick={() => setShowHistoryModal(false)}

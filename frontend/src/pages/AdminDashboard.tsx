@@ -448,7 +448,7 @@ const AdminDashboard: React.FC = () => {
                       <p className="font-medium text-yellow-800">Low Stock Alert</p>
                       <p className="text-sm text-yellow-700">{stats.lowStockCount} products are running low on stock</p>
                     </div>
-                    <Link to="/admin/inventory" className="ml-auto text-yellow-600 hover:text-yellow-800">
+                    <Link to="/inventory" className="ml-auto text-yellow-600 hover:text-yellow-800">
                       View →
                     </Link>
                   </div>
@@ -463,7 +463,7 @@ const AdminDashboard: React.FC = () => {
                         {stats.outOfStockCount} products are currently out of stock
                       </p>
                     </div>
-                    <Link to="/admin/inventory" className="ml-auto text-red-600 hover:text-red-800">
+                    <Link to="/inventory" className="ml-auto text-red-600 hover:text-red-800">
                       Restock →
                     </Link>
                   </div>

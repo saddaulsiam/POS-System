@@ -28,6 +28,7 @@ const Navbar: React.FC = () => {
               🛒
             </span>
             POS System
+            <span className="ml-1 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">{user?.role}</span>
           </span>
         </div>
 

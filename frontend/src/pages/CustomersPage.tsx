@@ -29,6 +29,7 @@ const CustomersPage: React.FC = () => {
 
   useEffect(() => {
     loadCustomers();
+    // eslint-disable-next-line
   }, [currentPage, searchTerm]);
 
   const loadCustomers = async () => {
@@ -41,9 +42,15 @@ const CustomersPage: React.FC = () => {
       });
       setCustomers(response.data);
       setTotalPages(response.pagination.totalPages);
-    } catch (error) {
-      console.error("Error loading customers:", error);
-      toast.error("Failed to load customers");
+    } catch (error: any) {
+      // Enhanced error logging for debugging
+      if (error.response) {
+        console.error("API error:", error.response.status, error.response.data);
+        toast.error(error.response.data?.error || "Failed to load customers");
+      } else {
+        console.error("Error loading customers:", error);
+        toast.error("Failed to load customers");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -139,14 +146,9 @@ const CustomersPage: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Customer Management</h1>
-          <div className="flex space-x-4">
-            <a href="/admin" className="text-blue-600 hover:text-blue-800">
-              ← Back to Dashboard
-            </a>
-            <button onClick={handleAdd} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-              Add Customer
-            </button>
-          </div>
+          <button onClick={handleAdd} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+            Add Customer
+          </button>
         </div>
 
         {/* Search */}
@@ -162,7 +164,10 @@ const CustomersPage: React.FC = () => {
               />
             </div>
             <button
-              onClick={() => setSearchTerm("")}
+              onClick={() => {
+                setSearchTerm("");
+                setCurrentPage(1);
+              }}
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
             >
               Clear
@@ -290,10 +295,17 @@ const CustomersPage: React.FC = () => {
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <h3 className="text-lg font-medium text-gray-900">
                 {editingCustomer ? "Edit Customer" : "Add New Customer"}
               </h3>
+              <button
+                className="text-gray-500 hover:text-gray-700 text-xl"
+                onClick={() => setShowModal(false)}
+                aria-label="Close"
+              >
+                &times;
+              </button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">

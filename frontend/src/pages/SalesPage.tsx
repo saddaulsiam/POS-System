@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { salesAPI, customersAPI, employeesAPI } from "../services/api";
 import { Sale, Customer, Employee } from "../types";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 
 const SalesPage: React.FC = () => {
   const [sales, setSales] = useState<Sale[]>([]);
@@ -21,9 +22,12 @@ const SalesPage: React.FC = () => {
 
   useEffect(() => {
     loadSales();
+  }, [currentPage, dateFrom, dateTo, selectedCustomer, selectedEmployee]);
+
+  useEffect(() => {
     loadCustomers();
     loadEmployees();
-  }, [currentPage, dateFrom, dateTo, selectedCustomer, selectedEmployee]);
+  }, []);
 
   const loadSales = async () => {
     setIsLoading(true);
@@ -36,11 +40,13 @@ const SalesPage: React.FC = () => {
         customerId: selectedCustomer || undefined,
         employeeId: selectedEmployee || undefined,
       });
-      setSales(response.data);
-      setTotalPages(response.pagination.totalPages);
-    } catch (error) {
+      const { data = [], pagination } = response || {};
+      setSales(data);
+      setTotalPages(pagination?.pages || 1);
+    } catch (error: any) {
       console.error("Error loading sales:", error);
-      toast.error("Failed to load sales");
+      toast.error(error?.response?.data?.error || "Failed to load sales");
+      setSales([]);
     } finally {
       setIsLoading(false);
     }
@@ -48,8 +54,8 @@ const SalesPage: React.FC = () => {
 
   const loadCustomers = async () => {
     try {
-      const response = await customersAPI.getAll({ limit: 1000 });
-      setCustomers(response.data);
+      const response = await customersAPI.getAll({ limit: 100 });
+      setCustomers(response.data || []);
     } catch (error) {
       console.error("Error loading customers:", error);
     }
@@ -58,7 +64,7 @@ const SalesPage: React.FC = () => {
   const loadEmployees = async () => {
     try {
       const data = await employeesAPI.getAll();
-      setEmployees(data);
+      setEmployees(data || []);
     } catch (error) {
       console.error("Error loading employees:", error);
     }
@@ -81,22 +87,19 @@ const SalesPage: React.FC = () => {
     }
 
     try {
-      // For simplicity, refund all items
       const refundData = {
-        items:
-          sale.saleItems?.map((item) => ({
-            saleItemId: item.id,
-            quantity: item.quantity,
-          })) || [],
+        items: (sale.saleItems ?? []).map((item) => ({
+          saleItemId: item.id,
+          quantity: item.quantity,
+        })),
         reason: "Customer return",
       };
-
       await salesAPI.processRefund(sale.id, refundData);
       toast.success("Refund processed successfully");
       loadSales();
     } catch (error: any) {
       console.error("Error processing refund:", error);
-      toast.error(error.response?.data?.error || "Failed to process refund");
+      toast.error(error?.response?.data?.error || "Failed to process refund");
     }
   };
 
@@ -195,8 +198,8 @@ const SalesPage: React.FC = () => {
         {/* Sales Table */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
           {isLoading ? (
-            <div className="text-center py-8">
-              <div className="text-gray-500">Loading sales...</div>
+            <div className="flex justify-center items-center py-8">
+              <LoadingSpinner />
             </div>
           ) : (
             <>
@@ -373,7 +376,7 @@ const SalesPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {selectedSale.saleItems?.map((item: any) => (
+                      {(selectedSale.saleItems ?? []).map((item: any) => (
                         <tr key={item.id}>
                           <td className="px-4 py-2 text-sm text-gray-900">{item.product?.name || "Unknown Product"}</td>
                           <td className="px-4 py-2 text-sm text-gray-900">{item.quantity}</td>

@@ -8,7 +8,8 @@ import {
   Customer,
   Sale,
   Employee,
-  PaginatedResponse,
+  PaginatedApiResponse,
+  SalesPaginatedResponse,
   CreateProductRequest,
   UpdateProductRequest,
   CreateCustomerRequest,
@@ -134,7 +135,7 @@ export const productsAPI = {
     search?: string;
     categoryId?: number;
     isActive?: boolean;
-  }): Promise<PaginatedResponse<Product>> => {
+  }): Promise<PaginatedApiResponse<Product[]>> => {
     const response = await api.get("/products", { params });
     return response.data;
   },
@@ -193,7 +194,11 @@ export const categoriesAPI = {
 
 // Customers API
 export const customersAPI = {
-  getAll: async (params?: { page?: number; limit?: number; search?: string }): Promise<PaginatedResponse<Customer>> => {
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<PaginatedApiResponse<Customer[]>> => {
     const response = await api.get("/customers", { params });
     return response.data;
   },
@@ -232,7 +237,7 @@ export const salesAPI = {
     endDate?: string;
     employeeId?: number;
     customerId?: number;
-  }): Promise<PaginatedResponse<Sale>> => {
+  }): Promise<SalesPaginatedResponse> => {
     const response = await api.get("/sales", { params });
     return response.data;
   },
@@ -279,7 +284,7 @@ export const employeesAPI = {
     name: string;
     username: string;
     pinCode: string;
-    role: "ADMIN" | "MANAGER" | "CASHIER";
+    role: "ADMIN" | "MANAGER" | "CASHIER" | "STAFF";
   }): Promise<Employee> => {
     const response = await api.post("/employees", data);
     return response.data;
@@ -291,7 +296,7 @@ export const employeesAPI = {
       name?: string;
       username?: string;
       pinCode?: string;
-      role?: "ADMIN" | "MANAGER" | "CASHIER";
+      role?: "ADMIN" | "MANAGER" | "CASHIER" | "STAFF";
       isActive?: boolean;
     }
   ): Promise<Employee> => {

@@ -2,7 +2,7 @@ export interface User {
   id: number;
   name: string;
   username: string;
-  role: "ADMIN" | "MANAGER" | "CASHIER";
+  role: "ADMIN" | "MANAGER" | "CASHIER" | "STAFF";
 }
 
 export interface AuthResponse {
@@ -72,7 +72,7 @@ export interface Employee {
   id: number;
   name: string;
   username: string;
-  role: "ADMIN" | "MANAGER" | "CASHIER";
+  role: "ADMIN" | "MANAGER" | "CASHIER" | "STAFF";
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
