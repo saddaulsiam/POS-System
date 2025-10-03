@@ -19,7 +19,8 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = "font-medium rounded transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseStyles =
+    "font-medium rounded transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variantStyles: Record<ButtonVariant, string> = {
     primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-400",
@@ -38,7 +39,8 @@ export const Button: React.FC<ButtonProps> = ({
 
   const widthStyle = fullWidth ? "w-full" : "";
 
-  const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyle} ${className}`.trim();
+  const combinedClassName =
+    `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyle} ${className}`.trim();
 
   return (
     <button className={combinedClassName} disabled={disabled} {...props}>

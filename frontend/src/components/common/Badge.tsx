@@ -48,13 +48,12 @@ export const Badge: React.FC<BadgeProps> = ({
     default: "bg-gray-600",
   };
 
-  const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${roundedStyle} ${className}`.trim();
+  const combinedClassName =
+    `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${roundedStyle} ${className}`.trim();
 
   return (
     <span className={combinedClassName}>
-      {dot && (
-        <span className={`w-2 h-2 rounded-full mr-1.5 ${dotColorStyles[variant]}`} />
-      )}
+      {dot && <span className={`w-2 h-2 rounded-full mr-1.5 ${dotColorStyles[variant]}`} />}
       {children}
     </span>
   );

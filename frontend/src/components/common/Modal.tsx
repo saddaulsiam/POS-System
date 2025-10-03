@@ -56,16 +56,10 @@ export const Modal: React.FC<ModalProps> = ({
         )}
 
         {/* Body */}
-        <div className="px-6 py-4 overflow-y-auto flex-1">
-          {children}
-        </div>
+        <div className="px-6 py-4 overflow-y-auto flex-1">{children}</div>
 
         {/* Footer */}
-        {footer && (
-          <div className="px-6 py-4 border-t bg-gray-50 rounded-b-lg">
-            {footer}
-          </div>
-        )}
+        {footer && <div className="px-6 py-4 border-t bg-gray-50 rounded-b-lg">{footer}</div>}
       </div>
     </div>
   );

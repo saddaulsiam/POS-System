@@ -27,7 +27,9 @@ export const Input: React.FC<InputProps> = ({
     ${error ? "border-red-500 focus:ring-red-500 focus:border-red-500" : "border-gray-300"}
     ${widthStyle}
     ${className}
-  `.trim().replace(/\s+/g, " ");
+  `
+    .trim()
+    .replace(/\s+/g, " ");
 
   return (
     <div className={widthStyle}>
@@ -72,7 +74,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
     ${error ? "border-red-500 focus:ring-red-500 focus:border-red-500" : "border-gray-300"}
     ${widthStyle}
     ${className}
-  `.trim().replace(/\s+/g, " ");
+  `
+    .trim()
+    .replace(/\s+/g, " ");
 
   return (
     <div className={widthStyle}>
@@ -118,7 +122,9 @@ export const Select: React.FC<SelectProps> = ({
     ${error ? "border-red-500 focus:ring-red-500 focus:border-red-500" : "border-gray-300"}
     ${widthStyle}
     ${className}
-  `.trim().replace(/\s+/g, " ");
+  `
+    .trim()
+    .replace(/\s+/g, " ");
 
   return (
     <div className={widthStyle}>

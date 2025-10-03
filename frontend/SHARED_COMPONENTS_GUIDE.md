@@ -2,7 +2,9 @@
 
 ## Overview
 
-This guide documents the shared component library created to provide consistent, reusable UI components across the POS System application. These components follow a unified design system with Tailwind CSS and provide a better developer experience.
+This guide documents the shared component library created to provide consistent, reusable UI components across the POS
+System application. These components follow a unified design system with Tailwind CSS and provide a better developer
+experience.
 
 **Location:** `frontend/src/components/common/`
 
@@ -41,14 +43,14 @@ interface ButtonProps {
 
 ### Variants
 
-| Variant | Color | Use Case |
-|---------|-------|----------|
-| `primary` | Blue | Primary actions (Save, Submit, Confirm) |
-| `secondary` | Gray | Secondary actions (Cancel, Back) |
-| `danger` | Red | Destructive actions (Delete, Remove) |
-| `success` | Green | Positive actions (Approve, Complete) |
-| `warning` | Yellow | Warning actions (Archive, Suspend) |
-| `ghost` | Transparent | Tertiary actions (Cancel in modals) |
+| Variant     | Color       | Use Case                                |
+| ----------- | ----------- | --------------------------------------- |
+| `primary`   | Blue        | Primary actions (Save, Submit, Confirm) |
+| `secondary` | Gray        | Secondary actions (Cancel, Back)        |
+| `danger`    | Red         | Destructive actions (Delete, Remove)    |
+| `success`   | Green       | Positive actions (Approve, Complete)    |
+| `warning`   | Yellow      | Warning actions (Archive, Suspend)      |
+| `ghost`     | Transparent | Tertiary actions (Cancel in modals)     |
 
 ### Sizes
 
@@ -99,16 +101,15 @@ import { Button } from "../components/common";
 ### Before & After
 
 **Before (Old Code):**
+
 ```tsx
-<button 
-  onClick={handleSave}
-  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
->
+<button onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
   Save
 </button>
 ```
 
 **After (Using Button Component):**
+
 ```tsx
 <Button variant="primary" onClick={handleSave}>
   Save
@@ -204,21 +205,25 @@ import { Modal, Button } from "../components/common";
 ### Before & After
 
 **Before (Old Code):**
+
 ```tsx
-{isOpen && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Title</h2>
-        <button onClick={onClose}>&times;</button>
+{
+  isOpen && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Title</h2>
+          <button onClick={onClose}>&times;</button>
+        </div>
+        <div>{children}</div>
       </div>
-      <div>{children}</div>
     </div>
-  </div>
-)}
+  );
+}
 ```
 
 **After (Using Modal Component):**
+
 ```tsx
 <Modal isOpen={isOpen} onClose={onClose} title="Title">
   {children}
@@ -344,6 +349,7 @@ import { Input, TextArea, Select } from "../components/common";
 ### Before & After
 
 **Before (Old Code):**
+
 ```tsx
 <div className="mb-4">
   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -360,14 +366,9 @@ import { Input, TextArea, Select } from "../components/common";
 ```
 
 **After (Using Input Component):**
+
 ```tsx
-<Input
-  label="Name"
-  value={name}
-  onChange={(e) => setName(e.target.value)}
-  required
-  fullWidth
-/>
+<Input label="Name" value={name} onChange={(e) => setName(e.target.value)} required fullWidth />
 ```
 
 ---
@@ -424,6 +425,7 @@ import { SearchBar } from "../components/common";
 ### Before & After
 
 **Before (Old Code):**
+
 ```tsx
 <div className="relative">
   <input
@@ -442,13 +444,9 @@ import { SearchBar } from "../components/common";
 ```
 
 **After (Using SearchBar Component):**
+
 ```tsx
-<SearchBar
-  value={search}
-  onChange={setSearch}
-  placeholder="Search..."
-  fullWidth
-/>
+<SearchBar value={search} onChange={setSearch} placeholder="Search..." fullWidth />
 ```
 
 ---
@@ -474,14 +472,14 @@ interface BadgeProps {
 
 ### Variants
 
-| Variant | Color | Use Case |
-|---------|-------|----------|
-| `success` | Green | Positive status (Active, Completed, In Stock) |
-| `warning` | Yellow | Warning status (Low Stock, Pending) |
-| `danger` | Red | Negative status (Inactive, Out of Stock) |
-| `info` | Blue | Informational status |
-| `primary` | Blue (solid) | Primary emphasis |
-| `default` | Gray | Neutral status |
+| Variant   | Color        | Use Case                                      |
+| --------- | ------------ | --------------------------------------------- |
+| `success` | Green        | Positive status (Active, Completed, In Stock) |
+| `warning` | Yellow       | Warning status (Low Stock, Pending)           |
+| `danger`  | Red          | Negative status (Inactive, Out of Stock)      |
+| `info`    | Blue         | Informational status                          |
+| `primary` | Blue (solid) | Primary emphasis                              |
+| `default` | Gray         | Neutral status                                |
 
 ### Sizes
 
@@ -525,13 +523,13 @@ import { Badge } from "../components/common";
 ### Before & After
 
 **Before (Old Code):**
+
 ```tsx
-<span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
-  Active
-</span>
+<span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">Active</span>
 ```
 
 **After (Using Badge Component):**
+
 ```tsx
 <Badge variant="success">Active</Badge>
 ```
@@ -720,7 +718,7 @@ import { Card, CardHeader, CardBody, Badge, Button } from "../components/common"
 function StatCard() {
   return (
     <Card hover>
-      <CardHeader 
+      <CardHeader
         actions={
           <Badge variant="success" size="sm" dot>
             Live
@@ -746,18 +744,9 @@ import { SearchBar, Select, Button } from "../components/common";
 function ProductFilters() {
   return (
     <div className="flex gap-4">
-      <SearchBar
-        value={search}
-        onChange={setSearch}
-        placeholder="Search products..."
-        className="flex-1"
-      />
+      <SearchBar value={search} onChange={setSearch} placeholder="Search products..." className="flex-1" />
 
-      <Select
-        value={categoryFilter}
-        onChange={(e) => setCategoryFilter(e.target.value)}
-        options={categoryOptions}
-      />
+      <Select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} options={categoryOptions} />
 
       <Button variant="ghost" onClick={handleClearFilters}>
         Clear Filters
@@ -787,8 +776,9 @@ import { Button, Input, Badge } from "../components/common";
 ### Step 2: Replace Inline Tailwind Classes
 
 **Before:**
+
 ```tsx
-<button 
+<button
   onClick={handleSave}
   className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
   disabled={isLoading}
@@ -798,6 +788,7 @@ import { Button, Input, Badge } from "../components/common";
 ```
 
 **After:**
+
 ```tsx
 <Button variant="primary" onClick={handleSave} disabled={isLoading}>
   Save
@@ -807,6 +798,7 @@ import { Button, Input, Badge } from "../components/common";
 ### Step 3: Simplify Form Inputs
 
 **Before:**
+
 ```tsx
 <div className="mb-4">
   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -824,6 +816,7 @@ import { Button, Input, Badge } from "../components/common";
 ```
 
 **After:**
+
 ```tsx
 <Input
   label="Email"
@@ -839,25 +832,29 @@ import { Button, Input, Badge } from "../components/common";
 ### Step 4: Use Modal Component
 
 **Before:**
+
 ```tsx
-{showModal && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Edit Item</h2>
-        <button onClick={() => setShowModal(false)}>&times;</button>
-      </div>
-      <div>{/* Content */}</div>
-      <div className="flex justify-end gap-2 mt-4">
-        <button onClick={() => setShowModal(false)}>Cancel</button>
-        <button onClick={handleSave}>Save</button>
+{
+  showModal && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Edit Item</h2>
+          <button onClick={() => setShowModal(false)}>&times;</button>
+        </div>
+        <div>{/* Content */}</div>
+        <div className="flex justify-end gap-2 mt-4">
+          <button onClick={() => setShowModal(false)}>Cancel</button>
+          <button onClick={handleSave}>Save</button>
+        </div>
       </div>
     </div>
-  </div>
-)}
+  );
+}
 ```
 
 **After:**
+
 ```tsx
 <Modal
   isOpen={showModal}
@@ -881,25 +878,23 @@ import { Button, Input, Badge } from "../components/common";
 ### Step 5: Standardize Status Badges
 
 **Before:**
+
 ```tsx
-{product.stockQuantity > 0 ? (
-  <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
-    In Stock
-  </span>
-) : (
-  <span className="px-2 py-1 text-xs rounded bg-red-100 text-red-800">
-    Out of Stock
-  </span>
-)}
+{
+  product.stockQuantity > 0 ? (
+    <span className="px-2 py-1 text-xs rounded bg-green-100 text-green-800">In Stock</span>
+  ) : (
+    <span className="px-2 py-1 text-xs rounded bg-red-100 text-red-800">Out of Stock</span>
+  );
+}
 ```
 
 **After:**
+
 ```tsx
-{product.stockQuantity > 0 ? (
-  <Badge variant="success">In Stock</Badge>
-) : (
-  <Badge variant="danger">Out of Stock</Badge>
-)}
+{
+  product.stockQuantity > 0 ? <Badge variant="success">In Stock</Badge> : <Badge variant="danger">Out of Stock</Badge>;
+}
 ```
 
 ---
@@ -907,27 +902,32 @@ import { Button, Input, Badge } from "../components/common";
 ## Benefits
 
 ### 1. **Consistency**
+
 - Unified design language across the entire application
 - Same button styles, colors, and sizes everywhere
 - Predictable component behavior
 
 ### 2. **Developer Experience**
+
 - Less code to write
 - Autocomplete with TypeScript
 - No need to remember Tailwind classes
 - Faster development
 
 ### 3. **Maintainability**
+
 - Change design system in one place
 - Easy to update colors, sizes, or styles
 - Centralized component logic
 
 ### 4. **Accessibility**
+
 - Built-in focus states
 - Proper ARIA labels
 - Keyboard navigation support
 
 ### 5. **Code Quality**
+
 - Reduced code duplication
 - Smaller component files
 - Easier to review code
@@ -941,6 +941,7 @@ import { Button, Input, Badge } from "../components/common";
 **Example: A simple form with 3 inputs and 2 buttons**
 
 **Before (Without Shared Components):** ~80 lines
+
 ```tsx
 // 3 inputs × ~20 lines each = 60 lines
 // 2 buttons × ~10 lines each = 20 lines
@@ -948,6 +949,7 @@ import { Button, Input, Badge } from "../components/common";
 ```
 
 **After (With Shared Components):** ~15 lines
+
 ```tsx
 <Input label="Name" value={name} onChange={setName} fullWidth />
 <Input label="Email" type="email" value={email} onChange={setEmail} fullWidth />
@@ -962,18 +964,23 @@ import { Button, Input, Badge } from "../components/common";
 ## Best Practices
 
 ### 1. **Always Use Shared Components**
+
 When you need a button, input, modal, etc., always check the shared library first before creating custom components.
 
 ### 2. **Use Semantic Variants**
+
 - Use `variant="danger"` for delete actions, not `variant="primary"` with red custom styles
 - Use `variant="success"` for approve/complete actions
 - Use `variant="ghost"` for cancel buttons in modals
 
 ### 3. **Leverage TypeScript**
+
 The components have full TypeScript support. Let the autocomplete guide you!
 
 ### 4. **Combine with Tailwind**
+
 You can still add custom classes when needed:
+
 ```tsx
 <Button variant="primary" className="mt-4 shadow-lg">
   Custom Styled Button
@@ -981,6 +988,7 @@ You can still add custom classes when needed:
 ```
 
 ### 5. **Use fullWidth Appropriately**
+
 - Form inputs: Usually `fullWidth`
 - Buttons in modals: Usually NOT `fullWidth`
 - Mobile layouts: Consider `fullWidth` for better UX
@@ -989,17 +997,18 @@ You can still add custom classes when needed:
 
 ## Component Sizes Summary
 
-| Component | Small | Medium (Default) | Large |
-|-----------|-------|------------------|-------|
-| Button | px-3 py-1 | px-4 py-2 | px-6 py-2 |
-| Badge | px-2 py-0.5 | px-2.5 py-1 | px-3 py-1.5 |
-| Modal | max-w-sm | max-w-md | max-w-lg / xl / 2xl |
+| Component | Small       | Medium (Default) | Large               |
+| --------- | ----------- | ---------------- | ------------------- |
+| Button    | px-3 py-1   | px-4 py-2        | px-6 py-2           |
+| Badge     | px-2 py-0.5 | px-2.5 py-1      | px-3 py-1.5         |
+| Modal     | max-w-sm    | max-w-md         | max-w-lg / xl / 2xl |
 
 ---
 
 ## Color System
 
 ### Primary Colors
+
 - **Blue** (Primary): Main actions, links, primary buttons
 - **Gray** (Secondary): Secondary actions, neutral elements
 - **Green** (Success): Positive actions, success states
@@ -1007,6 +1016,7 @@ You can still add custom classes when needed:
 - **Yellow** (Warning): Warning actions, caution states
 
 ### Usage in Components
+
 ```tsx
 // Buttons
 <Button variant="primary">  {/* Blue */}
@@ -1023,7 +1033,8 @@ You can still add custom classes when needed:
 
 ## Conclusion
 
-The shared component library provides a solid foundation for building consistent, maintainable UI across the POS System. By using these components, you'll:
+The shared component library provides a solid foundation for building consistent, maintainable UI across the POS System.
+By using these components, you'll:
 
 - ✅ Write less code
 - ✅ Maintain consistency
@@ -1038,19 +1049,20 @@ The shared component library provides a solid foundation for building consistent
 ## Quick Reference
 
 ### Import Statement
+
 ```typescript
-import { 
-  Button, 
-  Modal, 
-  Input, 
-  TextArea, 
-  Select, 
-  SearchBar, 
-  Badge, 
-  Card, 
-  CardHeader, 
-  CardBody, 
-  CardFooter 
+import {
+  Button,
+  Modal,
+  Input,
+  TextArea,
+  Select,
+  SearchBar,
+  Badge,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
 } from "../components/common";
 ```
 

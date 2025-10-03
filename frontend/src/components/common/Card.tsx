@@ -7,19 +7,12 @@ interface CardProps {
   hover?: boolean;
 }
 
-export const Card: React.FC<CardProps> = ({ 
-  children, 
-  className = "", 
-  padding = true,
-  hover = false 
-}) => {
+export const Card: React.FC<CardProps> = ({ children, className = "", padding = true, hover = false }) => {
   const paddingStyle = padding ? "p-6" : "";
   const hoverStyle = hover ? "hover:shadow-lg transition-shadow duration-200" : "";
-  
+
   return (
-    <div className={`bg-white rounded-lg shadow ${paddingStyle} ${hoverStyle} ${className}`.trim()}>
-      {children}
-    </div>
+    <div className={`bg-white rounded-lg shadow ${paddingStyle} ${hoverStyle} ${className}`.trim()}>{children}</div>
   );
 };
 
@@ -29,11 +22,7 @@ interface CardHeaderProps {
   actions?: React.ReactNode;
 }
 
-export const CardHeader: React.FC<CardHeaderProps> = ({ 
-  children, 
-  className = "",
-  actions 
-}) => {
+export const CardHeader: React.FC<CardHeaderProps> = ({ children, className = "", actions }) => {
   return (
     <div className={`pb-4 mb-4 border-b border-gray-200 ${className}`.trim()}>
       <div className="flex justify-between items-center">
@@ -59,11 +48,7 @@ interface CardFooterProps {
   align?: "left" | "center" | "right";
 }
 
-export const CardFooter: React.FC<CardFooterProps> = ({ 
-  children, 
-  className = "",
-  align = "right" 
-}) => {
+export const CardFooter: React.FC<CardFooterProps> = ({ children, className = "", align = "right" }) => {
   const alignStyles = {
     left: "justify-start",
     center: "justify-center",
