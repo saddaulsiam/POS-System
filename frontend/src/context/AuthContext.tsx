@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 
 interface AuthContextType {
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   token: string | null;
   login: (credentials: LoginRequest) => Promise<boolean>;
   logout: () => void;
@@ -12,7 +13,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -20,6 +21,14 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+};
+
+export const useSetUser = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useSetUser must be used within an AuthProvider");
+  }
+  return context.setUser;
 };
 
 interface AuthProviderProps {
@@ -125,6 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value: AuthContextType = {
     user,
+    setUser,
     token,
     login,
     logout,

@@ -8,8 +8,7 @@ import {
   Customer,
   Sale,
   Employee,
-  PaginatedApiResponse,
-  SalesPaginatedResponse,
+  PaginatedResponse,
   CreateProductRequest,
   UpdateProductRequest,
   CreateCustomerRequest,
@@ -93,6 +92,10 @@ api.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
+  updateProfile: async (data: { name?: string; username?: string }) => {
+    const response = await api.put("/profile/me", data);
+    return response.data;
+  },
   login: async (credentials: LoginRequest): Promise<AuthResponse> => {
     try {
       console.log("🔐 Attempting login with credentials:", {
@@ -127,7 +130,10 @@ export const authAPI = {
   },
 };
 
-// Products API
+// Export updateProfile and changePin for direct import
+export const updateProfile = authAPI.updateProfile;
+export const changePin = authAPI.changePin;
+
 export const productsAPI = {
   getAll: async (params?: {
     page?: number;
@@ -135,7 +141,7 @@ export const productsAPI = {
     search?: string;
     categoryId?: number;
     isActive?: boolean;
-  }): Promise<PaginatedApiResponse<Product[]>> => {
+  }): Promise<PaginatedResponse<Product[]>> => {
     const response = await api.get("/products", { params });
     return response.data;
   },
@@ -198,7 +204,7 @@ export const customersAPI = {
     page?: number;
     limit?: number;
     search?: string;
-  }): Promise<PaginatedApiResponse<Customer[]>> => {
+  }): Promise<PaginatedResponse<Customer[]>> => {
     const response = await api.get("/customers", { params });
     return response.data;
   },
@@ -237,7 +243,7 @@ export const salesAPI = {
     endDate?: string;
     employeeId?: number;
     customerId?: number;
-  }): Promise<SalesPaginatedResponse> => {
+  }): Promise<PaginatedResponse<Sale[]>> => {
     const response = await api.get("/sales", { params });
     return response.data;
   },

@@ -4,6 +4,7 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import LoadingSpinner from "./components/common/LoadingSpinner";
 import Navbar from "./components/common/Navbar";
 import { useAuth } from "./context/AuthContext";
+
 import AdminDashboard from "./pages/AdminDashboard";
 import CategoriesPage from "./pages/CategoriesPage";
 import CustomersPage from "./pages/CustomersPage";
@@ -15,6 +16,7 @@ import POSPage from "./pages/POSPage";
 import ProductsPage from "./pages/ProductsPage";
 import ReportsPage from "./pages/ReportsPage";
 import SalesPage from "./pages/SalesPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const adminPaths = [
   "/admin",
@@ -25,6 +27,7 @@ const adminPaths = [
   "/reports",
   "/inventory",
   "/employees",
+  "/profile",
 ];
 
 const App: React.FC = () => {
@@ -45,13 +48,15 @@ const App: React.FC = () => {
 
   return (
     <>
-      {(user?.role === "ADMIN" || user?.role === "MANAGER") &&
-        adminPaths.some((p) => location.pathname === p || location.pathname.startsWith(p + "/")) && <Navbar />}
+      {adminPaths.some((p) => location.pathname === p || location.pathname.startsWith(p + "/")) && <Navbar />}
 
       <Routes>
         {/* POS Interface - Main cashier interface */}
         <Route path="/" element={<POSPage />} />
         <Route path="/pos" element={<POSPage />} />
+
+        {/* Profile route for all authenticated users */}
+        <Route path="/profile" element={<ProfilePage />} />
 
         {/* Admin/Manager Routes */}
         {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
