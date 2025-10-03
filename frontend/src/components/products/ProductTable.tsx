@@ -1,6 +1,6 @@
 import React from "react";
 import { Product, Category, Supplier } from "../../types";
-import { Button } from "../common";
+import { Button, Badge } from "../common";
 
 interface ProductTableProps {
   products: Product[];
@@ -159,9 +159,9 @@ export const ProductTable: React.FC<ProductTableProps> = ({
 
                 {/* Category Column */}
                 <td className="px-6 py-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <Badge variant="primary" rounded size="sm">
                     {categories.find((c) => c.id === product.categoryId)?.name || "-"}
-                  </span>
+                  </Badge>
                 </td>
 
                 {/* Price Column */}
@@ -175,32 +175,27 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 {/* Stock Column */}
                 <td className="px-6 py-4">
                   <div className="flex items-center">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                    <Badge
+                      variant={
                         product.stockQuantity <= product.lowStockThreshold
-                          ? "bg-red-100 text-red-800"
+                          ? "danger"
                           : product.stockQuantity <= product.lowStockThreshold * 2
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
+                          ? "warning"
+                          : "success"
+                      }
+                      rounded
+                      size="sm"
                     >
                       {product.stockQuantity} units
-                    </span>
+                    </Badge>
                   </div>
                 </td>
 
                 {/* Status Column */}
                 <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                      product.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full mr-1.5 ${product.isActive ? "bg-green-600" : "bg-gray-600"}`}
-                    ></span>
+                  <Badge variant={product.isActive ? "success" : "default"} rounded size="sm" dot>
                     {product.isActive ? "Active" : "Inactive"}
-                  </span>
+                  </Badge>
                 </td>
 
                 {/* Actions Column */}

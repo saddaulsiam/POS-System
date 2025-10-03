@@ -1,6 +1,6 @@
 import React from "react";
 import { Product } from "../../types";
-import { Button } from "../common";
+import { Button, Badge } from "../common";
 
 interface InventoryTableProps {
   products: Product[];
@@ -42,13 +42,13 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
       <tbody>
         {products.map((product, idx) => {
           let status = "In Stock";
-          let statusClass = "bg-green-100 text-green-800";
+          let variant: "success" | "danger" | "warning" = "success";
           if (product.stockQuantity <= 0) {
             status = "Out of Stock";
-            statusClass = "bg-red-100 text-red-800";
+            variant = "danger";
           } else if (product.stockQuantity <= product.lowStockThreshold) {
             status = "Low Stock";
-            statusClass = "bg-yellow-100 text-yellow-800";
+            variant = "warning";
           }
 
           return (
@@ -82,7 +82,9 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
               <td className="px-3 py-2 text-gray-600 min-w-[80px]">{product.sku}</td>
               <td className="px-3 py-2 text-gray-900 min-w-[60px]">{product.stockQuantity}</td>
               <td className="px-3 py-2 min-w-[90px]">
-                <span className={`px-2 py-1 rounded text-xs font-semibold ${statusClass}`}>{status}</span>
+                <Badge variant={variant} size="sm">
+                  {status}
+                </Badge>
               </td>
               <td className="px-3 py-2 min-w-[120px]">
                 <div className="flex items-center justify-center gap-2 w-full">

@@ -1,4 +1,5 @@
 import React from "react";
+import { SearchBar, Button } from "../common";
 
 interface POSBarcodeScannerProps {
   barcode: string;
@@ -10,20 +11,16 @@ export const POSBarcodeScanner: React.FC<POSBarcodeScannerProps> = ({ barcode, o
   return (
     <div className="p-4 bg-white border-b border-gray-200">
       <form onSubmit={onSubmit} className="flex space-x-2">
-        <input
-          type="text"
-          placeholder="Scan barcode or search product..."
+        <SearchBar
           value={barcode}
-          onChange={(e) => onBarcodeChange(e.target.value)}
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          autoFocus
+          onChange={onBarcodeChange}
+          placeholder="Scan barcode or search product..."
+          fullWidth={true}
+          showClearButton={false}
         />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
+        <Button type="submit" variant="primary">
           Add
-        </button>
+        </Button>
       </form>
     </div>
   );

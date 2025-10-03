@@ -1,6 +1,7 @@
 import React from "react";
 import { Sale } from "../../types";
 import LoadingSpinner from "../common/LoadingSpinner";
+import { Badge } from "../common";
 
 interface SalesTableProps {
   sales: Sale[];
@@ -80,17 +81,18 @@ export const SalesTable: React.FC<SalesTableProps> = ({
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                  <Badge
+                    variant={
                       sale.paymentStatus === "COMPLETED"
-                        ? "bg-green-100 text-green-800"
+                        ? "success"
                         : sale.paymentStatus === "REFUNDED"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
+                        ? "danger"
+                        : "warning"
+                    }
+                    rounded
                   >
                     {sale.paymentStatus}
-                  </span>
+                  </Badge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button onClick={() => onViewDetails(sale)} className="text-blue-600 hover:text-blue-900 mr-4">

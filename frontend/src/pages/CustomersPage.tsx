@@ -108,11 +108,6 @@ const CustomersPage: React.FC = () => {
     }
   };
 
-  const handleSearchClear = () => {
-    setSearchTerm("");
-    setCurrentPage(1);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -125,7 +120,7 @@ const CustomersPage: React.FC = () => {
         </div>
 
         {/* Search */}
-        <CustomerSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} onClear={handleSearchClear} />
+        <CustomerSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
         {/* Customers Table */}
         <div className="bg-white shadow rounded-lg overflow-hidden">

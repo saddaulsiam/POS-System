@@ -105,11 +105,6 @@ const SuppliersPage: React.FC = () => {
     }
   };
 
-  const handleSearchClear = () => {
-    setSearchTerm("");
-    setCurrentPage(1);
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -122,7 +117,7 @@ const SuppliersPage: React.FC = () => {
         </div>
 
         {/* Search */}
-        <SupplierSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} onClear={handleSearchClear} />
+        <SupplierSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
         {/* Suppliers Table */}
         <div className="bg-white shadow rounded-lg overflow-hidden">

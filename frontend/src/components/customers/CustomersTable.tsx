@@ -1,5 +1,6 @@
 import React from "react";
 import { Customer } from "../../types";
+import { Badge } from "../common";
 
 interface CustomersTableProps {
   customers: Customer[];
@@ -59,13 +60,9 @@ export const CustomersTable: React.FC<CustomersTableProps> = ({ customers, isLoa
                   <div className="text-sm text-gray-900">{new Date(customer.createdAt).toLocaleDateString()}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      customer.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                    }`}
-                  >
+                  <Badge variant={customer.isActive ? "success" : "danger"} rounded size="sm">
                     {customer.isActive ? "Active" : "Inactive"}
-                  </span>
+                  </Badge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button onClick={() => onEdit(customer)} className="text-blue-600 hover:text-blue-900 mr-4">

@@ -1,4 +1,5 @@
 import React from "react";
+import { SearchBar } from "../common";
 import { Category } from "../../types";
 
 interface ProductFiltersProps {
@@ -18,12 +19,11 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 }) => {
   return (
     <div className="flex gap-2 w-full md:w-auto">
-      <input
-        type="text"
-        placeholder="Search by name or SKU..."
-        className="border rounded px-3 py-2 w-full md:w-64"
+      <SearchBar
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={setSearch}
+        placeholder="Search by name or SKU..."
+        className="w-full md:w-64"
       />
       <select
         className="border rounded px-3 py-2"
