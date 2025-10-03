@@ -40,21 +40,21 @@ const Navbar: React.FC = () => {
             {navLinks
               .filter((link) => !link.roles || link.roles.includes(user?.role || ""))
               .map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs md:text-sm font-medium whitespace-nowrap transition-colors duration-150
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs md:text-sm font-medium whitespace-nowrap transition-colors duration-150
                   ${
                     location.pathname === link.to
                       ? "bg-blue-600 text-white shadow"
                       : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"
                   }
                 `}
-              >
-                <span className="text-base md:text-lg">{link.icon}</span>
-                <span>{link.label}</span>
-              </Link>
-            ))}
+                >
+                  <span className="text-base md:text-lg">{link.icon}</span>
+                  <span>{link.label}</span>
+                </Link>
+              ))}
           </div>
         </div>
 

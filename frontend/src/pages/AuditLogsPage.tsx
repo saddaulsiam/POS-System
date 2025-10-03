@@ -99,23 +99,33 @@ const AuditLogsPage: React.FC = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={9} className="text-center p-4">Loading...</td>
+                <td colSpan={9} className="text-center p-4">
+                  Loading...
+                </td>
               </tr>
             ) : logs.length === 0 ? (
               <tr>
-                <td colSpan={9} className="text-center p-4">No logs found.</td>
+                <td colSpan={9} className="text-center p-4">
+                  No logs found.
+                </td>
               </tr>
             ) : (
               logs.map((log) => (
                 <tr key={log.id} className="border-b">
                   <td className="p-2">{log.id}</td>
-                  <td className="p-2">{log.user?.name} ({log.user?.username})</td>
+                  <td className="p-2">
+                    {log.user?.name} ({log.user?.username})
+                  </td>
                   <td className="p-2">{log.action}</td>
                   <td className="p-2">{log.entity}</td>
                   <td className="p-2">{log.entityId}</td>
-                  <td className="p-2 max-w-xs truncate" title={log.details}>{log.details}</td>
+                  <td className="p-2 max-w-xs truncate" title={log.details}>
+                    {log.details}
+                  </td>
                   <td className="p-2">{log.ipAddress}</td>
-                  <td className="p-2 max-w-xs truncate" title={log.userAgent}>{log.userAgent}</td>
+                  <td className="p-2 max-w-xs truncate" title={log.userAgent}>
+                    {log.userAgent}
+                  </td>
                   <td className="p-2">{new Date(log.createdAt).toLocaleString()}</td>
                 </tr>
               ))
@@ -128,19 +138,11 @@ const AuditLogsPage: React.FC = () => {
           Showing {logs.length} of {total} logs
         </span>
         <div className="flex gap-2">
-          <button
-            className="btn btn-sm"
-            disabled={page === 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-          >
+          <button className="btn btn-sm" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
             Prev
           </button>
           <span>Page {page}</span>
-          <button
-            className="btn btn-sm"
-            disabled={page * limit >= total}
-            onClick={() => setPage((p) => p + 1)}
-          >
+          <button className="btn btn-sm" disabled={page * limit >= total} onClick={() => setPage((p) => p + 1)}>
             Next
           </button>
         </div>
