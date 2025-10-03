@@ -1,5 +1,6 @@
 import React from "react";
 import { Product } from "../../types";
+import { Button } from "../common";
 
 interface InventoryTableProps {
   products: Product[];
@@ -85,18 +86,12 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
               </td>
               <td className="px-3 py-2 min-w-[120px]">
                 <div className="flex items-center justify-center gap-2 w-full">
-                  <button
-                    className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-xs"
-                    onClick={() => onAdjustStock(product)}
-                  >
+                  <Button variant="primary" size="sm" onClick={() => onAdjustStock(product)}>
                     Adjust Stock
-                  </button>
-                  <button
-                    className="bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300 text-xs"
-                    onClick={() => onViewHistory(product)}
-                  >
+                  </Button>
+                  <Button variant="secondary" size="sm" onClick={() => onViewHistory(product)}>
                     History
-                  </button>
+                  </Button>
                 </div>
               </td>
             </tr>

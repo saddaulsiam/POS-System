@@ -1,5 +1,6 @@
 import React from "react";
 import { CartItem } from "../../types";
+import { Button } from "../common";
 
 interface POSCartProps {
   cart: CartItem[];
@@ -98,20 +99,12 @@ export const POSCart: React.FC<POSCartProps> = ({
         </div>
 
         <div className="space-y-2">
-          <button
-            onClick={onProcessPayment}
-            disabled={cart.length === 0}
-            className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <Button variant="success" fullWidth onClick={onProcessPayment} disabled={cart.length === 0}>
             Process Payment
-          </button>
-          <button
-            disabled={cart.length === 0}
-            onClick={onClearCart}
-            className="w-full bg-gray-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          </Button>
+          <Button variant="secondary" fullWidth onClick={onClearCart} disabled={cart.length === 0}>
             Clear Cart
-          </button>
+          </Button>
         </div>
       </div>
     </>

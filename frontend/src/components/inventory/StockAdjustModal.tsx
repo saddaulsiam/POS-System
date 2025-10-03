@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Product } from "../../types";
+import { Button } from "../common";
 
 type AllowedMovementType = "PURCHASE" | "ADJUSTMENT" | "RETURN" | "DAMAGED" | "EXPIRED";
 
@@ -99,12 +100,12 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({ isOpen, prod
             />
           </div>
           <div className="flex justify-end gap-2">
-            <button type="button" className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" onClick={onClose}>
+            <Button type="button" variant="ghost" onClick={onClose}>
               Cancel
-            </button>
-            <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
+            </Button>
+            <Button type="submit" variant="primary">
               Adjust
-            </button>
+            </Button>
           </div>
         </form>
       </div>

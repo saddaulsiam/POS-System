@@ -1,6 +1,7 @@
 import React from "react";
 import { toast } from "react-hot-toast";
 import { Product, Category, Supplier } from "../../types";
+import { Button } from "../common";
 
 interface ProductModalsProps {
   // Add Modal
@@ -304,13 +305,9 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
                 </div>
               </div>
               <div className="md:col-span-2 mt-2">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-blue-700 hover:shadow-lg disabled:opacity-50 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-                >
+                <Button type="submit" variant="primary" fullWidth size="lg" disabled={isSubmitting}>
                   {isSubmitting ? "Adding..." : "Add Product"}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -534,13 +531,9 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
                 </div>
               </div>
               <div className="md:col-span-2 mt-2">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-blue-700 hover:shadow-lg disabled:opacity-50 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-                >
+                <Button type="submit" variant="primary" fullWidth size="lg" disabled={isSubmitting}>
                   {isSubmitting ? "Saving..." : "Save Changes"}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -554,21 +547,18 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
             <h3 className="text-lg font-semibold mb-4">Confirm Deletion</h3>
             <p className="mb-6">Are you sure you want to delete this product? This action cannot be undone.</p>
             <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-150 shadow focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+              <Button
+                variant="ghost"
                 onClick={() => {
                   setShowDeleteConfirm(false);
                   setDeletingId(null);
                 }}
               >
                 Cancel
-              </button>
-              <button
-                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-all duration-150 shadow focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-                onClick={confirmDeleteProduct}
-              >
+              </Button>
+              <Button variant="danger" onClick={confirmDeleteProduct}>
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -643,17 +633,17 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
               >
                 Cancel
               </button>
-              <button
+              <Button
+                variant="warning"
                 onClick={() => {
                   printBarcodeLabel(printProduct, printCopies);
                   setShowPrintModal(false);
                   setPrintProduct(null);
                   setPrintCopies(1);
                 }}
-                className="flex-1 bg-purple-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-purple-700 hover:shadow-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
               >
                 🖨️ Print
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -711,13 +701,15 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
               </ul>
             </div>
 
-            <button
+            <Button
+              variant="warning"
+              fullWidth
+              size="lg"
               onClick={handleImportCSV}
               disabled={!importFile || isImporting}
-              className="w-full bg-purple-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-purple-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
             >
               {isImporting ? "Importing..." : "Import Products"}
-            </button>
+            </Button>
           </div>
         </div>
       )}

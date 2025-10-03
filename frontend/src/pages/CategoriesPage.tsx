@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { categoriesAPI } from "../services/api";
 import { Category } from "../types";
 import toast from "react-hot-toast";
+import { Button } from "../components/common";
 
 const CategoriesPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -79,9 +80,9 @@ const CategoriesPage: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Category Management</h1>
-          <button onClick={handleAdd} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+          <Button variant="primary" onClick={handleAdd}>
             Add Category
-          </button>
+          </Button>
         </div>
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
@@ -110,13 +111,13 @@ const CategoriesPage: React.FC = () => {
                   categories.map((cat) => (
                     <tr key={cat.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cat.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button onClick={() => handleEdit(cat)} className="text-blue-600 hover:text-blue-900 mr-4">
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(cat)}>
                           Edit
-                        </button>
-                        <button onClick={() => handleDelete(cat)} className="text-red-600 hover:text-red-900">
+                        </Button>
+                        <Button variant="danger" size="sm" onClick={() => handleDelete(cat)}>
                           Delete
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))
@@ -155,20 +156,12 @@ const CategoriesPage: React.FC = () => {
                 />
               </div>
               <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
+                <Button type="button" variant="ghost" onClick={() => setShowModal(false)}>
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                >
+                </Button>
+                <Button type="submit" variant="primary" disabled={isSubmitting}>
                   {isSubmitting ? "Saving..." : editingCategory ? "Update" : "Create"}
-                </button>
+                </Button>
               </div>
             </form>
           </div>

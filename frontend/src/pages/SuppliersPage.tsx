@@ -6,6 +6,7 @@ import { SupplierSearch } from "../components/suppliers/SupplierSearch";
 import { SuppliersTable } from "../components/suppliers/SuppliersTable";
 import { SupplierModal } from "../components/suppliers/SupplierModal";
 import { Pagination } from "../components/sales/Pagination";
+import { Button } from "../components/common";
 
 interface SupplierFormData {
   name: string;
@@ -115,9 +116,9 @@ const SuppliersPage: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Supplier Management</h1>
-          <button onClick={handleAdd} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+          <Button variant="primary" onClick={handleAdd}>
             Add Supplier
-          </button>
+          </Button>
         </div>
 
         {/* Search */}

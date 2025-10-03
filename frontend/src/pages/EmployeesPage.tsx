@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import { employeesAPI } from "../services/api";
 import { Employee } from "../types";
+import { Button, Badge } from "../components/common";
 
 type EmployeeForm = {
   name: string;
@@ -116,15 +117,15 @@ const EmployeesPage: React.FC = () => {
         <div className="bg-white shadow rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
             <span className="text-lg font-semibold">Employees ({employees.length})</span>
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-medium"
+            <Button
+              variant="primary"
               onClick={() => {
                 setShowAddModal(true);
                 setForm({ ...defaultForm });
               }}
             >
               Add Employee
-            </button>
+            </Button>
           </div>
           {isLoading ? (
             <LoadingSpinner />
@@ -150,26 +151,27 @@ const EmployeesPage: React.FC = () => {
                       <td className="px-4 py-2 text-gray-700">{emp.role}</td>
                       <td className="px-4 py-2">
                         {emp.isActive ? (
-                          <span className="inline-block px-2 py-0.5 rounded bg-green-100 text-green-800 text-xs">
+                          <Badge variant="success" size="sm">
                             Active
-                          </span>
+                          </Badge>
                         ) : (
-                          <span className="inline-block px-2 py-0.5 rounded bg-red-100 text-red-800 text-xs">
+                          <Badge variant="danger" size="sm">
                             Inactive
-                          </span>
+                          </Badge>
                         )}
                       </td>
                       <td className="px-4 py-2 text-right space-x-2">
-                        <button className="text-blue-600 hover:underline text-sm" onClick={() => handleEdit(emp)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(emp)}>
                           Edit
-                        </button>
-                        <button
-                          className="text-red-600 hover:underline text-sm"
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
                           onClick={() => handleDelete(emp.id)}
                           disabled={deletingId === emp.id}
                         >
                           {deletingId === emp.id ? "Deleting..." : "Delete"}
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -239,13 +241,9 @@ const EmployeesPage: React.FC = () => {
                     <option value="STAFF">Staff</option>
                   </select>
                 </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 text-lg font-semibold"
-                >
+                <Button type="submit" variant="primary" fullWidth size="lg" disabled={isSubmitting}>
                   {isSubmitting ? "Adding..." : "Add Employee"}
-                </button>
+                </Button>
               </form>
             </div>
           </div>
@@ -310,13 +308,9 @@ const EmployeesPage: React.FC = () => {
                     <option value="STAFF">Staff</option>
                   </select>
                 </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 text-lg font-semibold"
-                >
+                <Button type="submit" variant="primary" fullWidth size="lg" disabled={isSubmitting}>
                   {isSubmitting ? "Saving..." : "Save Changes"}
-                </button>
+                </Button>
               </form>
             </div>
           </div>

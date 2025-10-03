@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { customersAPI } from "../services/api";
-import {
-  Customer,
-  CreateCustomerRequest,
-  UpdateCustomerRequest,
-} from "../types";
+import { Customer, CreateCustomerRequest, UpdateCustomerRequest } from "../types";
 import toast from "react-hot-toast";
 import { CustomerSearch } from "../components/customers/CustomerSearch";
 import { CustomersTable } from "../components/customers/CustomersTable";
 import { CustomerModal } from "../components/customers/CustomerModal";
 import { Pagination } from "../components/sales/Pagination";
+import { Button } from "../components/common";
 
 interface CustomerFormData {
   name: string;
@@ -121,39 +118,21 @@ const CustomersPage: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Customer Management
-          </h1>
-          <button
-            onClick={handleAdd}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          >
+          <h1 className="text-3xl font-bold text-gray-900">Customer Management</h1>
+          <Button variant="primary" onClick={handleAdd}>
             Add Customer
-          </button>
+          </Button>
         </div>
 
         {/* Search */}
-        <CustomerSearch
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          onClear={handleSearchClear}
-        />
+        <CustomerSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} onClear={handleSearchClear} />
 
         {/* Customers Table */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <CustomersTable
-            customers={customers}
-            isLoading={isLoading}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          <CustomersTable customers={customers} isLoading={isLoading} onEdit={handleEdit} onDelete={handleDelete} />
 
           {/* Pagination */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       </div>
 

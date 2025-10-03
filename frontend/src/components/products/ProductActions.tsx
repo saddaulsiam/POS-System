@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "../common";
 
 interface ProductActionsProps {
   canWrite: boolean;
@@ -14,26 +15,15 @@ export const ProductActions: React.FC<ProductActionsProps> = ({ canWrite, onExpo
 
   return (
     <div className="flex gap-2">
-      <button
-        className="bg-green-600 text-white px-4 py-2 rounded-lg shadow transition-all duration-150 hover:bg-green-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 font-semibold"
-        onClick={onExport}
-        title="Export products to CSV"
-      >
+      <Button variant="success" onClick={onExport} title="Export products to CSV">
         📥 Export
-      </button>
-      <button
-        className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow transition-all duration-150 hover:bg-purple-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 font-semibold"
-        onClick={onImport}
-        title="Import products from CSV"
-      >
+      </Button>
+      <Button variant="warning" onClick={onImport} title="Import products from CSV">
         📤 Import
-      </button>
-      <button
-        className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 font-semibold tracking-wide"
-        onClick={onAddNew}
-      >
+      </Button>
+      <Button variant="primary" onClick={onAddNew}>
         Add New Product
-      </button>
+      </Button>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React from "react";
 import { Product, Category, Supplier } from "../../types";
+import { Button } from "../common";
 
 interface ProductTableProps {
   products: Product[];
@@ -67,12 +68,9 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No Products Found</h3>
           <p className="text-gray-500 mb-6">Get started by adding your first product</p>
           {canWrite && (
-            <button
-              className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm"
-              onClick={onAddNew}
-            >
+            <Button variant="primary" onClick={onAddNew}>
               + Add Product
-            </button>
+            </Button>
           )}
         </div>
       </div>

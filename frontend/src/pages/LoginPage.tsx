@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import LoadingSpinner from "../components/common/LoadingSpinner";
+import { Button } from "../components/common";
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -105,13 +106,9 @@ const LoginPage: React.FC = () => {
           </div>
 
           <div>
-            <button
-              type="submit"
-              disabled={isLoading || !username || !pinCode}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <Button type="submit" variant="primary" fullWidth disabled={isLoading || !username || !pinCode}>
               {isLoading ? <LoadingSpinner size="sm" /> : "Sign in"}
-            </button>
+            </Button>
           </div>
 
           <div className="mt-6">
@@ -125,27 +122,15 @@ const LoginPage: React.FC = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-3 gap-3">
-              <button
-                type="button"
-                onClick={() => quickLogin("admin")}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              >
+              <Button type="button" variant="ghost" onClick={() => quickLogin("admin")}>
                 Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => quickLogin("manager")}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              >
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => quickLogin("manager")}>
                 Manager
-              </button>
-              <button
-                type="button"
-                onClick={() => quickLogin("cashier")}
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              >
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => quickLogin("cashier")}>
                 Cashier
-              </button>
+              </Button>
             </div>
           </div>
         </form>

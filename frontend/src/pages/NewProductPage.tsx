@@ -3,6 +3,7 @@ import { productsAPI, categoriesAPI, suppliersAPI } from "../services/api";
 import { Category, Supplier } from "../types";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../components/common";
 
 const NewProductPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -305,13 +306,9 @@ const NewProductPage: React.FC = () => {
             </div>
           </div>
           <div className="md:col-span-2 mt-2">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-blue-700 hover:shadow-lg disabled:opacity-50 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-            >
+            <Button type="submit" variant="primary" fullWidth size="lg" disabled={isSubmitting}>
               {isSubmitting ? "Adding..." : "Add Product"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
