@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { productsAPI, categoriesAPI } from "../services/api";
 import { Product, Category } from "../types";
+import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
 const ProductsPage: React.FC = () => {
+  const { user } = useAuth();
+  const canWrite = user?.role === "ADMIN" || user?.role === "MANAGER";
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -162,12 +165,14 @@ const ProductsPage: React.FC = () => {
               ))}
             </select>
           </div>
-          <button
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 font-semibold tracking-wide"
-            onClick={() => setShowAddModal(true)}
-          >
-            Add New Product
-          </button>
+          {canWrite && (
+            <button
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 font-semibold tracking-wide"
+              onClick={() => setShowAddModal(true)}
+            >
+              Add New Product
+            </button>
+          )}
         </div>
 
         {/* Add Product Modal */}
@@ -466,13 +471,15 @@ const ProductsPage: React.FC = () => {
                     >
                       Edit
                     </button>
-                    <button
-                      className="text-red-600 hover:bg-red-50 hover:underline text-xs rounded-lg px-2 py-1 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-                      onClick={() => handleDeleteProduct(product.id)}
-                      disabled={deletingId === product.id}
-                    >
-                      {deletingId === product.id ? "Deleting..." : "Delete"}
-                    </button>
+                    {canWrite && (
+                      <button
+                        className="text-red-600 hover:bg-red-50 hover:underline text-xs rounded-lg px-2 py-1 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+                        onClick={() => handleDeleteProduct(product.id)}
+                        disabled={deletingId === product.id}
+                      >
+                        {deletingId === product.id ? "Deleting..." : "Delete"}
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 import { employeesAPI } from "../services/api";
 import { Employee } from "../types";
-import LoadingSpinner from "../components/common/LoadingSpinner";
-import toast from "react-hot-toast";
 
-const defaultForm = {
+type EmployeeForm = {
+  name: string;
+  username: string;
+  pinCode: string;
+  role: "ADMIN" | "MANAGER" | "CASHIER" | "STAFF";
+};
+
+const defaultForm: EmployeeForm = {
   name: "",
   username: "",
   pinCode: "",
-  role: "STAFF" as "ADMIN" | "MANAGER" | "CASHIER" | "STAFF",
+  role: "STAFF",
 };
 
 const EmployeesPage: React.FC = () => {
@@ -16,10 +23,10 @@ const EmployeesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [form, setForm] = useState({ ...defaultForm });
-  const [editId, setEditId] = useState<number | null>(null);
+  const [form, setForm] = useState<EmployeeForm>({ ...defaultForm });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [editId, setEditId] = useState<number | null>(null);
 
   const loadEmployees = async () => {
     setIsLoading(true);
@@ -38,7 +45,8 @@ const EmployeesPage: React.FC = () => {
   }, []);
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const { name, value } = target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -74,12 +82,7 @@ const EmployeesPage: React.FC = () => {
     if (!editId) return;
     setIsSubmitting(true);
     try {
-      await employeesAPI.update(editId, {
-        name: form.name,
-        username: form.username,
-        pinCode: form.pinCode || undefined,
-        role: form.role,
-      });
+      await employeesAPI.update(editId, form);
       toast.success("Employee updated");
       setShowEditModal(false);
       setEditId(null);

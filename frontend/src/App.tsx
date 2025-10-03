@@ -17,6 +17,7 @@ import ProductsPage from "./pages/ProductsPage";
 import ReportsPage from "./pages/ReportsPage";
 import SalesPage from "./pages/SalesPage";
 import ProfilePage from "./pages/ProfilePage";
+import AuditLogsPage from "./pages/AuditLogsPage";
 
 const adminPaths = [
   "/admin",
@@ -28,6 +29,7 @@ const adminPaths = [
   "/inventory",
   "/employees",
   "/profile",
+  "/audit-logs",
 ];
 
 const App: React.FC = () => {
@@ -70,15 +72,9 @@ const App: React.FC = () => {
             <Route path="/sales" element={<SalesPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/inventory" element={<InventoryPage />} />
+            <Route path="/audit-logs" element={<AuditLogsPage />} />
           </>
         )}
-
-        {/* Admin Only Routes */}
-        {/* {user?.role === "ADMIN" && (
-          <>
-            <Route path="/employees" element={<EmployeesPage />} />
-          </>
-        )} */}
 
         {/* Redirect any unknown routes to home */}
         <Route path="*" element={<Navigate to="/" replace />} />

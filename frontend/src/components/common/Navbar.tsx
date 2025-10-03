@@ -3,15 +3,16 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const navLinks = [
-  { to: "/admin", label: "Dashboard", icon: "🏠" },
-  { to: "/profile", label: "Profile", icon: "🙍" },
-  { to: "/products", label: "Products", icon: "📦" },
-  { to: "/categories", label: "Categories", icon: "🗂️" },
-  { to: "/inventory", label: "Inventory", icon: "📋" },
-  { to: "/sales", label: "Sales", icon: "💰" },
-  { to: "/reports", label: "Reports", icon: "📊" },
-  { to: "/employees", label: "Employees", icon: "👥" },
-  { to: "/customers", label: "Customers", icon: "🧑‍🤝‍🧑" },
+  { to: "/admin", label: "Dashboard", icon: "🏠", roles: ["ADMIN", "MANAGER", "CASHIER", "STAFF"] },
+  { to: "/profile", label: "Profile", icon: "🙍", roles: ["ADMIN", "MANAGER", "CASHIER", "STAFF"] },
+  { to: "/products", label: "Products", icon: "📦", roles: ["ADMIN", "MANAGER", "CASHIER", "STAFF"] },
+  { to: "/categories", label: "Categories", icon: "🗂️", roles: ["ADMIN", "MANAGER"] },
+  { to: "/inventory", label: "Inventory", icon: "📋", roles: ["ADMIN", "MANAGER", "STAFF"] },
+  { to: "/sales", label: "Sales", icon: "💰", roles: ["ADMIN", "MANAGER", "CASHIER"] },
+  { to: "/reports", label: "Reports", icon: "📊", roles: ["ADMIN", "MANAGER"] },
+  { to: "/employees", label: "Employees", icon: "👥", roles: ["ADMIN"] },
+  { to: "/customers", label: "Customers", icon: "🧑‍🤝‍🧑", roles: ["ADMIN", "MANAGER", "CASHIER"] },
+  { to: "/audit-logs", label: "Audit Logs", icon: "📜", roles: ["ADMIN", "MANAGER"] },
 ];
 
 const Navbar: React.FC = () => {
@@ -36,7 +37,9 @@ const Navbar: React.FC = () => {
         {/* Nav Links */}
         <div className="flex-1 flex justify-center">
           <div className="flex gap-1 md:gap-2  flex-wrap">
-            {navLinks.map((link) => (
+            {navLinks
+              .filter((link) => !link.roles || link.roles.includes(user?.role || ""))
+              .map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
