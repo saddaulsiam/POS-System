@@ -906,327 +906,541 @@ const ProductsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Products List or Loading */}
-        <div className="bg-white rounded-lg shadow p-6 min-h-[300px]">
-          <h2 className="text-xl font-semibold mb-4">Products ({filteredProducts.length})</h2>
+        {/* Products Table or Loading */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Products List{" "}
+              <span className="text-sm font-normal text-gray-500 ml-2">({filteredProducts.length} items)</span>
+            </h2>
+          </div>
 
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <svg
-                className="animate-spin h-10 w-10 text-blue-600 mb-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-              </svg>
-              <p className="text-gray-500">Loading products...</p>
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-blue-200 rounded-full"></div>
+                <div className="w-16 h-16 border-4 border-blue-600 rounded-full animate-spin border-t-transparent absolute top-0 left-0"></div>
+              </div>
+              <p className="text-gray-600 mt-4 font-medium">Loading products...</p>
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <p className="text-gray-500 mb-4">No products found. Try adjusting your search or filters.</p>
-              <button
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 font-semibold tracking-wide"
-                onClick={() => setShowAddModal(true)}
-              >
-                Add New Product
-              </button>
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Products Found</h3>
+              <p className="text-gray-500 mb-6">Get started by adding your first product</p>
+              {canWrite && (
+                <button
+                  className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                  onClick={() => setShowAddModal(true)}
+                >
+                  + Add Product
+                </button>
+              )}
             </div>
           ) : (
-            <div className="grid gap-4">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="border rounded-lg p-4 bg-white hover:shadow-lg transition-shadow flex gap-4 items-center"
-                >
-                  <div className="flex-shrink-0">
-                    {product.image ? (
-                      <img src={product.image} alt={product.name} className="w-20 h-20 object-cover rounded border" />
-                    ) : (
-                      <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded border text-gray-400">
-                        No Image
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg text-gray-900 mb-1">{product.name}</h3>
-                    <div className="flex flex-wrap gap-2 text-xs text-gray-600 mb-1">
-                      <span>SKU: {product.sku}</span>
-                      {product.barcode && <span>Barcode: {product.barcode}</span>}
-                      <span>Category: {categories.find((c) => c.id === product.categoryId)?.name || "-"}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-2 text-xs text-gray-600 mb-1">
-                      <span>Price: ${product.sellingPrice}</span>
-                      <span>Stock: {product.stockQuantity}</span>
-                    </div>
-                    {product.barcode && (
-                      <div className="mt-2">
-                        <img
-                          src={productsAPI.getBarcodeImage(product.id)}
-                          alt={`Barcode ${product.barcode}`}
-                          className="h-12 border rounded bg-white"
-                          title="Click to print barcode"
-                          style={{ cursor: "pointer" }}
-                          onError={(e) => {
-                            console.error("Failed to load barcode image for product:", product.id);
-                            e.currentTarget.style.display = "none";
-                          }}
-                          onClick={() => {
-                            setPrintProduct(product);
-                            setPrintCopies(1);
-                            setShowPrintModal(true);
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    {product.barcode && (
-                      <button
-                        className="text-gray-600 hover:bg-gray-50 hover:underline text-xs rounded-lg px-2 py-1 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
-                        onClick={() => {
-                          setPrintProduct(product);
-                          setPrintCopies(1);
-                          setShowPrintModal(true);
-                        }}
-                        title="Print barcode label"
-                      >
-                        🖨️ Print
-                      </button>
-                    )}
-                    <button
-                      className={`px-2 py-1 rounded-lg text-xs font-semibold shadow transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                        product.isActive
-                          ? "bg-green-100 text-green-800 hover:bg-green-200 focus:ring-green-400"
-                          : "bg-red-100 text-red-800 hover:bg-red-200 focus:ring-red-400"
-                      }`}
-                      onClick={async () => {
-                        try {
-                          await productsAPI.update(product.id, { isActive: !product.isActive });
-                          setProducts((prev) =>
-                            prev.map((p) => (p.id === product.id ? { ...p, isActive: !p.isActive } : p))
-                          );
-                          toast.success(`Product marked as ${!product.isActive ? "Active" : "Inactive"}`);
-                        } catch {
-                          toast.error("Failed to update status");
-                        }
-                      }}
-                      title={product.isActive ? "Click to deactivate" : "Click to activate"}
-                    >
-                      {product.isActive ? "Active" : "Inactive"}
-                    </button>
-                    <button
-                      className="text-blue-600 hover:bg-blue-50 hover:underline text-xs rounded-lg px-2 py-1 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-                      onClick={() => {
-                        setEditProduct(product);
-                        setForm({
-                          name: product.name,
-                          sku: product.sku,
-                          categoryId: product.categoryId.toString(),
-                          supplierId: product.supplierId?.toString() || "",
-                          purchasePrice: product.purchasePrice.toString(),
-                          sellingPrice: product.sellingPrice.toString(),
-                          stockQuantity: product.stockQuantity.toString(),
-                          lowStockThreshold: product.lowStockThreshold.toString(),
-                          isActive: product.isActive,
-                          isWeighted: product.isWeighted,
-                          taxRate: product.taxRate.toString(),
-                          image: product.image || "",
-                        });
-                        setImagePreview(product.image || "");
-                        setShowEditModal(true);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    {canWrite && (
-                      <button
-                        className="text-red-600 hover:bg-red-50 hover:underline text-xs rounded-lg px-2 py-1 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-                        onClick={() => handleDeleteProduct(product.id)}
-                        disabled={deletingId === product.id}
-                      >
-                        {deletingId === product.id ? "Deleting..." : "Delete"}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Product
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      SKU / Barcode
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Price
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Stock
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {filteredProducts.map((product) => (
+                    <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                      {/* Product Column */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-shrink-0">
+                            {product.image ? (
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="h-12 w-12 rounded-lg object-cover border border-gray-200"
+                              />
+                            ) : (
+                              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center border border-gray-200">
+                                <svg
+                                  className="w-6 h-6 text-gray-400"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                                  />
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
+                            {product.supplierId && (
+                              <p className="text-xs text-gray-500">
+                                Supplier: {suppliers.find((s) => s.id === product.supplierId)?.name || "-"}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* SKU / Barcode Column */}
+                      <td className="px-6 py-4">
+                        <div className="text-sm">
+                          <p className="font-medium text-gray-900">{product.sku}</p>
+                          {product.barcode && <p className="text-xs text-gray-500 font-mono">{product.barcode}</p>}
+                        </div>
+                      </td>
+
+                      {/* Category Column */}
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {categories.find((c) => c.id === product.categoryId)?.name || "-"}
+                        </span>
+                      </td>
+
+                      {/* Price Column */}
+                      <td className="px-6 py-4">
+                        <div className="text-sm">
+                          <p className="font-semibold text-green-700">${product.sellingPrice.toFixed(2)}</p>
+                          <p className="text-xs text-gray-500">Cost: ${product.purchasePrice.toFixed(2)}</p>
+                        </div>
+                      </td>
+
+                      {/* Stock Column */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                              product.stockQuantity <= product.lowStockThreshold
+                                ? "bg-red-100 text-red-800"
+                                : product.stockQuantity <= product.lowStockThreshold * 2
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-green-100 text-green-800"
+                            }`}
+                          >
+                            {product.stockQuantity} units
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Status Column */}
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                            product.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                              product.isActive ? "bg-green-600" : "bg-gray-600"
+                            }`}
+                          ></span>
+                          {product.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+
+                      {/* Actions Column */}
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end space-x-2">
+                          {product.barcode && (
+                            <button
+                              onClick={() => {
+                                setPrintProduct(product);
+                                setPrintCopies(1);
+                                setShowPrintModal(true);
+                              }}
+                              className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                              title="Print Barcode"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                          {canWrite && (
+                            <>
+                              <button
+                                onClick={() => {
+                                  setEditProduct(product);
+                                  setForm({
+                                    name: product.name,
+                                    sku: product.sku,
+                                    categoryId: product.categoryId.toString(),
+                                    supplierId: product.supplierId?.toString() || "",
+                                    purchasePrice: product.purchasePrice.toString(),
+                                    sellingPrice: product.sellingPrice.toString(),
+                                    stockQuantity: product.stockQuantity.toString(),
+                                    lowStockThreshold: product.lowStockThreshold.toString(),
+                                    isActive: product.isActive,
+                                    isWeighted: product.isWeighted,
+                                    taxRate: product.taxRate.toString(),
+                                    image: product.image || "",
+                                  });
+                                  setImagePreview(product.image || "");
+                                  setShowEditModal(true);
+                                }}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Edit Product"
+                              >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await productsAPI.update(product.id, { isActive: !product.isActive });
+                                    setProducts((prev) =>
+                                      prev.map((p) => (p.id === product.id ? { ...p, isActive: !p.isActive } : p))
+                                    );
+                                    toast.success(`Product ${!product.isActive ? "activated" : "deactivated"}`);
+                                  } catch {
+                                    toast.error("Failed to update status");
+                                  }
+                                }}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  product.isActive
+                                    ? "text-green-600 hover:bg-green-50"
+                                    : "text-gray-600 hover:bg-gray-50"
+                                }`}
+                                title={product.isActive ? "Deactivate" : "Activate"}
+                              >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d={
+                                      product.isActive
+                                        ? "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        : "M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    }
+                                  />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteProduct(product.id)}
+                                disabled={deletingId === product.id}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                                title="Delete Product"
+                              >
+                                {deletingId === product.id ? (
+                                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle
+                                      className="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      strokeWidth="4"
+                                    ></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                                  </svg>
+                                ) : (
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                    />
+                                  </svg>
+                                )}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
-          {/* Edit Product Modal */}
-          {showEditModal && editProduct && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
-                <button
-                  className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
-                  onClick={() => setShowEditModal(false)}
-                  aria-label="Close"
-                >
-                  &times;
-                </button>
-                <h2 className="text-2xl font-bold mb-2 text-blue-700">Edit Product</h2>
-                <p className="mb-4 text-gray-500 text-sm">
-                  Update the details below and save to apply changes to this product.
-                </p>
-                <form
-                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    setIsSubmitting(true);
-                    try {
-                      const payload = {
-                        name: form.name,
-                        sku: form.sku,
-                        categoryId: parseInt(form.categoryId),
-                        purchasePrice: parseFloat(form.purchasePrice),
-                        sellingPrice: parseFloat(form.sellingPrice),
-                        stockQuantity: parseFloat(form.stockQuantity),
-                        lowStockThreshold: parseInt(form.lowStockThreshold),
-                        isActive: form.isActive,
-                        isWeighted: form.isWeighted,
-                        taxRate: parseFloat(form.taxRate),
-                        image: form.image || undefined,
-                      };
-                      await productsAPI.update(editProduct.id, payload);
-                      toast.success("Product updated successfully");
-                      setShowEditModal(false);
-                      setEditProduct(null);
-                      loadData();
-                    } catch (error: any) {
-                      toast.error(error?.response?.data?.error || "Failed to update product");
-                    } finally {
-                      setIsSubmitting(false);
+        </div>
+
+        {/* Edit Product Modal */}
+        {showEditModal && editProduct && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
+              <button
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
+                onClick={() => {
+                  setShowEditModal(false);
+                  setImageFile(null);
+                  setImagePreview("");
+                }}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <h2 className="text-2xl font-bold mb-2 text-blue-700 text-center">Edit Product</h2>
+              <p className="mb-4 text-gray-500 text-sm text-center">
+                Update the details below and save to apply changes to this product.
+              </p>
+              <form
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setIsSubmitting(true);
+                  try {
+                    const payload = {
+                      name: form.name,
+                      sku: form.sku,
+                      categoryId: parseInt(form.categoryId),
+                      supplierId: form.supplierId ? parseInt(form.supplierId) : undefined,
+                      purchasePrice: parseFloat(form.purchasePrice),
+                      sellingPrice: parseFloat(form.sellingPrice),
+                      stockQuantity: parseFloat(form.stockQuantity),
+                      lowStockThreshold: parseInt(form.lowStockThreshold),
+                      isActive: form.isActive,
+                      isWeighted: form.isWeighted,
+                      taxRate: parseFloat(form.taxRate),
+                    };
+                    await productsAPI.update(editProduct.id, payload);
+
+                    // Upload image if selected
+                    if (imageFile && editProduct.id) {
+                      const formData = new FormData();
+                      formData.append("image", imageFile);
+                      try {
+                        await productsAPI.uploadImage(editProduct.id, formData);
+                      } catch (error) {
+                        toast.error("Product updated but image upload failed");
+                      }
                     }
-                  }}
-                >
-                  <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        name="name"
-                        value={form.name}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                        placeholder="e.g. Coca Cola 500ml"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        SKU <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        name="sku"
-                        value={form.sku}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                        placeholder="e.g. CC500ML"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Category <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="categoryId"
-                      value={form.categoryId}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                    >
-                      <option value="">Select category</option>
-                      {categories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Purchase Price <span className="text-red-500">*</span>
-                    </label>
+
+                    toast.success("Product updated successfully");
+                    setShowEditModal(false);
+                    setEditProduct(null);
+                    setImageFile(null);
+                    setImagePreview("");
+                    loadData();
+                  } catch (error: any) {
+                    toast.error(error?.response?.data?.error || "Failed to update product");
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+              >
+                {/* Image Upload */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium mb-2">Product Image</label>
+                  <div className="flex items-center gap-4">
                     <input
-                      name="purchasePrice"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={form.purchasePrice}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                      placeholder="e.g. 10.00"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 5 * 1024 * 1024) {
+                            toast.error("Image size must be less than 5MB");
+                            return;
+                          }
+                          setImageFile(file);
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setImagePreview(reader.result as string);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                     />
-                    <span className="text-xs text-gray-400">The cost you pay to acquire this product.</span>
+                    {imagePreview && (
+                      <img src={imagePreview} alt="Preview" className="h-20 w-20 object-cover rounded border" />
+                    )}
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Selling Price <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      name="sellingPrice"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={form.sellingPrice}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                      placeholder="e.g. 15.00"
-                    />
-                    <span className="text-xs text-gray-400">The price at which you sell this product.</span>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Stock Quantity <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      name="stockQuantity"
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={form.stockQuantity}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                      placeholder="e.g. 100"
-                    />
-                    <span className="text-xs text-gray-400">Current stock available for this product.</span>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Low Stock Threshold</label>
-                    <input
-                      name="lowStockThreshold"
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={form.lowStockThreshold}
-                      onChange={handleFormChange}
-                      className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                      placeholder="e.g. 10"
-                    />
-                    <span className="text-xs text-gray-400">Get notified when stock falls below this number.</span>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Tax Rate (%)</label>
-                    <input
-                      name="taxRate"
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.01"
-                      value={form.taxRate}
-                      onChange={handleFormChange}
-                      className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                      placeholder="e.g. 5"
-                    />
-                    <span className="text-xs text-gray-400">Leave 0 if not applicable.</span>
-                  </div>
+                  <span className="text-xs text-gray-400 mt-1 block">
+                    Supported formats: JPEG, PNG, GIF, WebP. Max size: 5MB
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                    placeholder="e.g. Coca Cola 500ml"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    SKU <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="sku"
+                    value={form.sku}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                    placeholder="e.g. CC500ML"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="categoryId"
+                    value={form.categoryId}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  >
+                    <option value="">Select category</option>
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Supplier</label>
+                  <select
+                    name="supplierId"
+                    value={form.supplierId}
+                    onChange={handleFormChange}
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  >
+                    <option value="">Select supplier (optional)</option>
+                    {suppliers.map((supplier) => (
+                      <option key={supplier.id} value={supplier.id}>
+                        {supplier.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Purchase Price <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="purchasePrice"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.purchasePrice}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                    placeholder="e.g. 10.00"
+                  />
+                  <span className="text-xs text-gray-400">The cost you pay to acquire this product.</span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Selling Price <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="sellingPrice"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.sellingPrice}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                    placeholder="e.g. 15.00"
+                  />
+                  <span className="text-xs text-gray-400">The price at which you sell this product.</span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Stock Quantity <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="stockQuantity"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={form.stockQuantity}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                    placeholder="e.g. 100"
+                  />
+                  <span className="text-xs text-gray-400">Current stock available for this product.</span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Low Stock Threshold</label>
+                  <input
+                    name="lowStockThreshold"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={form.lowStockThreshold}
+                    onChange={handleFormChange}
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                    placeholder="e.g. 10"
+                  />
+                  <span className="text-xs text-gray-400">Get notified when stock falls below this number.</span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Tax Rate (%)</label>
+                  <input
+                    name="taxRate"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={form.taxRate}
+                    onChange={handleFormChange}
+                    className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                    placeholder="e.g. 5"
+                  />
+                  <span className="text-xs text-gray-400">Leave 0 if not applicable.</span>
+                </div>
+                <div className="flex space-x-10">
                   <div className="flex items-center mt-2">
                     <input
                       name="isWeighted"
@@ -1237,7 +1451,7 @@ const ProductsPage: React.FC = () => {
                     />
                     <label className="text-sm font-medium">Weighted Product</label>
                   </div>
-                  <div className="flex items-center mt-6">
+                  <div className="flex items-center mt-2">
                     <input
                       name="isActive"
                       type="checkbox"
@@ -1247,47 +1461,47 @@ const ProductsPage: React.FC = () => {
                     />
                     <label className="text-sm font-medium">Active</label>
                   </div>
-                  <div className="md:col-span-2 mt-2">
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:opacity-50 text-lg font-semibold shadow"
-                    >
-                      {isSubmitting ? "Saving..." : "Save Changes"}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Delete Confirmation Modal */}
-          {showDeleteConfirm && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
-                <h3 className="text-lg font-semibold mb-4">Confirm Deletion</h3>
-                <p className="mb-6">Are you sure you want to delete this product? This action cannot be undone.</p>
-                <div className="flex justify-end gap-2">
+                </div>
+                <div className="md:col-span-2 mt-2">
                   <button
-                    className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-150 shadow focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
-                    onClick={() => {
-                      setShowDeleteConfirm(false);
-                      setDeletingId(null);
-                    }}
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-blue-600 text-white px-6 py-2 rounded-lg shadow transition-all duration-150 hover:bg-blue-700 hover:shadow-lg disabled:opacity-50 text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-all duration-150 shadow focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-                    onClick={confirmDeleteProduct}
-                  >
-                    Delete
+                    {isSubmitting ? "Saving..." : "Save Changes"}
                   </button>
                 </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+              <h3 className="text-lg font-semibold mb-4">Confirm Deletion</h3>
+              <p className="mb-6">Are you sure you want to delete this product? This action cannot be undone.</p>
+              <div className="flex justify-end gap-2">
+                <button
+                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition-all duration-150 shadow focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setDeletingId(null);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-all duration-150 shadow focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+                  onClick={confirmDeleteProduct}
+                >
+                  Delete
+                </button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
