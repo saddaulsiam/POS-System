@@ -43,15 +43,6 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
 
       console.log("Loyalty Response:", loyaltyResponse);
 
-      // The backend returns:
-      // {
-      //   customer: { id, name, tier, points, dateOfBirth },
-      //   points: { current, lifetime },
-      //   tier: { current, multiplier, discountPercentage, birthdayBonus, next: {...} },
-      //   recentTransactions: [...],
-      //   activeRewards: [...]
-      // }
-
       const currentPoints = loyaltyResponse.points?.current || 0;
       const lifetimePoints = loyaltyResponse.points?.lifetime || 0;
       const tierData = loyaltyResponse.tier || {};
@@ -68,18 +59,30 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
       const nextTierMin = tierData.next ? tierData.next.minimumPoints : currentTierMin;
 
       // Calculate progress percentage
+      // Progress is based on CURRENT AVAILABLE POINTS
       let progressPercentage = 100;
       let pointsToNextTier = 0;
 
       if (tierData.next) {
-        pointsToNextTier = Math.max(0, tierData.next.pointsNeeded || 0);
+        // Use backend's calculated values if available
+        if (tierData.next.progressPoints !== undefined && tierData.next.totalPointsInTier !== undefined) {
+          // Backend provided relative progress values
+          const pointsInCurrentTier = tierData.next.progressPoints;
+          const pointsNeededForNextTier = tierData.next.totalPointsInTier;
+          pointsToNextTier = tierData.next.pointsNeeded || 0;
 
-        // Progress = (current lifetime - current tier min) / (next tier min - current tier min) * 100
-        const pointsInCurrentTier = lifetimePoints - currentTierMin;
-        const pointsNeededForNextTier = nextTierMin - currentTierMin;
+          if (pointsNeededForNextTier > 0) {
+            progressPercentage = (pointsInCurrentTier / pointsNeededForNextTier) * 100;
+          }
+        } else {
+          // Fallback: calculate from current available points
+          pointsToNextTier = Math.max(0, tierData.next.pointsNeeded || 0);
+          const pointsInCurrentTier = Math.max(0, currentPoints - currentTierMin);
+          const pointsNeededForNextTier = nextTierMin - currentTierMin;
 
-        if (pointsNeededForNextTier > 0) {
-          progressPercentage = (pointsInCurrentTier / pointsNeededForNextTier) * 100;
+          if (pointsNeededForNextTier > 0) {
+            progressPercentage = (pointsInCurrentTier / pointsNeededForNextTier) * 100;
+          }
         }
       }
 
@@ -92,10 +95,11 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
         nextTier: tierData.next?.tier,
         nextTierMin,
         pointsToNextTier,
-        pointsInCurrentTier: lifetimePoints - currentTierMin,
+        pointsInCurrentTier: Math.max(0, currentPoints - currentTierMin),
         pointsNeededForNextTier: nextTierMin - currentTierMin,
         progressPercentage: progressPercentage.toFixed(2) + "%",
         backendPointsNeeded: tierData.next?.pointsNeeded,
+        note: "Progress based on CURRENT POINTS, not lifetime",
       });
 
       setLoyaltyData({
