@@ -44,7 +44,6 @@ const POSPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<"CASH" | "CARD">("CASH");
   const [cashReceived, setCashReceived] = useState("");
   const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
-  const [pointsUsed, setPointsUsed] = useState(0);
 
   useEffect(() => {
     loadCategories();
@@ -295,7 +294,6 @@ const POSPage: React.FC = () => {
 
   const handlePointsRedeemed = (discountAmount: number, points: number) => {
     setLoyaltyDiscount(discountAmount);
-    setPointsUsed(points);
     setShowRedeemPointsDialog(false);
     toast.success(`Applied $${discountAmount.toFixed(2)} loyalty discount using ${points} points!`);
   };
@@ -331,7 +329,6 @@ const POSPage: React.FC = () => {
       setCustomerPhone("");
       setShowSplitPaymentModal(false);
       setLoyaltyDiscount(0);
-      setPointsUsed(0);
 
       // Reload products to update stock quantities
       loadProducts(selectedCategory || undefined);
@@ -347,7 +344,6 @@ const POSPage: React.FC = () => {
     if (confirm("Clear the entire cart?")) {
       setCart([]);
       setLoyaltyDiscount(0);
-      setPointsUsed(0);
     }
   };
 
@@ -391,7 +387,6 @@ const POSPage: React.FC = () => {
       setCashReceived("");
       setPaymentMethod("CASH");
       setLoyaltyDiscount(0);
-      setPointsUsed(0);
 
       // Reload products to update stock quantities
       loadProducts(selectedCategory || undefined);

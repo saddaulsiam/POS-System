@@ -25,7 +25,7 @@ export const ParkSaleDialog: React.FC<ParkSaleDialogProps> = ({
   isOpen,
   onClose,
   cartItems,
-  customerId,
+  // customerId, // Not used in this component
   subtotal,
   taxAmount,
   discountAmount,

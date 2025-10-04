@@ -17,6 +17,27 @@ export const CustomersTable: React.FC<CustomersTableProps> = ({
   onDelete,
   onViewDetails,
 }) => {
+  // Helper function to check if today is the customer's birthday
+  const isBirthday = (dateOfBirth?: string): boolean => {
+    if (!dateOfBirth) return false;
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    return today.getMonth() === birthDate.getMonth() && today.getDate() === birthDate.getDate();
+  };
+
+  // Helper function to calculate age
+  const calculateAge = (dateOfBirth?: string): number | null => {
+    if (!dateOfBirth) return null;
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   if (isLoading) {
     return (
       <div className="text-center py-8">
@@ -52,8 +73,20 @@ export const CustomersTable: React.FC<CustomersTableProps> = ({
               <tr key={customer.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
-                    <div className="text-sm font-medium text-gray-900">{customer.name}</div>
-                    <div className="text-sm text-gray-500">{customer.address}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {customer.name}
+                      {isBirthday(customer.dateOfBirth) && (
+                        <span className="ml-2" title="Happy Birthday! 🎉">
+                          🎂
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {customer.address}
+                      {customer.dateOfBirth && !isBirthday(customer.dateOfBirth) && (
+                        <span className="ml-2 text-xs">(Age: {calculateAge(customer.dateOfBirth)})</span>
+                      )}
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

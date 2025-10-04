@@ -13,6 +13,7 @@ interface CustomerFormData {
   name: string;
   phoneNumber: string;
   email: string;
+  dateOfBirth: string;
   address: string;
 }
 
@@ -62,6 +63,7 @@ const CustomersPage: React.FC = () => {
 
   const handleEdit = (customer: Customer) => {
     setEditingCustomer(customer);
+    setViewingCustomer(null); // Close detail view when editing
     setShowModal(true);
   };
 
@@ -76,19 +78,30 @@ const CustomersPage: React.FC = () => {
         name: formData.name.trim(),
         phoneNumber: formData.phoneNumber.trim() || undefined,
         email: formData.email.trim() || undefined,
+        dateOfBirth: formData.dateOfBirth.trim() || undefined,
         address: formData.address.trim() || undefined,
       };
+
+      let updatedCustomerId: number | null = null;
 
       if (editingCustomer) {
         await customersAPI.update(editingCustomer.id, customerData);
         toast.success("Customer updated successfully");
+        updatedCustomerId = editingCustomer.id;
       } else {
-        await customersAPI.create(customerData as CreateCustomerRequest);
+        const newCustomer = await customersAPI.create(customerData as CreateCustomerRequest);
         toast.success("Customer created successfully");
+        updatedCustomerId = newCustomer.id;
       }
 
       setShowModal(false);
-      loadCustomers();
+      await loadCustomers();
+
+      // If we were editing from detail view, reload and return to detail view
+      if (updatedCustomerId) {
+        const updated = await customersAPI.getById(updatedCustomerId);
+        setViewingCustomer(updated);
+      }
     } catch (error: any) {
       console.error("Error saving customer:", error);
       toast.error(error.response?.data?.error || "Failed to save customer");
@@ -181,6 +194,18 @@ const CustomersPage: React.FC = () => {
                         <div>
                           <dt className="text-xs text-gray-500">Email</dt>
                           <dd className="text-sm font-medium text-gray-900">{viewingCustomer.email || "N/A"}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-gray-500">Date of Birth</dt>
+                          <dd className="text-sm font-medium text-gray-900">
+                            {viewingCustomer.dateOfBirth
+                              ? new Date(viewingCustomer.dateOfBirth).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                })
+                              : "N/A"}
+                          </dd>
                         </div>
                         <div>
                           <dt className="text-xs text-gray-500">Address</dt>

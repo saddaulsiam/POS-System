@@ -79,6 +79,7 @@ export interface Customer {
   name: string;
   phoneNumber?: string;
   email?: string;
+  dateOfBirth?: string;
   loyaltyPoints: number;
   address?: string;
   isActive: boolean;
@@ -305,6 +306,7 @@ export interface CreateCustomerRequest {
   name: string;
   phoneNumber?: string;
   email?: string;
+  dateOfBirth?: string;
   address?: string;
 }
 

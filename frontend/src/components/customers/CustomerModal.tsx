@@ -6,6 +6,7 @@ interface CustomerFormData {
   name: string;
   phoneNumber: string;
   email: string;
+  dateOfBirth: string;
   address: string;
 }
 
@@ -21,16 +22,25 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, editingCus
     name: "",
     phoneNumber: "",
     email: "",
+    dateOfBirth: "",
     address: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (editingCustomer) {
+      // Convert ISO date to YYYY-MM-DD format for date input
+      let dateOfBirth = "";
+      if (editingCustomer.dateOfBirth) {
+        const date = new Date(editingCustomer.dateOfBirth);
+        dateOfBirth = date.toISOString().split("T")[0]; // Extract YYYY-MM-DD
+      }
+
       setFormData({
         name: editingCustomer.name,
         phoneNumber: editingCustomer.phoneNumber || "",
         email: editingCustomer.email || "",
+        dateOfBirth: dateOfBirth,
         address: editingCustomer.address || "",
       });
     } else {
@@ -38,6 +48,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, editingCus
         name: "",
         phoneNumber: "",
         email: "",
+        dateOfBirth: "",
         address: "",
       });
     }
@@ -85,6 +96,15 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({ isOpen, editingCus
         />
 
         <Input label="Email" type="email" name="email" value={formData.email} onChange={handleInputChange} fullWidth />
+
+        <Input
+          label="Date of Birth"
+          type="date"
+          name="dateOfBirth"
+          value={formData.dateOfBirth}
+          onChange={handleInputChange}
+          fullWidth
+        />
 
         <TextArea
           label="Address"
