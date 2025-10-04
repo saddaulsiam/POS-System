@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useSettings } from "../context/SettingsContext";
 import { productsAPI, customersAPI, salesAPI, categoriesAPI, parkedSalesAPI } from "../services/api";
 import { Product, Customer, Category, CartItem, ParkedSale, CreateCustomerRequest } from "../types";
 import toast from "react-hot-toast";
@@ -19,6 +20,7 @@ import { calculateSubtotal, calculateTax, calculateTotal, calculateChange } from
 
 const POSPage: React.FC = () => {
   const { user, logout } = useAuth();
+  const { settings } = useSettings();
 
   // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -501,18 +503,22 @@ const POSPage: React.FC = () => {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Product Scanning & Categories */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Barcode Scanner */}
-          <POSBarcodeScanner
-            barcode={barcode}
-            onBarcodeChange={setBarcode}
-            onSubmit={handleBarcodeSubmit}
-            onProductSelect={addToCart}
-          />
+          {/* Barcode Scanner - conditionally shown */}
+          {settings?.enableBarcodeScanner && (
+            <POSBarcodeScanner
+              barcode={barcode}
+              onBarcodeChange={setBarcode}
+              onSubmit={handleBarcodeSubmit}
+              onProductSelect={addToCart}
+            />
+          )}
 
-          {/* Quick Sale Buttons */}
-          <div className="px-4 pt-2">
-            <QuickSaleButtons onProductSelect={addToCart} />
-          </div>
+          {/* Quick Sale Buttons - conditionally shown */}
+          {settings?.enableQuickSale && (
+            <div className="px-4 pt-2">
+              <QuickSaleButtons onProductSelect={addToCart} />
+            </div>
+          )}
 
           {/* Quick Access Categories & Products Grid */}
           <POSProductGrid
@@ -526,16 +532,18 @@ const POSPage: React.FC = () => {
 
         {/* Right Panel - Shopping Cart */}
         <div className="w-96 bg-white border-l border-gray-200 flex flex-col">
-          {/* Customer Info */}
-          <POSCustomerSearch
-            customerPhone={customerPhone}
-            customer={customer}
-            customerNotFound={customerNotFound}
-            onPhoneChange={setCustomerPhone}
-            onSearch={searchCustomer}
-            onCreateCustomer={handleCreateCustomer}
-            onClearCustomer={handleClearCustomer}
-          />
+          {/* Customer Info - conditionally shown */}
+          {settings?.enableCustomerSearch && (
+            <POSCustomerSearch
+              customerPhone={customerPhone}
+              customer={customer}
+              customerNotFound={customerNotFound}
+              onPhoneChange={setCustomerPhone}
+              onSearch={searchCustomer}
+              onCreateCustomer={handleCreateCustomer}
+              onClearCustomer={handleClearCustomer}
+            />
+          )}
 
           {/* Cart */}
           <POSCart

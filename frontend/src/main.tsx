@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import App from "./App.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
+import { SettingsProvider } from "./context/SettingsContext.tsx";
 import "./index.css";
 
 const queryClient = new QueryClient({
@@ -30,29 +31,31 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <App />
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: "#363636",
-                color: "#fff",
-              },
-              success: {
-                duration: 3000,
+          <SettingsProvider>
+            <App />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
                 style: {
-                  background: "#10b981",
+                  background: "#363636",
+                  color: "#fff",
                 },
-              },
-              error: {
-                duration: 5000,
-                style: {
-                  background: "#ef4444",
+                success: {
+                  duration: 3000,
+                  style: {
+                    background: "#10b981",
+                  },
                 },
-              },
-            }}
-          />
+                error: {
+                  duration: 5000,
+                  style: {
+                    background: "#ef4444",
+                  },
+                },
+              }}
+            />
+          </SettingsProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

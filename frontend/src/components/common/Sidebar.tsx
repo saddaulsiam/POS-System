@@ -42,22 +42,44 @@ const Sidebar: React.FC = () => {
         </button>
 
         {/* Navigation Links */}
-        <nav className="flex flex-col gap-1 p-3 overflow-y-auto h-full">
-          {filteredLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                location.pathname === link.to
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
-              }`}
-              title={isCollapsed ? link.label : ""}
-            >
-              <span className="text-xl flex-shrink-0">{link.icon}</span>
-              {!isCollapsed && <span className="whitespace-nowrap">{link.label}</span>}
-            </Link>
-          ))}
+        <nav className="flex flex-col h-full p-3 overflow-y-auto">
+          {/* Main Navigation */}
+          <div className="flex flex-col gap-1 flex-1">
+            {filteredLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  location.pathname === link.to
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                }`}
+                title={isCollapsed ? link.label : ""}
+              >
+                <span className="text-xl flex-shrink-0">{link.icon}</span>
+                {!isCollapsed && <span className="whitespace-nowrap">{link.label}</span>}
+              </Link>
+            ))}
+          </div>
+
+          {/* Settings - Bottom Section */}
+          {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
+            <>
+              <div className="border-t border-gray-200 my-2"></div>
+              <Link
+                to="/settings"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  location.pathname === "/settings"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                }`}
+                title={isCollapsed ? "Settings" : ""}
+              >
+                <span className="text-xl flex-shrink-0">⚙️</span>
+                {!isCollapsed && <span className="whitespace-nowrap">Settings</span>}
+              </Link>
+            </>
+          )}
         </nav>
       </aside>
 

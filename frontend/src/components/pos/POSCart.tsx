@@ -1,6 +1,7 @@
 import React from "react";
 import { CartItem } from "../../types";
 import { Button } from "../common";
+import { useSettings } from "../../context/SettingsContext";
 
 interface POSCartProps {
   cart: CartItem[];
@@ -35,6 +36,8 @@ export const POSCart: React.FC<POSCartProps> = ({
   loyaltyDiscount = 0,
   customer,
 }) => {
+  const { settings } = useSettings();
+
   return (
     <>
       {/* Cart Items */}
@@ -117,32 +120,39 @@ export const POSCart: React.FC<POSCartProps> = ({
         </div>
 
         <div className="space-y-2">
-          {/* Loyalty Points Button - Show if customer has points */}
-          {onRedeemPoints && customer && customer.loyaltyPoints > 0 && loyaltyDiscount === 0 && cart.length > 0 && (
-            <Button variant="primary" fullWidth onClick={onRedeemPoints}>
-              ⭐ Use Loyalty Points ({customer.loyaltyPoints} pts)
-            </Button>
-          )}
+          {/* Loyalty Points Button - Show if customer has points and setting enabled */}
+          {settings?.enableLoyaltyPoints &&
+            onRedeemPoints &&
+            customer &&
+            customer.loyaltyPoints > 0 &&
+            loyaltyDiscount === 0 &&
+            cart.length > 0 && (
+              <Button variant="primary" fullWidth onClick={onRedeemPoints}>
+                ⭐ Use Loyalty Points ({customer.loyaltyPoints} pts)
+              </Button>
+            )}
           <Button variant="success" fullWidth onClick={onProcessPayment} disabled={cart.length === 0}>
             💳 Process Payment
           </Button>
-          {onSplitPayment && (
+          {settings?.enableSplitPayment && onSplitPayment && (
             <Button variant="primary" fullWidth onClick={onSplitPayment} disabled={cart.length === 0}>
               🔀 Split Payment
             </Button>
           )}
-          <div className="grid grid-cols-2 gap-2">
-            {onParkSale && (
-              <Button variant="warning" onClick={onParkSale} disabled={cart.length === 0}>
-                🅿️ Park Sale
-              </Button>
-            )}
-            {onViewParkedSales && (
-              <Button variant="secondary" onClick={onViewParkedSales}>
-                📋 Parked
-              </Button>
-            )}
-          </div>
+          {settings?.enableParkSale && (
+            <div className="grid grid-cols-2 gap-2">
+              {onParkSale && (
+                <Button variant="warning" onClick={onParkSale} disabled={cart.length === 0}>
+                  🅿️ Park Sale
+                </Button>
+              )}
+              {onViewParkedSales && (
+                <Button variant="secondary" onClick={onViewParkedSales}>
+                  📋 Parked
+                </Button>
+              )}
+            </div>
+          )}
           <Button variant="secondary" fullWidth onClick={onClearCart} disabled={cart.length === 0}>
             🗑️ Clear Cart
           </Button>

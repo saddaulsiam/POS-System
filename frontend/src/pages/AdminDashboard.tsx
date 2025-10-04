@@ -244,6 +244,13 @@ const AdminDashboard: React.FC = () => {
       color: "yellow",
       description: "Stock management",
     },
+    {
+      name: "Settings",
+      href: "/settings",
+      icon: "⚙️",
+      color: "gray",
+      description: "System configuration",
+    },
   ];
 
   if (user?.role === "CASHIER") {

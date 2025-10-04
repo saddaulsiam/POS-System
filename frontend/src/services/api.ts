@@ -872,4 +872,26 @@ export const returnsAPI = {
   },
 };
 
+// POS Settings API
+export const posSettingsAPI = {
+  get: async () => {
+    const response = await api.get("/pos-settings");
+    return response.data;
+  },
+
+  update: async (settings: {
+    enableQuickSale?: boolean;
+    enableSplitPayment?: boolean;
+    enableParkSale?: boolean;
+    enableCustomerSearch?: boolean;
+    enableBarcodeScanner?: boolean;
+    enableLoyaltyPoints?: boolean;
+    taxRate?: number;
+    receiptFooterText?: string;
+  }) => {
+    const response = await api.put("/pos-settings", settings);
+    return response.data;
+  },
+};
+
 export default api;
