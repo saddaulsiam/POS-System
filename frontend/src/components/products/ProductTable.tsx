@@ -15,6 +15,7 @@ interface ProductTableProps {
   onToggleStatus: (product: Product) => void;
   onDelete: (id: number) => void;
   onAddNew: () => void;
+  onQuickSale?: (product: Product) => void;
 }
 
 export const ProductTable: React.FC<ProductTableProps> = ({
@@ -29,6 +30,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
   onToggleStatus,
   onDelete,
   onAddNew,
+  onQuickSale,
 }) => {
   const navigate = useNavigate();
   if (isLoading) {
@@ -241,6 +243,22 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     )}
                     {canWrite && (
                       <>
+                        {onQuickSale && (
+                          <button
+                            onClick={() => onQuickSale(product)}
+                            className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                            title="Add to Quick Sale"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M13 10V3L4 14h7v7l9-11h-7z"
+                              />
+                            </svg>
+                          </button>
+                        )}
                         <button
                           onClick={() => onEdit(product)}
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

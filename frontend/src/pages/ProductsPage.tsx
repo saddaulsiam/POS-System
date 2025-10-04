@@ -8,6 +8,7 @@ import { ProductActions } from "../components/products/ProductActions";
 import { ProductTable } from "../components/products/ProductTable";
 import { ProductModals } from "../components/products/ProductModals";
 import { ExcelImportDialog } from "../components/products/ExcelImportDialog";
+import { QuickSaleManager } from "../components/products/QuickSaleManager";
 import { printBarcodeLabel } from "../utils/productUtils";
 
 const ProductsPage: React.FC = () => {
@@ -29,9 +30,11 @@ const ProductsPage: React.FC = () => {
   const [showImportModal, setShowImportModal] = useState(false);
   const [showImportExcelModal, setShowImportExcelModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [showQuickSaleModal, setShowQuickSaleModal] = useState(false);
 
   // Form and file states
   const [printProduct, setPrintProduct] = useState<Product | null>(null);
+  const [quickSaleProduct, setQuickSaleProduct] = useState<Product | null>(null);
   const [printCopies, setPrintCopies] = useState(1);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
@@ -245,6 +248,15 @@ const ProductsPage: React.FC = () => {
     }
   };
 
+  const handleQuickSale = (product: Product) => {
+    setQuickSaleProduct(product);
+    setShowQuickSaleModal(true);
+  };
+
+  const handleQuickSaleSuccess = () => {
+    toast.success("Quick Sale updated successfully");
+  };
+
   // Import/Export operations
   const handleExportCSV = async () => {
     try {
@@ -410,6 +422,7 @@ const ProductsPage: React.FC = () => {
           onToggleStatus={handleToggleStatus}
           onDelete={handleDeleteProduct}
           onAddNew={() => setShowAddModal(true)}
+          onQuickSale={handleQuickSale}
         />
 
         {/* All Modals */}
@@ -457,6 +470,20 @@ const ProductsPage: React.FC = () => {
           isOpen={showImportExcelModal}
           onClose={() => setShowImportExcelModal(false)}
           onSuccess={loadData}
+        />
+
+        <QuickSaleManager
+          isOpen={showQuickSaleModal}
+          onClose={() => {
+            setShowQuickSaleModal(false);
+            setQuickSaleProduct(null);
+          }}
+          product={quickSaleProduct}
+          onSuccess={() => {
+            handleQuickSaleSuccess();
+            setShowQuickSaleModal(false);
+            setQuickSaleProduct(null);
+          }}
         />
       </div>
     </div>
