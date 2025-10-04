@@ -7,6 +7,8 @@ import { CustomersTable } from "../components/customers/CustomersTable";
 import { CustomerModal } from "../components/customers/CustomerModal";
 import { Pagination } from "../components/sales/Pagination";
 import { Button } from "../components/common";
+import { LoyaltyDashboard, PointsHistoryTable, RewardsGallery } from "../components/loyalty";
+
 
 interface CustomerFormData {
   name: string;
@@ -23,6 +25,8 @@ const CustomersPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [viewingCustomer, setViewingCustomer] = useState<Customer | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'loyalty'>('overview');
 
   useEffect(() => {
     loadCustomers();
@@ -108,6 +112,171 @@ const CustomersPage: React.FC = () => {
     }
   };
 
+  const handleViewDetails = (customer: Customer) => {
+    setViewingCustomer(customer);
+    setActiveTab('overview');
+  };
+
+  const handleCloseDetails = () => {
+    setViewingCustomer(null);
+    setActiveTab('overview');
+  };
+
+  // If viewing customer details, show detail view
+  if (viewingCustomer) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header with Back Button */}
+          <div className="mb-6">
+            <button
+              onClick={handleCloseDetails}
+              className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Customers
+            </button>
+            <h1 className="text-3xl font-bold text-gray-900">{viewingCustomer.name}</h1>
+            <p className="text-gray-600 mt-1">{viewingCustomer.email || viewingCustomer.phoneNumber}</p>
+          </div>
+
+          {/* Tabs */}
+          <div className="bg-white shadow rounded-lg mb-6">
+            <div className="border-b border-gray-200">
+              <nav className="flex -mb-px">
+                <button
+                  onClick={() => setActiveTab('overview')}
+                  className={`py-4 px-6 text-sm font-medium border-b-2 ${
+                    activeTab === 'overview'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Overview
+                </button>
+                <button
+                  onClick={() => setActiveTab('loyalty')}
+                  className={`py-4 px-6 text-sm font-medium border-b-2 ${
+                    activeTab === 'loyalty'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  🎁 Loyalty Program
+                </button>
+              </nav>
+            </div>
+
+            {/* Tab Content */}
+            <div className="p-6">
+              {activeTab === 'overview' && (
+                <div className="space-y-6">
+                  {/* Customer Information */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="text-sm font-medium text-gray-500 mb-3">Contact Information</h3>
+                      <dl className="space-y-2">
+                        <div>
+                          <dt className="text-xs text-gray-500">Phone</dt>
+                          <dd className="text-sm font-medium text-gray-900">{viewingCustomer.phoneNumber || 'N/A'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-gray-500">Email</dt>
+                          <dd className="text-sm font-medium text-gray-900">{viewingCustomer.email || 'N/A'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-gray-500">Address</dt>
+                          <dd className="text-sm font-medium text-gray-900">{viewingCustomer.address || 'N/A'}</dd>
+                        </div>
+                      </dl>
+                    </div>
+
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="text-sm font-medium text-gray-500 mb-3">Account Information</h3>
+                      <dl className="space-y-2">
+                        <div>
+                          <dt className="text-xs text-gray-500">Customer ID</dt>
+                          <dd className="text-sm font-medium text-gray-900">#{viewingCustomer.id}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-gray-500">Loyalty Points</dt>
+                          <dd className="text-lg font-medium text-blue-600">{viewingCustomer.loyaltyPoints || 0}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-gray-500">Member Since</dt>
+                          <dd className="text-sm font-medium text-gray-900">
+                            {new Date(viewingCustomer.createdAt).toLocaleDateString()}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-gray-500">Status</dt>
+                          <dd className="text-sm font-medium">
+                            <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
+                              viewingCustomer.isActive 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {viewingCustomer.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                          </dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </div>
+
+                  {/* Quick Actions */}
+                  <div className="flex gap-3">
+                    <Button variant="primary" onClick={() => handleEdit(viewingCustomer)}>
+                      Edit Customer
+                    </Button>
+                    <Button 
+                      variant="secondary" 
+                      onClick={() => setActiveTab('loyalty')}
+                      className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                    >
+                      View Loyalty Details
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'loyalty' && (
+                <div className="space-y-6">
+                  {/* Loyalty Dashboard */}
+                  <LoyaltyDashboard 
+                    customer={viewingCustomer}
+                    onRefresh={() => {
+                      loadCustomers();
+                      // Refresh the viewing customer
+                      const updated = customers.find(c => c.id === viewingCustomer.id);
+                      if (updated) setViewingCustomer(updated);
+                    }}
+                  />
+
+                  {/* Points History */}
+                  <PointsHistoryTable customerId={viewingCustomer.id} />
+
+                  {/* Rewards Gallery */}
+                  <RewardsGallery 
+                    customerId={viewingCustomer.id}
+                    customerPoints={viewingCustomer.loyaltyPoints || 0}
+                    onRewardRedeemed={() => {
+                      loadCustomers();
+                      const updated = customers.find(c => c.id === viewingCustomer.id);
+                      if (updated) setViewingCustomer(updated);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -124,7 +293,13 @@ const CustomersPage: React.FC = () => {
 
         {/* Customers Table */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <CustomersTable customers={customers} isLoading={isLoading} onEdit={handleEdit} onDelete={handleDelete} />
+          <CustomersTable 
+            customers={customers} 
+            isLoading={isLoading} 
+            onEdit={handleEdit} 
+            onDelete={handleDelete}
+            onViewDetails={handleViewDetails}
+          />
 
           {/* Pagination */}
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

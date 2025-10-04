@@ -7,9 +7,16 @@ interface CustomersTableProps {
   isLoading: boolean;
   onEdit: (customer: Customer) => void;
   onDelete: (customer: Customer) => void;
+  onViewDetails?: (customer: Customer) => void;
 }
 
-export const CustomersTable: React.FC<CustomersTableProps> = ({ customers, isLoading, onEdit, onDelete }) => {
+export const CustomersTable: React.FC<CustomersTableProps> = ({ 
+  customers, 
+  isLoading, 
+  onEdit, 
+  onDelete,
+  onViewDetails 
+}) => {
   if (isLoading) {
     return (
       <div className="text-center py-8">
@@ -65,6 +72,14 @@ export const CustomersTable: React.FC<CustomersTableProps> = ({ customers, isLoa
                   </Badge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  {onViewDetails && (
+                    <button 
+                      onClick={() => onViewDetails(customer)} 
+                      className="text-blue-600 hover:text-blue-900 mr-4"
+                    >
+                      👁️ View
+                    </button>
+                  )}
                   <button onClick={() => onEdit(customer)} className="text-blue-600 hover:text-blue-900 mr-4">
                     Edit
                   </button>

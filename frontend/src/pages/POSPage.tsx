@@ -5,8 +5,9 @@ import {
   customersAPI,
   salesAPI,
   categoriesAPI,
+  parkedSalesAPI,
 } from "../services/api";
-import { Product, Customer, Category, CartItem } from "../types";
+import { Product, Customer, Category, CartItem, ParkedSale } from "../types";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { POSBarcodeScanner } from "../components/pos/POSBarcodeScanner";
@@ -14,6 +15,11 @@ import { POSProductGrid } from "../components/pos/POSProductGrid";
 import { POSCustomerSearch } from "../components/pos/POSCustomerSearch";
 import { POSCart } from "../components/pos/POSCart";
 import { POSPaymentModal } from "../components/pos/POSPaymentModal";
+import { QuickSaleButtons } from "../components/pos/QuickSaleButtons";
+import { ParkSaleDialog } from "../components/pos/ParkSaleDialog";
+import { ParkedSalesList } from "../components/pos/ParkedSalesList";
+import { SplitPaymentDialog } from "../components/pos/SplitPaymentDialog";
+import { RedeemPointsDialog } from "../components/loyalty";
 import {
   calculateSubtotal,
   calculateTax,
@@ -42,8 +48,14 @@ const POSPage: React.FC = () => {
   // Payment state
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showSplitPaymentModal, setShowSplitPaymentModal] = useState(false);
+  const [showParkSaleDialog, setShowParkSaleDialog] = useState(false);
+  const [showParkedSalesList, setShowParkedSalesList] = useState(false);
+  const [showRedeemPointsDialog, setShowRedeemPointsDialog] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"CASH" | "CARD">("CASH");
   const [cashReceived, setCashReceived] = useState("");
+  const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
+  const [pointsUsed, setPointsUsed] = useState(0);
 
   useEffect(() => {
     loadCategories();
@@ -216,9 +228,137 @@ const POSPage: React.FC = () => {
     setShowPaymentModal(true);
   };
 
+  const handleSplitPayment = () => {
+    if (cart.length === 0) {
+      toast.error("Cart is empty");
+      return;
+    }
+    setShowSplitPaymentModal(true);
+  };
+
+  const handleParkSale = () => {
+    if (cart.length === 0) {
+      toast.error("Cart is empty");
+      return;
+    }
+    setShowParkSaleDialog(true);
+  };
+
+  const confirmParkSale = async (notes: string) => {
+    try {
+      const parkData = {
+        customerId: customer?.id,
+        items: cart.map((item) => ({
+          productId: item.product.id,
+          productVariantId: undefined,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subtotal,
+        taxAmount: tax,
+        discountAmount: 0,
+        notes,
+      };
+
+      await parkedSalesAPI.create(parkData);
+      toast.success("Sale parked successfully");
+
+      // Clear cart
+      setCart([]);
+      setCustomer(null);
+      setCustomerPhone("");
+      setShowParkSaleDialog(false);
+    } catch (error: any) {
+      console.error("Error parking sale:", error);
+      toast.error(error.response?.data?.error || "Failed to park sale");
+    }
+  };
+
+  const handleResumeParkedSale = (parkedSale: ParkedSale) => {
+    try {
+      // Convert parked items to cart items
+      const parkedItems = parkedSale.items as any[];
+      const cartItems: CartItem[] = parkedItems.map((item: any) => ({
+        product: {
+          id: item.productId,
+          name: item.productName || "Product",
+          sellingPrice: item.price,
+          stockQuantity: 999, // We don't have stock info in parked sale
+        } as Product,
+        quantity: item.quantity,
+        price: item.price,
+        subtotal: item.quantity * item.price,
+      }));
+
+      setCart(cartItems);
+      
+      if (parkedSale.customer) {
+        setCustomer(parkedSale.customer);
+        setCustomerPhone(parkedSale.customer.phoneNumber || "");
+      }
+
+      toast.success("Parked sale resumed");
+    } catch (error) {
+      console.error("Error resuming parked sale:", error);
+      toast.error("Failed to resume parked sale");
+    }
+  };
+
+  const handlePointsRedeemed = (discountAmount: number, points: number) => {
+    setLoyaltyDiscount(discountAmount);
+    setPointsUsed(points);
+    setShowRedeemPointsDialog(false);
+    toast.success(`Applied $${discountAmount.toFixed(2)} loyalty discount using ${points} points!`);
+  };
+
+  const handleConfirmSplitPayment = async (splits: any[]) => {
+    if (isProcessingPayment) return;
+
+    setIsProcessingPayment(true);
+
+    try {
+      const saleData = {
+        customerId: customer?.id,
+        items: cart.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+          price: item.price,
+          discount: item.discount || 0,
+        })),
+        paymentMethod: "MIXED" as any,
+        paymentSplits: splits.map((split) => ({
+          method: split.method,
+          amount: split.amount,
+        })),
+      };
+
+      const sale = await salesAPI.create(saleData);
+
+      toast.success(`Sale completed! Receipt ID: ${sale.receiptId}`);
+
+      // Clear cart and reset form
+      setCart([]);
+      setCustomer(null);
+      setCustomerPhone("");
+      setShowSplitPaymentModal(false);
+      setLoyaltyDiscount(0);
+      setPointsUsed(0);
+
+      // Reload products to update stock quantities
+      loadProducts(selectedCategory || undefined);
+    } catch (error) {
+      console.error("Error processing split payment:", error);
+      toast.error("Failed to process payment");
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   const handleClearCart = () => {
     if (confirm("Clear the entire cart?")) {
       setCart([]);
+      setLoyaltyDiscount(0);
+      setPointsUsed(0);
     }
   };
 
@@ -229,10 +369,11 @@ const POSPage: React.FC = () => {
 
     try {
       const total = calculateTotal(cart);
+      const finalTotal = total - loyaltyDiscount;
       const cashAmount =
-        paymentMethod === "CASH" ? parseFloat(cashReceived) : total;
+        paymentMethod === "CASH" ? parseFloat(cashReceived) : finalTotal;
 
-      if (paymentMethod === "CASH" && cashAmount < total) {
+      if (paymentMethod === "CASH" && cashAmount < finalTotal) {
         toast.error("Insufficient cash amount");
         setIsProcessingPayment(false);
         return;
@@ -261,6 +402,8 @@ const POSPage: React.FC = () => {
       setShowPaymentModal(false);
       setCashReceived("");
       setPaymentMethod("CASH");
+      setLoyaltyDiscount(0);
+      setPointsUsed(0);
 
       // Reload products to update stock quantities
       loadProducts(selectedCategory || undefined);
@@ -276,7 +419,8 @@ const POSPage: React.FC = () => {
   const subtotal = calculateSubtotal(cart);
   const tax = calculateTax(cart);
   const total = calculateTotal(cart);
-  const changeAmount = calculateChange(parseFloat(cashReceived) || 0, total);
+  const finalTotal = total - loyaltyDiscount;
+  const changeAmount = calculateChange(parseFloat(cashReceived) || 0, finalTotal);
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
@@ -320,13 +464,18 @@ const POSPage: React.FC = () => {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Product Scanning & Categories */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Barcode Scanner */}
           <POSBarcodeScanner
             barcode={barcode}
             onBarcodeChange={setBarcode}
             onSubmit={handleBarcodeSubmit}
           />
+
+          {/* Quick Sale Buttons */}
+          <div className="px-4 pb-2">
+            <QuickSaleButtons onProductSelect={addToCart} />
+          </div>
 
           {/* Quick Access Categories & Products Grid */}
           <POSProductGrid
@@ -355,9 +504,15 @@ const POSPage: React.FC = () => {
             onRemoveItem={removeFromCart}
             onClearCart={handleClearCart}
             onProcessPayment={handlePayment}
+            onSplitPayment={handleSplitPayment}
+            onParkSale={handleParkSale}
+            onViewParkedSales={() => setShowParkedSalesList(true)}
+            onRedeemPoints={() => setShowRedeemPointsDialog(true)}
             subtotal={subtotal}
             tax={tax}
             total={total}
+            loyaltyDiscount={loyaltyDiscount}
+            customer={customer}
           />
         </div>
       </div>
@@ -367,7 +522,7 @@ const POSPage: React.FC = () => {
         isOpen={showPaymentModal}
         subtotal={subtotal}
         tax={tax}
-        total={total}
+        total={finalTotal}
         paymentMethod={paymentMethod}
         cashReceived={cashReceived}
         changeAmount={changeAmount}
@@ -377,6 +532,51 @@ const POSPage: React.FC = () => {
         onCashReceivedChange={setCashReceived}
         onConfirm={processPayment}
       />
+
+      {/* Split Payment Modal */}
+      <SplitPaymentDialog
+        isOpen={showSplitPaymentModal}
+        onClose={() => setShowSplitPaymentModal(false)}
+        totalAmount={finalTotal}
+        onConfirm={handleConfirmSplitPayment}
+      />
+
+      {/* Park Sale Dialog */}
+      <ParkSaleDialog
+        isOpen={showParkSaleDialog}
+        onClose={() => setShowParkSaleDialog(false)}
+        cartItems={cart.map((item) => ({
+          productId: item.product.id,
+          productName: item.product.name,
+          quantity: item.quantity,
+          price: item.price,
+        }))}
+        customerId={customer?.id}
+        subtotal={subtotal}
+        taxAmount={tax}
+        discountAmount={0}
+        onConfirm={confirmParkSale}
+      />
+
+      {/* Parked Sales List */}
+      <ParkedSalesList
+        isOpen={showParkedSalesList}
+        onClose={() => setShowParkedSalesList(false)}
+        onResume={handleResumeParkedSale}
+      />
+
+      {/* Redeem Loyalty Points Dialog */}
+      {customer && (
+        <RedeemPointsDialog
+          isOpen={showRedeemPointsDialog}
+          onClose={() => setShowRedeemPointsDialog(false)}
+          customerId={customer.id}
+          customerName={customer.name}
+          availablePoints={customer.loyaltyPoints || 0}
+          cartTotal={total}
+          onRedeemed={handlePointsRedeemed}
+        />
+      )}
     </div>
   );
 };

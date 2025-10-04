@@ -8,9 +8,15 @@ interface POSCartProps {
   onRemoveItem: (productId: number) => void;
   onClearCart: () => void;
   onProcessPayment: () => void;
+  onSplitPayment?: () => void;
+  onParkSale?: () => void;
+  onViewParkedSales?: () => void;
+  onRedeemPoints?: () => void;
   subtotal: number;
   tax: number;
   total: number;
+  loyaltyDiscount?: number;
+  customer?: any; // Customer with loyalty points
 }
 
 export const POSCart: React.FC<POSCartProps> = ({
@@ -19,9 +25,15 @@ export const POSCart: React.FC<POSCartProps> = ({
   onRemoveItem,
   onClearCart,
   onProcessPayment,
+  onSplitPayment,
+  onParkSale,
+  onViewParkedSales,
+  onRedeemPoints,
   subtotal,
   tax,
   total,
+  loyaltyDiscount = 0,
+  customer,
 }) => {
   return (
     <>
@@ -92,18 +104,47 @@ export const POSCart: React.FC<POSCartProps> = ({
             <span>Tax:</span>
             <span>${tax.toFixed(2)}</span>
           </div>
+          {loyaltyDiscount > 0 && (
+            <div className="flex justify-between text-sm text-green-600">
+              <span>🎁 Loyalty Discount:</span>
+              <span>-${loyaltyDiscount.toFixed(2)}</span>
+            </div>
+          )}
           <div className="flex justify-between font-medium text-lg border-t pt-2">
             <span>Total:</span>
-            <span>${total.toFixed(2)}</span>
+            <span>${(total - loyaltyDiscount).toFixed(2)}</span>
           </div>
         </div>
 
         <div className="space-y-2">
+          {/* Loyalty Points Button - Show if customer has points */}
+          {onRedeemPoints && customer && customer.loyaltyPoints > 0 && loyaltyDiscount === 0 && cart.length > 0 && (
+            <Button variant="primary" fullWidth onClick={onRedeemPoints}>
+              ⭐ Use Loyalty Points ({customer.loyaltyPoints} pts)
+            </Button>
+          )}
           <Button variant="success" fullWidth onClick={onProcessPayment} disabled={cart.length === 0}>
-            Process Payment
+            💳 Process Payment
           </Button>
+          {onSplitPayment && (
+            <Button variant="primary" fullWidth onClick={onSplitPayment} disabled={cart.length === 0}>
+              🔀 Split Payment
+            </Button>
+          )}
+          <div className="grid grid-cols-2 gap-2">
+            {onParkSale && (
+              <Button variant="warning" onClick={onParkSale} disabled={cart.length === 0}>
+                🅿️ Park Sale
+              </Button>
+            )}
+            {onViewParkedSales && (
+              <Button variant="secondary" onClick={onViewParkedSales}>
+                📋 Parked
+              </Button>
+            )}
+          </div>
           <Button variant="secondary" fullWidth onClick={onClearCart} disabled={cart.length === 0}>
-            Clear Cart
+            🗑️ Clear Cart
           </Button>
         </div>
       </div>

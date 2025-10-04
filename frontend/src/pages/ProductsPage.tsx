@@ -7,6 +7,7 @@ import { ProductFilters } from "../components/products/ProductFilters";
 import { ProductActions } from "../components/products/ProductActions";
 import { ProductTable } from "../components/products/ProductTable";
 import { ProductModals } from "../components/products/ProductModals";
+import { ExcelImportDialog } from "../components/products/ExcelImportDialog";
 import { printBarcodeLabel } from "../utils/productUtils";
 
 const ProductsPage: React.FC = () => {
@@ -26,6 +27,7 @@ const ProductsPage: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [showImportExcelModal, setShowImportExcelModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
 
   // Form and file states
@@ -317,6 +319,26 @@ const ProductsPage: React.FC = () => {
     }
   };
 
+  // Excel Export/Import handlers
+  const handleExportExcel = async () => {
+    try {
+      const blob = await productsAPI.exportExcel();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `products_export_${
+        new Date().toISOString().split("T")[0]
+      }.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Products exported to Excel successfully");
+    } catch (error: any) {
+      toast.error("Failed to export products to Excel");
+    }
+  };
+
   // Edit modal handler
   const handleEditClick = (product: Product) => {
     setEditProduct(product);
@@ -370,7 +392,9 @@ const ProductsPage: React.FC = () => {
           <ProductActions
             canWrite={canWrite}
             onExport={handleExportCSV}
+            onExportExcel={handleExportExcel}
             onImport={() => setShowImportModal(true)}
+            onImportExcel={() => setShowImportExcelModal(true)}
             onAddNew={() => setShowAddModal(true)}
           />
         </div>
@@ -428,6 +452,13 @@ const ProductsPage: React.FC = () => {
           isImporting={isImporting}
           handleImportCSV={handleImportCSV}
           handleDownloadTemplate={handleDownloadTemplate}
+        />
+
+        {/* Excel Import Modal */}
+        <ExcelImportDialog
+          isOpen={showImportExcelModal}
+          onClose={() => setShowImportExcelModal(false)}
+          onSuccess={loadData}
         />
       </div>
     </div>

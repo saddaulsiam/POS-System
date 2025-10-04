@@ -199,8 +199,22 @@ export const productsAPI = {
     return response.data;
   },
 
+  exportExcel: async (): Promise<Blob> => {
+    const response = await api.get("/products/export/excel", {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
   downloadTemplate: async (): Promise<Blob> => {
     const response = await api.get("/products/import/template", {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  downloadExcelTemplate: async (): Promise<Blob> => {
+    const response = await api.get("/products/import/excel/template", {
       responseType: "blob",
     });
     return response.data;
@@ -224,12 +238,78 @@ export const productsAPI = {
     return response.data;
   },
 
+  importExcel: async (
+    file: File
+  ): Promise<{
+    message: string;
+    imported: number;
+    duplicates: number;
+    invalid: number;
+    invalidDetails?: Array<{ row: number; data: any; errors: string[] }>;
+  }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await api.post("/products/import/excel", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  },
+
   getBarcodeImage: (id: number): string => {
     return `/api/products/${id}/barcode`;
   },
 
   regenerateBarcode: async (id: number): Promise<Product> => {
     const response = await api.post(`/products/${id}/barcode/regenerate`);
+    return response.data;
+  },
+};
+
+// Product Variants API
+export const productVariantsAPI = {
+  getByProduct: async (productId: number) => {
+    const response = await api.get(`/product-variants/product/${productId}`);
+    return response.data;
+  },
+
+  create: async (data: {
+    productId: number;
+    name: string;
+    sku: string;
+    barcode?: string;
+    purchasePrice: number;
+    sellingPrice: number;
+    stockQuantity?: number;
+    isActive?: boolean;
+  }) => {
+    const response = await api.post("/product-variants", data);
+    return response.data;
+  },
+
+  update: async (
+    id: number,
+    data: {
+      name?: string;
+      sku?: string;
+      barcode?: string;
+      purchasePrice?: number;
+      sellingPrice?: number;
+      stockQuantity?: number;
+      isActive?: boolean;
+    }
+  ) => {
+    const response = await api.put(`/product-variants/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: number) => {
+    await api.delete(`/product-variants/${id}`);
+  },
+
+  lookup: async (identifier: string) => {
+    const response = await api.get(`/product-variants/lookup/${identifier}`);
     return response.data;
   },
 };
@@ -466,6 +546,336 @@ export const inventoryAPI = {
     const response = await api.get("/inventory/movements", {
       params: { productId, ...params },
     });
+    return response.data;
+  },
+
+  // OPTION 4: Inventory Management
+  adjustStock: async (data: {
+    productId: number;
+    productVariantId?: number;
+    quantity: number;
+    reason: "DAMAGED" | "EXPIRED" | "LOST" | "FOUND" | "COUNT_ADJUSTMENT";
+    notes?: string;
+  }) => {
+    const response = await api.post("/inventory/adjust", data);
+    return response.data;
+  },
+
+  transferStock: async (data: {
+    productId: number;
+    productVariantId?: number;
+    quantity: number;
+    fromLocation: string;
+    toLocation: string;
+    notes?: string;
+  }) => {
+    const response = await api.post("/inventory/transfer", data);
+    return response.data;
+  },
+
+  getAlerts: async (params?: {
+    alertType?: "LOW_STOCK" | "OUT_OF_STOCK" | "EXPIRING_SOON" | "DAMAGED";
+    isResolved?: boolean;
+  }) => {
+    const response = await api.get("/inventory/alerts", { params });
+    return response.data;
+  },
+
+  resolveAlert: async (alertId: number) => {
+    const response = await api.put(`/inventory/alerts/${alertId}/resolve`);
+    return response.data;
+  },
+
+  receivePurchaseOrder: async (data: {
+    purchaseOrderId: number;
+    items: Array<{
+      purchaseOrderItemId: number;
+      quantityReceived: number;
+      notes?: string;
+    }>;
+  }) => {
+    const response = await api.post("/inventory/receive-po", data);
+    return response.data;
+  },
+};
+
+// OPTION 2: Parked Sales API
+export const parkedSalesAPI = {
+  getAll: async () => {
+    const response = await api.get("/parked-sales");
+    return response.data;
+  },
+
+  getById: async (id: number) => {
+    const response = await api.get(`/parked-sales/${id}`);
+    return response.data;
+  },
+
+  create: async (data: {
+    customerId?: number;
+    items: Array<{
+      productId: number;
+      productVariantId?: number;
+      quantity: number;
+      price: number;
+    }>;
+    subtotal: number;
+    taxAmount: number;
+    discountAmount: number;
+    notes?: string;
+  }) => {
+    const response = await api.post("/parked-sales", data);
+    return response.data;
+  },
+
+  delete: async (id: number) => {
+    await api.delete(`/parked-sales/${id}`);
+  },
+};
+
+// OPTION 2: Quick Sale Items API
+export const quickSaleItemsAPI = {
+  getAll: async () => {
+    const response = await api.get("/quick-sale-items");
+    return response.data;
+  },
+
+  create: async (data: {
+    productId: number;
+    displayName: string;
+    color: string;
+    sortOrder: number;
+  }) => {
+    const response = await api.post("/quick-sale-items", data);
+    return response.data;
+  },
+
+  update: async (
+    id: number,
+    data: {
+      displayName?: string;
+      color?: string;
+      sortOrder?: number;
+      isActive?: boolean;
+    }
+  ) => {
+    const response = await api.put(`/quick-sale-items/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: number) => {
+    await api.delete(`/quick-sale-items/${id}`);
+  },
+};
+
+// OPTION 3: Loyalty Program API
+export const loyaltyAPI = {
+  // Customer Loyalty
+  getCustomerLoyalty: async (customerId: number) => {
+    const response = await api.get(`/loyalty/customer/${customerId}`);
+    return response.data;
+  },
+
+  awardPoints: async (data: {
+    customerId: number;
+    saleId: number;
+    amount: number;
+  }) => {
+    const response = await api.post("/loyalty/award-points", data);
+    return response.data;
+  },
+
+  redeemPoints: async (data: {
+    customerId: number;
+    points: number;
+    rewardType: "DISCOUNT" | "FREE_PRODUCT" | "STORE_CREDIT" | "SPECIAL_OFFER";
+    rewardValue: number;
+    description?: string;
+  }) => {
+    const response = await api.post("/loyalty/redeem-points", data);
+    return response.data;
+  },
+
+  getTransactions: async (customerId: number) => {
+    const response = await api.get(`/loyalty/customer/${customerId}/transactions`);
+    return response.data;
+  },
+
+  getRewards: async (customerId: number) => {
+    const response = await api.get(`/loyalty/customer/${customerId}/rewards`);
+    return response.data;
+  },
+
+  useReward: async (rewardId: number) => {
+    const response = await api.put(`/loyalty/rewards/${rewardId}/use`);
+    return response.data;
+  },
+
+  // Loyalty Offers
+  getAllOffers: async () => {
+    const response = await api.get("/loyalty/offers");
+    return response.data;
+  },
+
+  createOffer: async (data: {
+    title: string;
+    description?: string;
+    offerType: "PERCENTAGE" | "FIXED_AMOUNT" | "FREE_ITEM";
+    discountValue: number;
+    minimumPurchase?: number;
+    requiredTier?: "BRONZE" | "SILVER" | "GOLD" | "PLATINUM";
+    startDate: string;
+    endDate: string;
+  }) => {
+    const response = await api.post("/loyalty/offers", data);
+    return response.data;
+  },
+
+  updateOffer: async (id: number, data: any) => {
+    const response = await api.put(`/loyalty/offers/${id}`, data);
+    return response.data;
+  },
+
+  // Tier Configuration
+  getTierConfig: async () => {
+    const response = await api.get("/loyalty/tiers");
+    return response.data;
+  },
+};
+
+// OPTION 5: Advanced Reports & Analytics API
+export const analyticsAPI = {
+  getProfitMargin: async (params?: {
+    startDate?: string;
+    endDate?: string;
+    categoryId?: number;
+  }) => {
+    const response = await api.get("/reports/profit-margin", { params });
+    return response.data;
+  },
+
+  getStockTurnover: async (params?: {
+    days?: number;
+    categoryId?: number;
+  }) => {
+    const response = await api.get("/reports/stock-turnover", { params });
+    return response.data;
+  },
+
+  getSalesTrends: async (params?: {
+    period?: "daily" | "weekly" | "monthly";
+    startDate?: string;
+    endDate?: string;
+  }) => {
+    const response = await api.get("/reports/sales-trends", { params });
+    return response.data;
+  },
+
+  getCustomerAnalytics: async (params?: {
+    startDate?: string;
+    endDate?: string;
+    limit?: number;
+  }) => {
+    const response = await api.get("/reports/customer-analytics", { params });
+    return response.data;
+  },
+};
+
+// OPTION 6: Receipt & Printing API
+export const receiptsAPI = {
+  generate: async (
+    saleId: number,
+    format: "PDF" | "HTML" | "THERMAL" = "PDF"
+  ): Promise<Blob> => {
+    const response = await api.get(`/receipts/${saleId}/generate`, {
+      params: { format },
+      responseType: format === "HTML" ? "text" : "blob",
+    });
+    return response.data;
+  },
+
+  preview: async (saleId: number) => {
+    const response = await api.get(`/receipts/${saleId}/preview`);
+    return response.data;
+  },
+
+  send: async (data: {
+    saleId: number;
+    customerEmail: string;
+    customerName?: string;
+    includePDF?: boolean;
+  }) => {
+    const response = await api.post("/receipts/send", data);
+    return response.data;
+  },
+
+  print: async (saleId: number, printerName?: string) => {
+    const response = await api.post("/receipts/print", {
+      saleId,
+      printerName,
+    });
+    return response.data;
+  },
+
+  bulkSend: async (data: {
+    saleIds: number[];
+    customerEmail: string;
+    customerName?: string;
+  }) => {
+    const response = await api.post("/receipts/bulk-send", data);
+    return response.data;
+  },
+
+  getStoreSettings: async () => {
+    const response = await api.get("/receipts/store-settings");
+    return response.data;
+  },
+
+  updateStoreSettings: async (data: {
+    storeName?: string;
+    storeAddress?: string;
+    storePhone?: string;
+    storeEmail?: string;
+    taxId?: string;
+    returnPolicy?: string;
+  }) => {
+    const response = await api.put("/receipts/store-settings", data);
+    return response.data;
+  },
+};
+
+// OPTION 7: Enhanced Returns & Refunds API
+export const returnsAPI = {
+  processReturn: async (
+    saleId: number,
+    data: {
+      items: Array<{
+        saleItemId: number;
+        quantity: number;
+        condition: "NEW" | "OPENED" | "DAMAGED" | "DEFECTIVE";
+      }>;
+      reason: string;
+      refundMethod: "CASH" | "ORIGINAL_PAYMENT" | "STORE_CREDIT" | "EXCHANGE";
+      restockingFee?: number;
+      exchangeProductId?: number;
+      notes?: string;
+    }
+  ) => {
+    const response = await api.post(`/sales/${saleId}/return`, data);
+    return response.data;
+  },
+
+  getReturnHistory: async (params?: {
+    customerId?: number;
+    startDate?: string;
+    endDate?: string;
+  }) => {
+    const response = await api.get("/sales/returns", { params });
+    return response.data;
+  },
+
+  getReturnById: async (saleId: number) => {
+    const response = await api.get(`/sales/${saleId}/return`);
     return response.data;
   },
 };

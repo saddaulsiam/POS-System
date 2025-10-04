@@ -5,8 +5,8 @@ import LoadingSpinner from "./components/common/LoadingSpinner";
 import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import { useAuth } from "./context/AuthContext";
-
 import AdminDashboard from "./pages/AdminDashboard";
+import AuditLogsPage from "./pages/AuditLogsPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import CustomersPage from "./pages/CustomersPage";
 import EmployeesPage from "./pages/EmployeesPage";
@@ -14,11 +14,11 @@ import InventoryPage from "./pages/InventoryPage";
 import LoginPage from "./pages/LoginPage";
 import NewProductPage from "./pages/NewProductPage";
 import POSPage from "./pages/POSPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 import ProductsPage from "./pages/ProductsPage";
+import ProfilePage from "./pages/ProfilePage";
 import ReportsPage from "./pages/ReportsPage";
 import SalesPage from "./pages/SalesPage";
-import ProfilePage from "./pages/ProfilePage";
-import AuditLogsPage from "./pages/AuditLogsPage";
 import SuppliersPage from "./pages/SuppliersPage";
 
 const adminPaths = [
@@ -75,6 +75,7 @@ const App: React.FC = () => {
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/products/new" element={<NewProductPage />} />
+                <Route path="/products/:id" element={<ProductDetailPage />} />
                 <Route path="/categories" element={<CategoriesPage />} />
                 <Route path="/suppliers" element={<SuppliersPage />} />
                 <Route path="/employees" element={<EmployeesPage />} />
@@ -93,7 +94,7 @@ const App: React.FC = () => {
       </div>
 
       <Toaster
-        position="top-right"
+        position="top-center"
         toastOptions={{
           duration: 3000,
           style: {
