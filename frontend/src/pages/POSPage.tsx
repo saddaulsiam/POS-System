@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { productsAPI, customersAPI, salesAPI, categoriesAPI, parkedSalesAPI } from "../services/api";
-import { Product, Customer, Category, CartItem, ParkedSale } from "../types";
+import { Product, Customer, Category, CartItem, ParkedSale, CreateCustomerRequest } from "../types";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { POSBarcodeScanner } from "../components/pos/POSBarcodeScanner";
@@ -14,6 +14,7 @@ import { ParkSaleDialog } from "../components/pos/ParkSaleDialog";
 import { ParkedSalesList } from "../components/pos/ParkedSalesList";
 import { SplitPaymentDialog } from "../components/pos/SplitPaymentDialog";
 import { RedeemPointsDialog } from "../components/loyalty";
+import { CustomerModal } from "../components/customers/CustomerModal";
 import { calculateSubtotal, calculateTax, calculateTotal, calculateChange } from "../utils/posUtils";
 
 const POSPage: React.FC = () => {
@@ -28,6 +29,8 @@ const POSPage: React.FC = () => {
   // Customer state
   const [customerPhone, setCustomerPhone] = useState("");
   const [customer, setCustomer] = useState<Customer | null>(null);
+  const [customerNotFound, setCustomerNotFound] = useState(false);
+  const [showCreateCustomerModal, setShowCreateCustomerModal] = useState(false);
 
   // Products and categories state
   const [categories, setCategories] = useState<Category[]>([]);
@@ -195,16 +198,53 @@ const POSPage: React.FC = () => {
   const searchCustomer = async () => {
     if (!customerPhone.trim()) {
       setCustomer(null);
+      setCustomerNotFound(false);
       return;
     }
 
     try {
       const customerData = await customersAPI.getByPhone(customerPhone);
       setCustomer(customerData);
+      setCustomerNotFound(false);
       toast.success(`Customer found: ${customerData.name}`);
     } catch (error) {
       setCustomer(null);
-      toast.error("Customer not found");
+      setCustomerNotFound(true);
+      // Don't show error toast, let the UI show the create button instead
+    }
+  };
+
+  const handleCreateCustomer = () => {
+    setShowCreateCustomerModal(true);
+  };
+
+  const handleClearCustomer = () => {
+    setCustomer(null);
+    setCustomerPhone("");
+    setCustomerNotFound(false);
+    setLoyaltyDiscount(0);
+  };
+
+  const handleCustomerFormSubmit = async (formData: any) => {
+    try {
+      const customerData: CreateCustomerRequest = {
+        name: formData.name.trim(),
+        phoneNumber: formData.phoneNumber.trim() || customerPhone.trim(), // Use searched phone if form phone is empty
+        email: formData.email.trim() || undefined,
+        dateOfBirth: formData.dateOfBirth.trim() || undefined,
+        address: formData.address.trim() || undefined,
+      };
+
+      const newCustomer = await customersAPI.create(customerData);
+      setCustomer(newCustomer);
+      setCustomerPhone(newCustomer.phoneNumber || "");
+      setCustomerNotFound(false);
+      setShowCreateCustomerModal(false);
+      toast.success(`Customer created: ${newCustomer.name}`);
+    } catch (error: any) {
+      console.error("Error creating customer:", error);
+      toast.error(error.response?.data?.error || "Failed to create customer");
+      throw error;
     }
   };
 
@@ -466,8 +506,11 @@ const POSPage: React.FC = () => {
           <POSCustomerSearch
             customerPhone={customerPhone}
             customer={customer}
+            customerNotFound={customerNotFound}
             onPhoneChange={setCustomerPhone}
             onSearch={searchCustomer}
+            onCreateCustomer={handleCreateCustomer}
+            onClearCustomer={handleClearCustomer}
           />
 
           {/* Cart */}
@@ -550,6 +593,15 @@ const POSPage: React.FC = () => {
           onRedeemed={handlePointsRedeemed}
         />
       )}
+
+      {/* Create Customer Modal */}
+      <CustomerModal
+        isOpen={showCreateCustomerModal}
+        editingCustomer={null}
+        initialPhoneNumber={customerPhone}
+        onClose={() => setShowCreateCustomerModal(false)}
+        onSubmit={handleCustomerFormSubmit}
+      />
     </div>
   );
 };

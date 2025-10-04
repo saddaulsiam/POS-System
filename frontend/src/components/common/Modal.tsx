@@ -3,7 +3,7 @@ import React from "react";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
+  title?: string | React.ReactNode;
   children: React.ReactNode;
   footer?: React.ReactNode;
   size?: "sm" | "md" | "lg" | "xl" | "2xl";
@@ -43,11 +43,15 @@ export const Modal: React.FC<ModalProps> = ({
       <div className={`bg-white rounded-lg shadow-xl ${sizeStyles[size]} w-full max-h-[90vh] flex flex-col`}>
         {/* Header */}
         {title && (
-          <div className="flex justify-between items-center px-6 py-4 border-b">
-            <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+          <div className="flex justify-between items-start px-6 py-4 border-b">
+            {typeof title === "string" ? (
+              <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+            ) : (
+              <div className="flex-1">{title}</div>
+            )}
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none focus:outline-none"
+              className="text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none focus:outline-none ml-4 flex-shrink-0"
               aria-label="Close modal"
             >
               &times;
