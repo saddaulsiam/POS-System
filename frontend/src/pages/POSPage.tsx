@@ -278,9 +278,14 @@ const POSPage: React.FC = () => {
         customerId: customer?.id,
         items: cart.map((item) => ({
           productId: item.product.id,
+          productName: item.product.name,
+          productSku: item.product.sku,
+          productBarcode: item.product.barcode,
           productVariantId: undefined,
           quantity: item.quantity,
           price: item.price,
+          taxRate: item.product.taxRate || 0,
+          categoryId: item.product.categoryId,
         })),
         subtotal,
         taxAmount: tax,
@@ -310,8 +315,22 @@ const POSPage: React.FC = () => {
         product: {
           id: item.productId,
           name: item.productName || "Product",
+          sku: item.productSku || "",
+          barcode: item.productBarcode || "",
+          description: "",
+          categoryId: item.categoryId || 0,
+          supplierId: undefined,
+          costPrice: item.price,
+          purchasePrice: item.price,
           sellingPrice: item.price,
           stockQuantity: 999, // We don't have stock info in parked sale
+          reorderLevel: 0,
+          lowStockThreshold: 0,
+          taxRate: item.taxRate || 0, // Use stored tax rate or default to 0
+          isActive: true,
+          isWeighted: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         } as Product,
         quantity: item.quantity,
         price: item.price,
@@ -491,7 +510,7 @@ const POSPage: React.FC = () => {
           />
 
           {/* Quick Sale Buttons */}
-          <div className="px-4 pb-2">
+          <div className="px-4 pt-2">
             <QuickSaleButtons onProductSelect={addToCart} />
           </div>
 

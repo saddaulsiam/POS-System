@@ -121,7 +121,7 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({ isOpen, onClos
                 <div
                   key={sale.id}
                   className={`border rounded-lg p-4 ${
-                    expired ? "border-red-200 bg-red-50" : "border-gray-200 bg-white hover:shadow-md"
+                    expired ? "border-orange-200 bg-orange-50" : "border-gray-200 bg-white hover:shadow-md"
                   } transition-shadow`}
                 >
                   <div className="flex items-start justify-between">
@@ -131,8 +131,8 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({ isOpen, onClos
                         <span className="font-semibold text-gray-900">Sale #{sale.id}</span>
                         {sale.customer && <span className="text-sm text-gray-600">• {sale.customer.name}</span>}
                         {expired && (
-                          <span className="px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">
-                            Expired
+                          <span className="px-2 py-1 text-xs font-semibold bg-orange-100 text-orange-800 rounded-full">
+                            Expired (Still Resumable)
                           </span>
                         )}
                       </div>
@@ -153,7 +153,7 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({ isOpen, onClos
                         </div>
                         <div>
                           <span className="text-gray-600">Expires in:</span>
-                          <p className={`font-medium ${expired ? "text-red-600" : "text-gray-900"}`}>
+                          <p className={`font-medium ${expired ? "text-orange-600" : "text-gray-900"}`}>
                             {getTimeRemaining(sale.expiresAt)}
                           </p>
                         </div>
@@ -175,25 +175,27 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({ isOpen, onClos
 
                     {/* Actions */}
                     <div className="flex flex-col gap-2 ml-4">
-                      {!expired && (
-                        <Button variant="primary" onClick={() => handleResume(sale)} className="text-sm">
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          Resume
-                        </Button>
-                      )}
+                      <Button
+                        variant={expired ? "secondary" : "primary"}
+                        onClick={() => handleResume(sale)}
+                        className="text-sm flex"
+                      >
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Resume
+                      </Button>
                       <button
                         onClick={() => handleDelete(sale.id)}
                         disabled={deleting === sale.id}
