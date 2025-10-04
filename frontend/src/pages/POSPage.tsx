@@ -483,7 +483,12 @@ const POSPage: React.FC = () => {
         {/* Left Panel - Product Scanning & Categories */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Barcode Scanner */}
-          <POSBarcodeScanner barcode={barcode} onBarcodeChange={setBarcode} onSubmit={handleBarcodeSubmit} />
+          <POSBarcodeScanner
+            barcode={barcode}
+            onBarcodeChange={setBarcode}
+            onSubmit={handleBarcodeSubmit}
+            onProductSelect={addToCart}
+          />
 
           {/* Quick Sale Buttons */}
           <div className="px-4 pb-2">
