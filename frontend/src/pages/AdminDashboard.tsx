@@ -77,7 +77,7 @@ const AdminDashboard: React.FC = () => {
     setIsLoading(true);
     try {
       const { reportsAPI, customersAPI } = await import("../services/api");
-      
+
       // Helper to format date as YYYY-MM-DD
       const formatDate = (date: Date) => {
         const year = date.getFullYear();
@@ -142,19 +142,15 @@ const AdminDashboard: React.FC = () => {
       }).length;
 
       // Map top selling products
-      const topSellingProducts = (productPerformance.products || []).map(
-        (p: any) => ({
-          id: p.product.id,
-          name: p.product.name,
-          totalSold: p.totalQuantitySold,
-          revenue: p.totalRevenue,
-        })
-      );
+      const topSellingProducts = (productPerformance.products || []).map((p: any) => ({
+        id: p.product.id,
+        name: p.product.name,
+        totalSold: p.totalQuantitySold,
+        revenue: p.totalRevenue,
+      }));
 
       // Map recent transactions
-      const recentTransactions: DashboardStats["recentTransactions"] = (
-        todaySalesRange.sales || []
-      )
+      const recentTransactions: DashboardStats["recentTransactions"] = (todaySalesRange.sales || [])
         .slice(0, 5)
         .map((sale: any) => ({
           id: sale.id,
@@ -162,10 +158,7 @@ const AdminDashboard: React.FC = () => {
           createdAt: sale.createdAt,
           customerName: sale.customer?.name,
           itemCount: Array.isArray(sale.saleItems)
-            ? sale.saleItems.reduce(
-                (sum: number, item: any) => sum + (item.quantity || 0),
-                0
-              )
+            ? sale.saleItems.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0)
             : 0,
         }));
 
@@ -185,10 +178,8 @@ const AdminDashboard: React.FC = () => {
         todayTransactions: todaySalesReport.summary.totalTransactions ?? 0,
         weekTransactions: weekSalesReport.summary.totalTransactions ?? 0,
         averageOrderValue:
-          todaySalesReport.summary.totalSales &&
-          todaySalesReport.summary.totalTransactions
-            ? todaySalesReport.summary.totalSales /
-              todaySalesReport.summary.totalTransactions
+          todaySalesReport.summary.totalSales && todaySalesReport.summary.totalTransactions
+            ? todaySalesReport.summary.totalSales / todaySalesReport.summary.totalTransactions
             : 0,
         topSellingProducts,
         recentTransactions,
@@ -197,21 +188,13 @@ const AdminDashboard: React.FC = () => {
       });
     } catch (error: any) {
       console.error("Failed to load dashboard data:", error);
-      toast.error(
-        "Failed to load dashboard data: " + (error?.message || error)
-      );
+      toast.error("Failed to load dashboard data: " + (error?.message || error));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const ChartCard = ({
-    title,
-    children,
-  }: {
-    title: string;
-    children: React.ReactNode;
-  }) => (
+  const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
       {children}
@@ -267,12 +250,8 @@ const AdminDashboard: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Access Denied
-          </h1>
-          <p className="text-gray-600 mb-4">
-            You don't have permission to access the admin dashboard.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <p className="text-gray-600 mb-4">You don't have permission to access the admin dashboard.</p>
           <BackButton to="/" label="Back to POS" />
         </div>
       </div>
@@ -290,9 +269,7 @@ const AdminDashboard: React.FC = () => {
           <div className="space-y-8">
             {/* Key Metrics */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                📊 Key Metrics
-              </h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">📊 Key Metrics</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <DashboardStatCard
                   title="Today's Sales"
@@ -301,18 +278,8 @@ const AdminDashboard: React.FC = () => {
                   icon="💰"
                   color="green"
                 />
-                <DashboardStatCard
-                  title="Total Products"
-                  value={stats.totalProducts}
-                  icon="📦"
-                  color="blue"
-                />
-                <DashboardStatCard
-                  title="Low Stock Items"
-                  value={stats.lowStockCount}
-                  icon="⚠️"
-                  color="yellow"
-                />
+                <DashboardStatCard title="Total Products" value={stats.totalProducts} icon="📦" color="blue" />
+                <DashboardStatCard title="Low Stock Items" value={stats.lowStockCount} icon="⚠️" color="yellow" />
                 <DashboardStatCard
                   title="Today's Orders"
                   value={stats.todayTransactions}
@@ -325,9 +292,7 @@ const AdminDashboard: React.FC = () => {
 
             {/* Sales Overview */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                📈 Sales Overview
-              </h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">📈 Sales Overview</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <DashboardStatCard
                   title="Yesterday"
@@ -361,9 +326,7 @@ const AdminDashboard: React.FC = () => {
 
             {/* Performance Metrics */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                ⚡ Performance Metrics
-              </h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">⚡ Performance Metrics</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <DashboardStatCard
                   title="Total Customers"
@@ -411,17 +374,12 @@ const AdminDashboard: React.FC = () => {
 
             {/* Recent Activity */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <RecentTransactionsList
-                transactions={stats.recentTransactions}
-              />
+              <RecentTransactionsList transactions={stats.recentTransactions} />
               <QuickActionsGrid actions={quickActions} />
             </div>
 
             {/* Alerts and Notifications */}
-            <AlertsSection
-              lowStockCount={stats.lowStockCount}
-              outOfStockCount={stats.outOfStockCount}
-            />
+            <AlertsSection lowStockCount={stats.lowStockCount} outOfStockCount={stats.outOfStockCount} />
           </div>
         )}
       </div>

@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { reportsAPI } from "../services/api";
-import {
-  DailySalesReport,
-  EmployeePerformanceReport,
-  ProductPerformanceReport,
-  InventoryReport,
-} from "../types";
+import { DailySalesReport, EmployeePerformanceReport, ProductPerformanceReport, InventoryReport } from "../types";
 import { formatDate } from "../utils/reportUtils";
 import { BackButton } from "../components/common";
 import { DateRangeFilter } from "../components/reports/DateRangeFilter";
@@ -24,10 +19,8 @@ const ReportsPage: React.FC = () => {
     end: formatDate(new Date()),
   });
   const [salesRange, setSalesRange] = useState<any>(null);
-  const [employeePerf, setEmployeePerf] =
-    useState<EmployeePerformanceReport | null>(null);
-  const [productPerf, setProductPerf] =
-    useState<ProductPerformanceReport | null>(null);
+  const [employeePerf, setEmployeePerf] = useState<EmployeePerformanceReport | null>(null);
+  const [productPerf, setProductPerf] = useState<ProductPerformanceReport | null>(null);
   const [inventory, setInventory] = useState<InventoryReport | null>(null);
 
   useEffect(() => {
@@ -62,9 +55,7 @@ const ReportsPage: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-4xl font-extrabold text-blue-900 tracking-tight">
-            📊 Reports & Analytics
-          </h1>
+          <h1 className="text-4xl font-extrabold text-blue-900 tracking-tight">📊 Reports & Analytics</h1>
           <BackButton to="/admin" label="Back to Dashboard" />
         </div>
 
@@ -83,39 +74,23 @@ const ReportsPage: React.FC = () => {
           </div>
         ) : error ? (
           /* Error State */
-          <div className="bg-red-100 text-red-700 p-4 rounded mb-6">
-            {error}
-          </div>
+          <div className="bg-red-100 text-red-700 p-4 rounded mb-6">{error}</div>
         ) : (
           <>
             {/* Daily Sales Summary */}
             {daily && <DailySalesCard daily={daily} />}
 
             {/* Sales Range Summary */}
-            {salesRange && (
-              <SalesRangeCard
-                salesRange={salesRange}
-                startDate={range.start}
-                endDate={range.end}
-              />
-            )}
+            {salesRange && <SalesRangeCard salesRange={salesRange} startDate={range.start} endDate={range.end} />}
 
             {/* Employee Performance */}
             {employeePerf && (
-              <EmployeePerformanceCard
-                employeePerf={employeePerf}
-                startDate={range.start}
-                endDate={range.end}
-              />
+              <EmployeePerformanceCard employeePerf={employeePerf} startDate={range.start} endDate={range.end} />
             )}
 
             {/* Product Performance */}
             {productPerf && (
-              <ProductPerformanceCard
-                productPerf={productPerf}
-                startDate={range.start}
-                endDate={range.end}
-              />
+              <ProductPerformanceCard productPerf={productPerf} startDate={range.start} endDate={range.end} />
             )}
 
             {/* Inventory Summary */}

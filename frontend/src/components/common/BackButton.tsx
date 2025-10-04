@@ -8,12 +8,7 @@ interface BackButtonProps {
   className?: string;
 }
 
-export const BackButton: React.FC<BackButtonProps> = ({ 
-  to, 
-  label = "Back", 
-  onClick,
-  className = ""
-}) => {
+export const BackButton: React.FC<BackButtonProps> = ({ to, label = "Back", onClick, className = "" }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
