@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Gift, Star, ShoppingBag, Sparkles, X } from 'lucide-react';
-import { loyaltyAPI } from '../../services/api';
-import toast from 'react-hot-toast';
-import type { LoyaltyReward } from '../../types';
+import React, { useEffect, useState } from "react";
+import { Gift, Star, ShoppingBag, Sparkles, X } from "lucide-react";
+import { loyaltyAPI } from "../../services/api";
+import toast from "react-hot-toast";
+import type { LoyaltyReward } from "../../types";
 
 interface RewardsGalleryProps {
   customerId: number;
@@ -10,11 +10,7 @@ interface RewardsGalleryProps {
   onRewardRedeemed?: () => void;
 }
 
-const RewardsGallery: React.FC<RewardsGalleryProps> = ({
-  customerId,
-  customerPoints,
-  onRewardRedeemed,
-}) => {
+const RewardsGallery: React.FC<RewardsGalleryProps> = ({ customerId, customerPoints, onRewardRedeemed }) => {
   const [rewards, setRewards] = useState<LoyaltyReward[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,8 +28,8 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({
       const data = await loyaltyAPI.getRewards(customerId);
       setRewards(data || []);
     } catch (err: any) {
-      setError(err.message || 'Failed to load rewards');
-      console.error('Error fetching rewards:', err);
+      setError(err.message || "Failed to load rewards");
+      console.error("Error fetching rewards:", err);
     } finally {
       setLoading(false);
     }
@@ -50,16 +46,16 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({
       fetchRewards();
       onRewardRedeemed?.();
     } catch (err: any) {
-      toast.error(err.message || 'Failed to use reward');
-      console.error('Error using reward:', err);
+      toast.error(err.message || "Failed to use reward");
+      console.error("Error using reward:", err);
     } finally {
       setRedeeming(false);
     }
   };
 
-  const availableRewards = rewards.filter(r => !r.redeemedAt);
-  const usedRewards = rewards.filter(r => r.redeemedAt);
-  const expiredRewards = rewards.filter(r => {
+  const availableRewards = rewards.filter((r) => !r.redeemedAt);
+  const usedRewards = rewards.filter((r) => r.redeemedAt);
+  const expiredRewards = rewards.filter((r) => {
     if (!r.expiresAt) return false;
     return new Date(r.expiresAt) < new Date() && !r.redeemedAt;
   });
@@ -77,18 +73,18 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({
 
   const getRewardColor = (type: string) => {
     const colors: Record<string, string> = {
-      DISCOUNT: 'from-yellow-400 to-orange-500',
-      FREE_PRODUCT: 'from-green-400 to-emerald-500',
-      STORE_CREDIT: 'from-blue-400 to-indigo-500',
-      SPECIAL_OFFER: 'from-purple-400 to-pink-500',
+      DISCOUNT: "from-yellow-400 to-orange-500",
+      FREE_PRODUCT: "from-green-400 to-emerald-500",
+      STORE_CREDIT: "from-blue-400 to-indigo-500",
+      SPECIAL_OFFER: "from-purple-400 to-pink-500",
     };
-    return colors[type] || 'from-gray-400 to-gray-500';
+    return colors[type] || "from-gray-400 to-gray-500";
   };
 
   const formatRewardValue = (reward: LoyaltyReward) => {
-    if (reward.rewardType === 'DISCOUNT') {
+    if (reward.rewardType === "DISCOUNT") {
       return `${reward.rewardValue}% OFF`;
-    } else if (reward.rewardType === 'STORE_CREDIT') {
+    } else if (reward.rewardType === "STORE_CREDIT") {
       return `$${reward.rewardValue.toFixed(2)} Credit`;
     }
     return reward.description;
@@ -109,10 +105,7 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex flex-col items-center justify-center h-64 text-red-500">
           <p className="mb-4">{error}</p>
-          <button
-            onClick={fetchRewards}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
+          <button onClick={fetchRewards} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Retry
           </button>
         </div>
@@ -161,9 +154,7 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({
 
                       <div className="flex items-center justify-between">
                         <div className="text-xs text-gray-500">
-                          {reward.expiresAt && (
-                            <span>Expires: {new Date(reward.expiresAt).toLocaleDateString()}</span>
-                          )}
+                          {reward.expiresAt && <span>Expires: {new Date(reward.expiresAt).toLocaleDateString()}</span>}
                         </div>
                         <button
                           onClick={() => setSelectedReward(reward)}
@@ -182,9 +173,7 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({
           <div className="text-center py-12 bg-gray-50 rounded-lg mb-8">
             <Gift className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600 text-lg font-medium mb-2">No rewards available yet</p>
-            <p className="text-gray-500 text-sm">
-              Keep earning points to unlock exciting rewards!
-            </p>
+            <p className="text-gray-500 text-sm">Keep earning points to unlock exciting rewards!</p>
           </div>
         )}
 
@@ -201,13 +190,13 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-gray-200 rounded">
                       {React.createElement(getRewardIcon(reward.rewardType), {
-                        className: 'w-5 h-5 text-gray-600',
+                        className: "w-5 h-5 text-gray-600",
                       })}
                     </div>
                     <div>
                       <div className="text-sm font-medium text-gray-700">{reward.description}</div>
                       <div className="text-xs text-gray-500">
-                        Used: {reward.redeemedAt ? new Date(reward.redeemedAt).toLocaleDateString() : '-'}
+                        Used: {reward.redeemedAt ? new Date(reward.redeemedAt).toLocaleDateString() : "-"}
                       </div>
                     </div>
                   </div>
@@ -231,13 +220,13 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-red-200 rounded">
                       {React.createElement(getRewardIcon(reward.rewardType), {
-                        className: 'w-5 h-5 text-red-600',
+                        className: "w-5 h-5 text-red-600",
                       })}
                     </div>
                     <div>
                       <div className="text-sm font-medium text-gray-700">{reward.description}</div>
                       <div className="text-xs text-red-600">
-                        Expired: {reward.expiresAt ? new Date(reward.expiresAt).toLocaleDateString() : '-'}
+                        Expired: {reward.expiresAt ? new Date(reward.expiresAt).toLocaleDateString() : "-"}
                       </div>
                     </div>
                   </div>
@@ -264,10 +253,12 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({
               </button>
             </div>
 
-            <div className={`bg-gradient-to-r ${getRewardColor(selectedReward.rewardType)} p-6 rounded-lg mb-4 text-white`}>
+            <div
+              className={`bg-gradient-to-r ${getRewardColor(selectedReward.rewardType)} p-6 rounded-lg mb-4 text-white`}
+            >
               <div className="flex items-center gap-3 mb-3">
                 {React.createElement(getRewardIcon(selectedReward.rewardType), {
-                  className: 'w-10 h-10',
+                  className: "w-10 h-10",
                 })}
                 <div>
                   <div className="text-2xl font-bold">{formatRewardValue(selectedReward)}</div>
@@ -301,7 +292,7 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({
                 disabled={redeeming}
                 className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
               >
-                {redeeming ? 'Using...' : 'Confirm Use'}
+                {redeeming ? "Using..." : "Confirm Use"}
               </button>
             </div>
           </div>

@@ -5,6 +5,7 @@
 ---
 
 ## 📚 **Table of Contents**
+
 1. [What I Added](#what-i-added)
 2. [Component Overview](#component-overview)
 3. [Integration Guide](#integration-guide)
@@ -18,6 +19,7 @@
 I created **6 loyalty program components** that are ready to use in your POS system:
 
 ### **File Structure:**
+
 ```
 frontend/src/components/loyalty/
 ├── LoyaltyDashboard.tsx          (300 lines) - Main dashboard
@@ -30,6 +32,7 @@ frontend/src/components/loyalty/
 ```
 
 ### **Dependencies Installed:**
+
 ```bash
 ✅ lucide-react - Icon library (already installed)
 ```
@@ -39,9 +42,11 @@ frontend/src/components/loyalty/
 ## 🔍 **Component Overview**
 
 ### **1. LoyaltyDashboard** 🏆
+
 **What it does:** Shows customer's loyalty status at a glance
 
 **Visual:**
+
 ```
 ┌─────────────────────────────────────────┐
 │  Loyalty Program            [Refresh]   │
@@ -62,15 +67,18 @@ frontend/src/components/loyalty/
 ```
 
 **When to use:**
+
 - Customer detail page (main loyalty view)
 - POS screen (when customer is selected)
 
 ---
 
 ### **2. PointsHistoryTable** 📋
+
 **What it does:** Shows complete transaction history with filters
 
 **Visual:**
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Points History              [Export CSV]       │
@@ -89,15 +97,18 @@ frontend/src/components/loyalty/
 ```
 
 **When to use:**
+
 - Customer detail page (in a tab)
 - Loyalty audit/review
 
 ---
 
 ### **3. RewardsGallery** 🎁
+
 **What it does:** Displays earned rewards customer can activate
 
 **Visual:**
+
 ```
 ┌──────────────────────────────────────────────┐
 │  Your Rewards     Available Points: 2,500    │
@@ -114,15 +125,18 @@ frontend/src/components/loyalty/
 ```
 
 **When to use:**
+
 - Customer detail page (rewards section)
 - Customer wants to see their rewards
 
 ---
 
 ### **4. LoyaltyOffersList** 🏷️
+
 **What it does:** Shows active promotions and special offers
 
 **Visual:**
+
 ```
 ┌────────────────────────────────────────────┐
 │  Active Offers & Promotions            🏷️  │
@@ -143,6 +157,7 @@ frontend/src/components/loyalty/
 ```
 
 **When to use:**
+
 - Customer detail page
 - Standalone "Offers" page
 - Marketing/promotions view
@@ -150,9 +165,11 @@ frontend/src/components/loyalty/
 ---
 
 ### **5. TierBenefitsDisplay** 🏅
+
 **What it does:** Shows all 4 loyalty tiers with benefits
 
 **Visual:**
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Loyalty Tier Benefits                      📈  │
@@ -171,6 +188,7 @@ frontend/src/components/loyalty/
 ```
 
 **When to use:**
+
 - Standalone "Loyalty Program" info page
 - Customer onboarding
 - Marketing materials
@@ -178,9 +196,11 @@ frontend/src/components/loyalty/
 ---
 
 ### **6. RedeemPointsDialog** 💳
+
 **What it does:** Let customers redeem points during checkout
 
 **Visual:**
+
 ```
 ┌─────────────────────────────────────────┐
 │  🎁 Redeem Points              [X]      │
@@ -204,6 +224,7 @@ frontend/src/components/loyalty/
 ```
 
 **When to use:**
+
 - POS checkout flow
 - Before processing payment
 
@@ -222,7 +243,7 @@ import {
   LoyaltyOffersList,
   TierBenefitsDisplay,
   RedeemPointsDialog,
-} from '../components/loyalty';
+} from "../components/loyalty";
 ```
 
 ---
@@ -234,41 +255,37 @@ import {
 **Option A: Add a Loyalty Tab (Recommended)**
 
 ```typescript
-import { useState } from 'react';
-import { LoyaltyDashboard, PointsHistoryTable, RewardsGallery } from '../components/loyalty';
+import { useState } from "react";
+import { LoyaltyDashboard, PointsHistoryTable, RewardsGallery } from "../components/loyalty";
 
 const CustomerDetailView = ({ customer }) => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   return (
     <div>
       {/* Tabs */}
       <div className="flex gap-4 border-b mb-6">
-        <button 
-          onClick={() => setActiveTab('overview')}
-          className={activeTab === 'overview' ? 'border-b-2 border-blue-500' : ''}
+        <button
+          onClick={() => setActiveTab("overview")}
+          className={activeTab === "overview" ? "border-b-2 border-blue-500" : ""}
         >
           Overview
         </button>
-        <button 
-          onClick={() => setActiveTab('loyalty')}
-          className={activeTab === 'loyalty' ? 'border-b-2 border-blue-500' : ''}
+        <button
+          onClick={() => setActiveTab("loyalty")}
+          className={activeTab === "loyalty" ? "border-b-2 border-blue-500" : ""}
         >
           Loyalty Program
         </button>
       </div>
 
       {/* Content */}
-      {activeTab === 'overview' && (
-        <div>
-          {/* Existing customer info */}
-        </div>
-      )}
+      {activeTab === "overview" && <div>{/* Existing customer info */}</div>}
 
-      {activeTab === 'loyalty' && (
+      {activeTab === "loyalty" && (
         <div className="space-y-6">
           {/* Loyalty Dashboard */}
-          <LoyaltyDashboard 
+          <LoyaltyDashboard
             customer={customer}
             onRefresh={() => {
               // Refresh customer data
@@ -280,7 +297,7 @@ const CustomerDetailView = ({ customer }) => {
           <PointsHistoryTable customerId={customer.id} />
 
           {/* Rewards Gallery */}
-          <RewardsGallery 
+          <RewardsGallery
             customerId={customer.id}
             customerPoints={customer.loyaltyPoints || 0}
             onRewardRedeemed={() => {
@@ -298,7 +315,7 @@ const CustomerDetailView = ({ customer }) => {
 **Option B: Add Inline (Simpler)**
 
 ```typescript
-import { LoyaltyDashboard } from '../components/loyalty';
+import { LoyaltyDashboard } from "../components/loyalty";
 
 const CustomerDetailView = ({ customer }) => {
   return (
@@ -320,8 +337,8 @@ const CustomerDetailView = ({ customer }) => {
 **File:** `frontend/src/pages/POSPage.tsx`
 
 ```typescript
-import { useState } from 'react';
-import { RedeemPointsDialog } from '../components/loyalty';
+import { useState } from "react";
+import { RedeemPointsDialog } from "../components/loyalty";
 
 const POSPage = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -332,18 +349,18 @@ const POSPage = () => {
   const handleRedeemPoints = (discountAmount, points) => {
     setLoyaltyDiscount(discountAmount);
     setPointsUsed(points);
-    
+
     // Apply discount to cart total
     const newTotal = cartTotal - discountAmount;
     // Update your cart state...
-    
+
     toast.success(`Applied $${discountAmount.toFixed(2)} loyalty discount!`);
   };
 
   return (
     <div>
       {/* Your existing POS UI */}
-      
+
       {/* Add "Use Loyalty Points" button in cart */}
       <div className="cart-actions">
         {selectedCustomer && selectedCustomer.loyaltyPoints > 0 && (
@@ -359,7 +376,7 @@ const POSPage = () => {
       {/* Redeem Points Dialog */}
       <RedeemPointsDialog
         customerId={selectedCustomer?.id || 0}
-        customerName={selectedCustomer?.name || ''}
+        customerName={selectedCustomer?.name || ""}
         availablePoints={selectedCustomer?.loyaltyPoints || 0}
         cartTotal={cartTotal}
         isOpen={showRedeemDialog}
@@ -371,12 +388,8 @@ const POSPage = () => {
       {loyaltyDiscount > 0 && (
         <div className="bg-purple-50 border border-purple-200 rounded p-3 mt-2">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-purple-800">
-              Loyalty Discount ({pointsUsed} points)
-            </span>
-            <span className="font-bold text-purple-600">
-              -${loyaltyDiscount.toFixed(2)}
-            </span>
+            <span className="text-sm text-purple-800">Loyalty Discount ({pointsUsed} points)</span>
+            <span className="font-bold text-purple-600">-${loyaltyDiscount.toFixed(2)}</span>
           </div>
         </div>
       )}
@@ -392,19 +405,15 @@ const POSPage = () => {
 **File:** Create `frontend/src/pages/LoyaltyPage.tsx`
 
 ```typescript
-import React from 'react';
-import { TierBenefitsDisplay, LoyaltyOffersList } from '../components/loyalty';
+import React from "react";
+import { TierBenefitsDisplay, LoyaltyOffersList } from "../components/loyalty";
 
 const LoyaltyPage: React.FC = () => {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          Loyalty Program
-        </h1>
-        <p className="text-gray-600">
-          Earn points, unlock tiers, and get exclusive rewards!
-        </p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Loyalty Program</h1>
+        <p className="text-gray-600">Earn points, unlock tiers, and get exclusive rewards!</p>
       </div>
 
       {/* Tier Benefits Overview */}
@@ -450,10 +459,10 @@ export default LoyaltyPage;
 **Add route in `App.tsx`:**
 
 ```typescript
-import LoyaltyPage from './pages/LoyaltyPage';
+import LoyaltyPage from "./pages/LoyaltyPage";
 
 // In your routes:
-<Route path="/loyalty" element={<LoyaltyPage />} />
+<Route path="/loyalty" element={<LoyaltyPage />} />;
 ```
 
 **Add to sidebar navigation:**
@@ -477,9 +486,7 @@ const POSPage = () => {
   return (
     <div className="grid grid-cols-3 gap-6">
       {/* Left: Product Grid */}
-      <div className="col-span-2">
-        {/* Products */}
-      </div>
+      <div className="col-span-2">{/* Products */}</div>
 
       {/* Right: Cart + Customer Info */}
       <div className="space-y-4">
@@ -487,11 +494,7 @@ const POSPage = () => {
         <CustomerSearch onSelect={setSelectedCustomer} />
 
         {/* Show Loyalty Info */}
-        {selectedCustomer && (
-          <LoyaltyDashboard 
-            customer={selectedCustomer}
-          />
-        )}
+        {selectedCustomer && <LoyaltyDashboard customer={selectedCustomer} />}
 
         {/* Cart */}
         <Cart />
@@ -509,10 +512,10 @@ const POSPage = () => {
 const handleCheckout = async () => {
   // 1. Show redeem dialog
   setShowRedeemDialog(true);
-  
+
   // 2. After redemption (in onRedeemed callback):
   const finalTotal = cartTotal - loyaltyDiscount;
-  
+
   // 3. Process payment
   const sale = await createSale({
     customerId: selectedCustomer.id,
@@ -522,11 +525,11 @@ const handleCheckout = async () => {
     total: finalTotal,
     loyaltyPointsUsed: pointsUsed,
   });
-  
+
   // 4. Award points for purchase (backend handles this)
   // Customer earns points automatically when sale is created
-  
-  toast.success('Sale completed! Points awarded!');
+
+  toast.success("Sale completed! Points awarded!");
 };
 ```
 
@@ -553,10 +556,7 @@ const CustomerProfile = ({ customer }) => {
       {/* Available Rewards */}
       <div className="bg-white p-6 rounded shadow">
         <h3 className="text-xl font-bold mb-4">Your Rewards</h3>
-        <RewardsGallery 
-          customerId={customer.id}
-          customerPoints={customer.loyaltyPoints}
-        />
+        <RewardsGallery customerId={customer.id} customerPoints={customer.loyaltyPoints} />
       </div>
 
       {/* Transaction History */}
@@ -598,7 +598,8 @@ const CustomerProfile = ({ customer }) => {
    - Select "Earned" type → Should show only earned points
 4. **Click "Export CSV"**
 
-**Expected Result:** 
+**Expected Result:**
+
 - ✅ Transactions display in table
 - ✅ Filters work correctly
 - ✅ CSV file downloads
@@ -612,6 +613,7 @@ const CustomerProfile = ({ customer }) => {
 3. **Confirm in modal**
 
 **Expected Result:**
+
 - ✅ Confirmation modal appears
 - ✅ After confirm: "Reward activated successfully!"
 - ✅ Reward moves to "Used Rewards" section
@@ -628,6 +630,7 @@ const CustomerProfile = ({ customer }) => {
 6. **Click "Redeem Points"**
 
 **Expected Result:**
+
 - ✅ Dialog opens showing points and cart total
 - ✅ After redemption: Discount applied to cart
 - ✅ Toast shows success message
@@ -642,6 +645,7 @@ const CustomerProfile = ({ customer }) => {
 3. **Click on an offer to see details**
 
 **Expected Result:**
+
 - ✅ Active offers display
 - ✅ Shows eligibility status
 - ✅ Detail modal opens with full info
@@ -654,6 +658,7 @@ const CustomerProfile = ({ customer }) => {
 2. **View tier benefits display**
 
 **Expected Result:**
+
 - ✅ All 4 tiers shown
 - ✅ Current tier highlighted
 - ✅ Progress bars for locked tiers
@@ -684,12 +689,12 @@ In `LoyaltyDashboard.tsx`, line 51:
 ```typescript
 const getTierColor = (tier: string): string => {
   const colors: Record<string, string> = {
-    BRONZE: 'text-orange-700 bg-orange-100 border-orange-300',
-    SILVER: 'text-gray-700 bg-gray-100 border-gray-300',
-    GOLD: 'text-yellow-700 bg-yellow-100 border-yellow-300',
-    PLATINUM: 'text-purple-700 bg-purple-100 border-purple-300',
+    BRONZE: "text-orange-700 bg-orange-100 border-orange-300",
+    SILVER: "text-gray-700 bg-gray-100 border-gray-300",
+    GOLD: "text-yellow-700 bg-yellow-100 border-yellow-300",
+    PLATINUM: "text-purple-700 bg-purple-100 border-purple-300",
   };
-  return colors[tier] || 'text-gray-700 bg-gray-100 border-gray-300';
+  return colors[tier] || "text-gray-700 bg-gray-100 border-gray-300";
 };
 ```
 
@@ -702,21 +707,21 @@ In `RedeemPointsDialog.tsx`, line 41:
 ```typescript
 const predefinedOptions: RedemptionOption[] = [
   {
-    type: 'DISCOUNT',
-    label: '$5 Discount',
-    description: 'Get $5 off your purchase',
+    type: "DISCOUNT",
+    label: "$5 Discount",
+    description: "Get $5 off your purchase",
     pointsRequired: 500,
     value: 5,
-    icon: '💵',
+    icon: "💵",
   },
   // Add more options here...
   {
-    type: 'DISCOUNT',
-    label: '$100 Discount',
-    description: 'Get $100 off your purchase',
+    type: "DISCOUNT",
+    label: "$100 Discount",
+    description: "Get $100 off your purchase",
     pointsRequired: 10000,
     value: 100,
-    icon: '💎',
+    icon: "💎",
   },
 ];
 ```
@@ -728,6 +733,7 @@ const predefinedOptions: RedemptionOption[] = [
 ### **Issue: "Cannot find module 'lucide-react'"**
 
 **Solution:**
+
 ```bash
 cd frontend
 npm install lucide-react
@@ -738,11 +744,13 @@ npm install lucide-react
 ### **Issue: Components not showing data**
 
 **Check:**
+
 1. ✅ Backend server running on port 5000?
 2. ✅ Customer has loyalty data in database?
 3. ✅ API endpoints working? (Check browser console)
 
 **Test API manually:**
+
 ```bash
 # Get customer loyalty
 curl http://localhost:5000/api/loyalty/customer/1
@@ -756,6 +764,7 @@ curl http://localhost:5000/api/loyalty/tier-config
 ### **Issue: TypeScript errors**
 
 **Solution:**
+
 ```bash
 cd frontend
 npm run build
@@ -768,6 +777,7 @@ Check the error message and ensure all imports are correct.
 ## 📝 **Summary**
 
 ### **What You Have:**
+
 ✅ **6 complete loyalty components**  
 ✅ **Production-ready code**  
 ✅ **Full TypeScript support**  
@@ -776,16 +786,17 @@ Check the error message and ensure all imports are correct.
 
 ### **How to Use Them:**
 
-| Component | Where to Use | Purpose |
-|-----------|-------------|---------|
-| LoyaltyDashboard | Customer detail page | Show loyalty status |
-| PointsHistoryTable | Customer detail page | Show transaction history |
-| RewardsGallery | Customer detail page | Show/use rewards |
-| LoyaltyOffersList | Loyalty page / Customer detail | Show active offers |
-| TierBenefitsDisplay | Loyalty page | Show all tier info |
-| RedeemPointsDialog | POS checkout | Redeem points for discount |
+| Component           | Where to Use                   | Purpose                    |
+| ------------------- | ------------------------------ | -------------------------- |
+| LoyaltyDashboard    | Customer detail page           | Show loyalty status        |
+| PointsHistoryTable  | Customer detail page           | Show transaction history   |
+| RewardsGallery      | Customer detail page           | Show/use rewards           |
+| LoyaltyOffersList   | Loyalty page / Customer detail | Show active offers         |
+| TierBenefitsDisplay | Loyalty page                   | Show all tier info         |
+| RedeemPointsDialog  | POS checkout                   | Redeem points for discount |
 
 ### **Next Steps:**
+
 1. **Integrate into your pages** (see examples above)
 2. **Test each component** (see testing instructions)
 3. **Customize as needed** (see customization tips)

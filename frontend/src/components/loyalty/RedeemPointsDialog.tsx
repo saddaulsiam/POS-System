@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Gift, AlertCircle, X } from 'lucide-react';
-import { loyaltyAPI } from '../../services/api';
-import toast from 'react-hot-toast';
-import type { RewardType } from '../../types';
+import React, { useState } from "react";
+import { Gift, AlertCircle, X } from "lucide-react";
+import { loyaltyAPI } from "../../services/api";
+import toast from "react-hot-toast";
+import type { RewardType } from "../../types";
 
 interface RedeemPointsDialogProps {
   customerId: number;
@@ -33,7 +33,7 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
   onRedeemed,
 }) => {
   const [selectedOption, setSelectedOption] = useState<RedemptionOption | null>(null);
-  const [customPoints, setCustomPoints] = useState<string>('');
+  const [customPoints, setCustomPoints] = useState<string>("");
   const [redeeming, setRedeeming] = useState(false);
 
   if (!isOpen) return null;
@@ -43,36 +43,36 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
 
   const predefinedOptions: RedemptionOption[] = [
     {
-      type: 'DISCOUNT',
-      label: '$5 Discount',
-      description: 'Get $5 off your purchase',
+      type: "DISCOUNT",
+      label: "$5 Discount",
+      description: "Get $5 off your purchase",
       pointsRequired: 500,
       value: 5,
-      icon: '💵',
+      icon: "💵",
     },
     {
-      type: 'DISCOUNT',
-      label: '$10 Discount',
-      description: 'Get $10 off your purchase',
+      type: "DISCOUNT",
+      label: "$10 Discount",
+      description: "Get $10 off your purchase",
       pointsRequired: 1000,
       value: 10,
-      icon: '💰',
+      icon: "💰",
     },
     {
-      type: 'DISCOUNT',
-      label: '$20 Discount',
-      description: 'Get $20 off your purchase',
+      type: "DISCOUNT",
+      label: "$20 Discount",
+      description: "Get $20 off your purchase",
       pointsRequired: 2000,
       value: 20,
-      icon: '🎁',
+      icon: "🎁",
     },
     {
-      type: 'STORE_CREDIT',
-      label: '$50 Store Credit',
-      description: 'Convert to store credit for future use',
+      type: "STORE_CREDIT",
+      label: "$50 Store Credit",
+      description: "Convert to store credit for future use",
       pointsRequired: 5000,
       value: 50,
-      icon: '🏪',
+      icon: "🏪",
     },
   ];
 
@@ -82,21 +82,21 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
 
   const handleRedeem = async () => {
     if (!selectedOption && !customPoints) {
-      toast.error('Please select a redemption option');
+      toast.error("Please select a redemption option");
       return;
     }
 
     const pointsToRedeem = selectedOption ? selectedOption.pointsRequired : parseInt(customPoints);
     const discountValue = selectedOption ? selectedOption.value : calculateCustomDiscount(pointsToRedeem);
-    const rewardType = selectedOption ? selectedOption.type : 'DISCOUNT';
+    const rewardType = selectedOption ? selectedOption.type : "DISCOUNT";
 
     if (pointsToRedeem > availablePoints) {
-      toast.error('Insufficient points');
+      toast.error("Insufficient points");
       return;
     }
 
-    if (rewardType === 'DISCOUNT' && discountValue > cartTotal) {
-      toast.error('Discount cannot exceed cart total');
+    if (rewardType === "DISCOUNT" && discountValue > cartTotal) {
+      toast.error("Discount cannot exceed cart total");
       return;
     }
 
@@ -108,8 +108,8 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
         points: pointsToRedeem,
         rewardType,
         rewardValue: discountValue,
-        description: selectedOption 
-          ? selectedOption.label 
+        description: selectedOption
+          ? selectedOption.label
           : `Custom redemption: ${pointsToRedeem} points for $${discountValue.toFixed(2)}`,
       });
 
@@ -117,8 +117,8 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
       onRedeemed(discountValue, pointsToRedeem);
       onClose();
     } catch (err: any) {
-      toast.error(err.message || 'Failed to redeem points');
-      console.error('Error redeeming points:', err);
+      toast.error(err.message || "Failed to redeem points");
+      console.error("Error redeeming points:", err);
     } finally {
       setRedeeming(false);
     }
@@ -139,11 +139,7 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
             </h2>
             <p className="text-sm text-gray-600 mt-1">{customerName}</p>
           </div>
-          <button
-            onClick={onClose}
-            disabled={redeeming}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={onClose} disabled={redeeming} className="text-gray-400 hover:text-gray-600">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -180,15 +176,15 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
                   key={option.label}
                   onClick={() => {
                     setSelectedOption(option);
-                    setCustomPoints('');
+                    setCustomPoints("");
                   }}
                   disabled={!canAfford || redeeming}
                   className={`relative p-4 rounded-lg border-2 text-left transition-all ${
                     isSelected
-                      ? 'border-blue-500 bg-blue-50'
+                      ? "border-blue-500 bg-blue-50"
                       : canAfford
-                      ? 'border-gray-200 hover:border-blue-300 bg-white'
-                      : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
+                      ? "border-gray-200 hover:border-blue-300 bg-white"
+                      : "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
                   }`}
                 >
                   {isSelected && (
@@ -201,7 +197,7 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
                   <div className="font-bold text-gray-800 mb-1">{option.label}</div>
                   <div className="text-sm text-gray-600 mb-2">{option.description}</div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className={canAfford ? 'text-blue-600 font-semibold' : 'text-red-600 font-semibold'}>
+                    <span className={canAfford ? "text-blue-600 font-semibold" : "text-red-600 font-semibold"}>
                       {option.pointsRequired} points
                     </span>
                     {!canAfford && (
@@ -237,9 +233,7 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
               {customPointsValue > 0 && (
                 <div className="mt-3 flex items-center justify-between text-sm">
                   <span className="text-gray-600">Discount Value:</span>
-                  <span className="font-bold text-green-600 text-lg">
-                    ${customDiscount.toFixed(2)}
-                  </span>
+                  <span className="font-bold text-green-600 text-lg">${customDiscount.toFixed(2)}</span>
                 </div>
               )}
               {customPointsValue > availablePoints && (
@@ -260,8 +254,8 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
           {/* Info */}
           <div className="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
             <p className="text-sm text-blue-800">
-              <strong>Note:</strong> Redeemed points will be deducted from your balance and applied as a discount to this purchase.
-              This action cannot be undone.
+              <strong>Note:</strong> Redeemed points will be deducted from your balance and applied as a discount to
+              this purchase. This action cannot be undone.
             </p>
           </div>
         </div>
@@ -285,7 +279,7 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
             }
             className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 font-semibold"
           >
-            {redeeming ? 'Redeeming...' : 'Redeem Points'}
+            {redeeming ? "Redeeming..." : "Redeem Points"}
           </button>
         </div>
       </div>

@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Trophy, Award, Star, Zap, TrendingUp } from 'lucide-react';
-import { loyaltyAPI } from '../../services/api';
-import type { LoyaltyTier, LoyaltyTierConfig } from '../../types';
+import React, { useEffect, useState } from "react";
+import { Trophy, Award, Star, Zap, TrendingUp } from "lucide-react";
+import { loyaltyAPI } from "../../services/api";
+import type { LoyaltyTier, LoyaltyTierConfig } from "../../types";
 
 interface TierBenefitsDisplayProps {
   currentTier?: LoyaltyTier;
   lifetimePoints?: number;
 }
 
-const TierBenefitsDisplay: React.FC<TierBenefitsDisplayProps> = ({
-  currentTier,
-  lifetimePoints = 0,
-}) => {
+const TierBenefitsDisplay: React.FC<TierBenefitsDisplayProps> = ({ currentTier, lifetimePoints = 0 }) => {
   const [tierConfigs, setTierConfigs] = useState<LoyaltyTierConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,8 +24,8 @@ const TierBenefitsDisplay: React.FC<TierBenefitsDisplayProps> = ({
       const data = await loyaltyAPI.getTierConfig();
       setTierConfigs(data || []);
     } catch (err: any) {
-      setError(err.message || 'Failed to load tier information');
-      console.error('Error fetching tier configs:', err);
+      setError(err.message || "Failed to load tier information");
+      console.error("Error fetching tier configs:", err);
     } finally {
       setLoading(false);
     }
@@ -46,20 +43,20 @@ const TierBenefitsDisplay: React.FC<TierBenefitsDisplayProps> = ({
 
   const getTierGradient = (tier: LoyaltyTier) => {
     const gradients: Record<LoyaltyTier, string> = {
-      BRONZE: 'from-orange-400 to-orange-600',
-      SILVER: 'from-gray-400 to-gray-600',
-      GOLD: 'from-yellow-400 to-yellow-600',
-      PLATINUM: 'from-purple-400 to-purple-600',
+      BRONZE: "from-orange-400 to-orange-600",
+      SILVER: "from-gray-400 to-gray-600",
+      GOLD: "from-yellow-400 to-yellow-600",
+      PLATINUM: "from-purple-400 to-purple-600",
     };
     return gradients[tier];
   };
 
   const getTierBorder = (tier: LoyaltyTier) => {
     const borders: Record<LoyaltyTier, string> = {
-      BRONZE: 'border-orange-300',
-      SILVER: 'border-gray-300',
-      GOLD: 'border-yellow-300',
-      PLATINUM: 'border-purple-300',
+      BRONZE: "border-orange-300",
+      SILVER: "border-gray-300",
+      GOLD: "border-yellow-300",
+      PLATINUM: "border-purple-300",
     };
     return borders[tier];
   };
@@ -79,10 +76,7 @@ const TierBenefitsDisplay: React.FC<TierBenefitsDisplayProps> = ({
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex flex-col items-center justify-center h-64 text-red-500">
           <p className="mb-4">{error}</p>
-          <button
-            onClick={fetchTierConfigs}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
+          <button onClick={fetchTierConfigs} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Retry
           </button>
         </div>
@@ -110,11 +104,7 @@ const TierBenefitsDisplay: React.FC<TierBenefitsDisplayProps> = ({
               <div
                 key={config.id}
                 className={`relative overflow-hidden rounded-lg border-2 transition-all ${
-                  isCurrent
-                    ? `${border} ring-4 ring-blue-200`
-                    : isUnlocked
-                    ? `${border}`
-                    : 'border-gray-200 opacity-60'
+                  isCurrent ? `${border} ring-4 ring-blue-200` : isUnlocked ? `${border}` : "border-gray-200 opacity-60"
                 }`}
               >
                 {/* Current Badge */}
@@ -128,9 +118,7 @@ const TierBenefitsDisplay: React.FC<TierBenefitsDisplayProps> = ({
                 <div className={`bg-gradient-to-r ${gradient} p-4 text-white`}>
                   <Icon className="w-10 h-10 mb-2" />
                   <h3 className="text-xl font-bold mb-1">{config.tier}</h3>
-                  <p className="text-sm opacity-90">
-                    {config.minimumPoints.toLocaleString()} points
-                  </p>
+                  <p className="text-sm opacity-90">{config.minimumPoints.toLocaleString()} points</p>
                 </div>
 
                 {/* Benefits */}

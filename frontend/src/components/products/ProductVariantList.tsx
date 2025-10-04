@@ -9,15 +9,11 @@ interface ProductVariantListProps {
   product: Product;
 }
 
-export const ProductVariantList: React.FC<ProductVariantListProps> = ({
-  product,
-}) => {
+export const ProductVariantList: React.FC<ProductVariantListProps> = ({ product }) => {
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(
-    null
-  );
+  const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const fetchVariants = async () => {
@@ -59,9 +55,7 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({
       fetchVariants();
     } catch (error: any) {
       console.error("Error deleting variant:", error);
-      toast.error(
-        error.response?.data?.error || "Failed to delete variant"
-      );
+      toast.error(error.response?.data?.error || "Failed to delete variant");
     } finally {
       setDeletingId(null);
     }
@@ -92,26 +86,12 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800">
-            Product Variants
-          </h3>
-          <p className="text-sm text-gray-600 mt-1">
-            Manage different sizes, colors, or variations of this product
-          </p>
+          <h3 className="text-lg font-semibold text-gray-800">Product Variants</h3>
+          <p className="text-sm text-gray-600 mt-1">Manage different sizes, colors, or variations of this product</p>
         </div>
         <Button variant="primary" onClick={handleAddVariant}>
-          <svg
-            className="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Add Variant
         </Button>
@@ -121,12 +101,7 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({
       <div className="overflow-x-auto">
         {variants.length === 0 ? (
           <div className="px-6 py-12 text-center">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -134,26 +109,12 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({
                 d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
               />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              No variants
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Get started by creating a new product variant.
-            </p>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No variants</h3>
+            <p className="mt-1 text-sm text-gray-500">Get started by creating a new product variant.</p>
             <div className="mt-6">
               <Button variant="primary" onClick={handleAddVariant}>
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
                 Add Variant
               </Button>
@@ -166,9 +127,7 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Variant Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  SKU
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Barcode
                 </th>
@@ -193,35 +152,22 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({
               {variants.map((variant) => (
                 <tr key={variant.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {variant.name}
-                    </div>
+                    <div className="text-sm font-medium text-gray-900">{variant.name}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{variant.sku}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">
-                      {variant.barcode || "-"}
-                    </div>
+                    <div className="text-sm text-gray-500">{variant.barcode || "-"}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      ${variant.purchasePrice.toFixed(2)}
-                    </div>
+                    <div className="text-sm text-gray-900">${variant.purchasePrice.toFixed(2)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold text-gray-900">
-                      ${variant.sellingPrice.toFixed(2)}
-                    </div>
+                    <div className="text-sm font-semibold text-gray-900">${variant.sellingPrice.toFixed(2)}</div>
                     <div className="text-xs text-gray-500">
                       Margin:{" "}
-                      {(
-                        ((variant.sellingPrice - variant.purchasePrice) /
-                          variant.sellingPrice) *
-                        100
-                      ).toFixed(1)}
-                      %
+                      {(((variant.sellingPrice - variant.purchasePrice) / variant.sellingPrice) * 100).toFixed(1)}%
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -240,19 +186,14 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        variant.isActive
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
+                        variant.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
                       }`}
                     >
                       {variant.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    <button
-                      onClick={() => handleEditVariant(variant)}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
+                    <button onClick={() => handleEditVariant(variant)} className="text-blue-600 hover:text-blue-900">
                       Edit
                     </button>
                     <button
@@ -277,19 +218,11 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({
             <div>
               <span className="font-semibold">{variants.length}</span> variant
               {variants.length !== 1 ? "s" : ""} •{" "}
-              <span className="font-semibold">
-                {variants.filter((v) => v.isActive).length}
-              </span>{" "}
-              active
+              <span className="font-semibold">{variants.filter((v) => v.isActive).length}</span> active
             </div>
             <div>
               Total Stock:{" "}
-              <span className="font-semibold">
-                {variants.reduce(
-                  (sum, v) => sum + (v.stockQuantity || 0),
-                  0
-                )}
-              </span>
+              <span className="font-semibold">{variants.reduce((sum, v) => sum + (v.stockQuantity || 0), 0)}</span>
             </div>
           </div>
         </div>

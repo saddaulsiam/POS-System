@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Trophy, TrendingUp, Gift, Star, Award, Zap } from 'lucide-react';
-import { loyaltyAPI } from '../../services/api';
-import type { Customer, LoyaltyTier, LoyaltyTierConfig } from '../../types';
+import React, { useEffect, useState } from "react";
+import { Trophy, TrendingUp, Gift, Star, Award, Zap } from "lucide-react";
+import { loyaltyAPI } from "../../services/api";
+import type { Customer, LoyaltyTier, LoyaltyTierConfig } from "../../types";
 
 interface LoyaltyDashboardProps {
   customer: Customer;
@@ -40,30 +40,28 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
 
       // Fetch customer loyalty data
       const loyaltyResponse = await loyaltyAPI.getCustomerLoyalty(customer.id);
-      
+
       // Fetch tier configurations
       const tierConfigs = await loyaltyAPI.getTierConfig();
-      
+
       // Get current tier config
-      const currentTierConfig = tierConfigs.find(
-        (tc: any) => tc.tier === loyaltyResponse.tier
-      );
-      
+      const currentTierConfig = tierConfigs.find((tc: any) => tc.tier === loyaltyResponse.tier);
+
       // Calculate next tier
-      const tierOrder: LoyaltyTier[] = ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'];
+      const tierOrder: LoyaltyTier[] = ["BRONZE", "SILVER", "GOLD", "PLATINUM"];
       const currentTierIndex = tierOrder.indexOf(loyaltyResponse.tier);
       const nextTier = currentTierIndex < tierOrder.length - 1 ? tierOrder[currentTierIndex + 1] : null;
       const nextTierConfig = nextTier ? tierConfigs.find((tc: any) => tc.tier === nextTier) : null;
-      
+
       // Calculate progress
       const currentLifetimePoints = loyaltyResponse.lifetimePoints || 0;
       const currentTierMin = currentTierConfig?.minimumPoints || 0;
       const nextTierMin = nextTierConfig?.minimumPoints || currentTierMin;
       const pointsToNextTier = nextTier ? Math.max(0, nextTierMin - currentLifetimePoints) : 0;
-      const progressPercentage = nextTier 
+      const progressPercentage = nextTier
         ? ((currentLifetimePoints - currentTierMin) / (nextTierMin - currentTierMin)) * 100
         : 100;
-      
+
       setLoyaltyData({
         currentPoints: loyaltyResponse.points || 0,
         lifetimePoints: loyaltyResponse.lifetimePoints || 0,
@@ -71,18 +69,21 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
           tier: loyaltyResponse.tier,
           config: currentTierConfig,
         },
-        nextTier: nextTier && nextTierConfig ? {
-          tier: nextTier,
-          config: nextTierConfig,
-        } : null,
+        nextTier:
+          nextTier && nextTierConfig
+            ? {
+                tier: nextTier,
+                config: nextTierConfig,
+              }
+            : null,
         pointsToNextTier,
         progressPercentage: Math.min(Math.max(progressPercentage, 0), 100),
         availableRewards: 0, // TODO: Fetch actual rewards count
         pendingPoints: 0, // TODO: Fetch pending points
       });
     } catch (err: any) {
-      setError(err.message || 'Failed to load loyalty data');
-      console.error('Error fetching loyalty data:', err);
+      setError(err.message || "Failed to load loyalty data");
+      console.error("Error fetching loyalty data:", err);
     } finally {
       setLoading(false);
     }
@@ -90,12 +91,12 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
 
   const getTierColor = (tier: string): string => {
     const colors: Record<string, string> = {
-      BRONZE: 'text-orange-700 bg-orange-100 border-orange-300',
-      SILVER: 'text-gray-700 bg-gray-100 border-gray-300',
-      GOLD: 'text-yellow-700 bg-yellow-100 border-yellow-300',
-      PLATINUM: 'text-purple-700 bg-purple-100 border-purple-300',
+      BRONZE: "text-orange-700 bg-orange-100 border-orange-300",
+      SILVER: "text-gray-700 bg-gray-100 border-gray-300",
+      GOLD: "text-yellow-700 bg-yellow-100 border-yellow-300",
+      PLATINUM: "text-purple-700 bg-purple-100 border-purple-300",
     };
-    return colors[tier] || 'text-gray-700 bg-gray-100 border-gray-300';
+    return colors[tier] || "text-gray-700 bg-gray-100 border-gray-300";
   };
 
   const getTierIcon = (tier: string) => {
@@ -124,10 +125,7 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex flex-col items-center justify-center h-64 text-red-500">
           <p className="mb-4">{error}</p>
-          <button
-            onClick={fetchLoyaltyData}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
+          <button onClick={fetchLoyaltyData} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Retry
           </button>
         </div>
@@ -180,9 +178,7 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
             </div>
             <div>
               <div className="text-xs text-gray-500 uppercase">Available Points</div>
-              <div className="text-2xl font-bold text-blue-600">
-                {loyaltyData.currentPoints.toLocaleString()}
-              </div>
+              <div className="text-2xl font-bold text-blue-600">{loyaltyData.currentPoints.toLocaleString()}</div>
             </div>
           </div>
         </div>
@@ -195,9 +191,7 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
             </div>
             <div>
               <div className="text-xs text-gray-500 uppercase">Lifetime Points</div>
-              <div className="text-2xl font-bold text-purple-600">
-                {loyaltyData.lifetimePoints.toLocaleString()}
-              </div>
+              <div className="text-2xl font-bold text-purple-600">{loyaltyData.lifetimePoints.toLocaleString()}</div>
             </div>
           </div>
         </div>
@@ -210,9 +204,7 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
             </div>
             <div>
               <div className="text-xs text-gray-500 uppercase">Available Rewards</div>
-              <div className="text-2xl font-bold text-green-600">
-                {loyaltyData.availableRewards}
-              </div>
+              <div className="text-2xl font-bold text-green-600">{loyaltyData.availableRewards}</div>
             </div>
           </div>
         </div>
@@ -222,9 +214,7 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
       {loyaltyData.nextTier && (
         <div className="bg-white rounded-lg p-5 mb-6">
           <div className="flex items-center justify-between mb-2">
-            <div className="text-sm font-medium text-gray-700">
-              Progress to {loyaltyData.nextTier.tier}
-            </div>
+            <div className="text-sm font-medium text-gray-700">Progress to {loyaltyData.nextTier.tier}</div>
             <div className="text-sm font-bold text-blue-600">
               {loyaltyData.pointsToNextTier.toLocaleString()} points to go
             </div>
@@ -238,9 +228,7 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
                 style={{ width: `${Math.min(loyaltyData.progressPercentage, 100)}%` }}
               >
                 {loyaltyData.progressPercentage > 10 && (
-                  <span className="text-xs font-bold text-white">
-                    {loyaltyData.progressPercentage.toFixed(0)}%
-                  </span>
+                  <span className="text-xs font-bold text-white">{loyaltyData.progressPercentage.toFixed(0)}%</span>
                 )}
               </div>
             </div>
@@ -286,12 +274,8 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-yellow-600" />
             <div>
-              <p className="text-sm font-medium text-yellow-800">
-                {loyaltyData.pendingPoints} points pending
-              </p>
-              <p className="text-xs text-yellow-700 mt-1">
-                Points will be credited after purchase confirmation
-              </p>
+              <p className="text-sm font-medium text-yellow-800">{loyaltyData.pendingPoints} points pending</p>
+              <p className="text-xs text-yellow-700 mt-1">Points will be credited after purchase confirmation</p>
             </div>
           </div>
         </div>

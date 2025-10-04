@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import {
-  productsAPI,
-  customersAPI,
-  salesAPI,
-  categoriesAPI,
-  parkedSalesAPI,
-} from "../services/api";
+import { productsAPI, customersAPI, salesAPI, categoriesAPI, parkedSalesAPI } from "../services/api";
 import { Product, Customer, Category, CartItem, ParkedSale } from "../types";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -20,31 +14,26 @@ import { ParkSaleDialog } from "../components/pos/ParkSaleDialog";
 import { ParkedSalesList } from "../components/pos/ParkedSalesList";
 import { SplitPaymentDialog } from "../components/pos/SplitPaymentDialog";
 import { RedeemPointsDialog } from "../components/loyalty";
-import {
-  calculateSubtotal,
-  calculateTax,
-  calculateTotal,
-  calculateChange,
-} from "../utils/posUtils";
+import { calculateSubtotal, calculateTax, calculateTotal, calculateChange } from "../utils/posUtils";
 
 const POSPage: React.FC = () => {
   const { user, logout } = useAuth();
-  
+
   // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
-  
+
   // Barcode state
   const [barcode, setBarcode] = useState("");
-  
+
   // Customer state
   const [customerPhone, setCustomerPhone] = useState("");
   const [customer, setCustomer] = useState<Customer | null>(null);
-  
+
   // Products and categories state
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  
+
   // Payment state
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -291,7 +280,7 @@ const POSPage: React.FC = () => {
       }));
 
       setCart(cartItems);
-      
+
       if (parkedSale.customer) {
         setCustomer(parkedSale.customer);
         setCustomerPhone(parkedSale.customer.phoneNumber || "");
@@ -370,8 +359,7 @@ const POSPage: React.FC = () => {
     try {
       const total = calculateTotal(cart);
       const finalTotal = total - loyaltyDiscount;
-      const cashAmount =
-        paymentMethod === "CASH" ? parseFloat(cashReceived) : finalTotal;
+      const cashAmount = paymentMethod === "CASH" ? parseFloat(cashReceived) : finalTotal;
 
       if (paymentMethod === "CASH" && cashAmount < finalTotal) {
         toast.error("Insufficient cash amount");
@@ -432,18 +420,12 @@ const POSPage: React.FC = () => {
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
               <span className="text-2xl">🛒</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 tracking-tight">
-              Fresh Mart
-            </span>
-            <span className="ml-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">
-              {user?.role}
-            </span>
+            <span className="text-xl font-bold text-gray-900 tracking-tight">Fresh Mart</span>
+            <span className="ml-2 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">{user?.role}</span>
           </div>
           {/* Right: User Info and Actions */}
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-700 hidden sm:inline">
-              Welcome, {user?.name}
-            </span>
+            <span className="text-sm text-gray-700 hidden sm:inline">Welcome, {user?.name}</span>
             {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
               <Link
                 to="/admin"
@@ -466,11 +448,7 @@ const POSPage: React.FC = () => {
         {/* Left Panel - Product Scanning & Categories */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Barcode Scanner */}
-          <POSBarcodeScanner
-            barcode={barcode}
-            onBarcodeChange={setBarcode}
-            onSubmit={handleBarcodeSubmit}
-          />
+          <POSBarcodeScanner barcode={barcode} onBarcodeChange={setBarcode} onSubmit={handleBarcodeSubmit} />
 
           {/* Quick Sale Buttons */}
           <div className="px-4 pb-2">

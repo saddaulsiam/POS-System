@@ -9,10 +9,12 @@
 ## 🚀 **Setup & Prerequisites**
 
 ### **1. Servers Running**
+
 - ✅ Backend: `http://localhost:5000` (Already running)
 - ✅ Frontend: `http://localhost:3001` (Already running)
 
 ### **2. Login Credentials**
+
 ```
 Username: admin
 PIN Code: 1234
@@ -25,6 +27,7 @@ PIN Code: 1234
 ### **Test 1: View Product Details Page**
 
 **Steps:**
+
 1. Navigate to **Products** page from sidebar
 2. Find any product in the table
 3. Click the **👁️ View** button (first action button)
@@ -35,6 +38,7 @@ PIN Code: 1234
    - **Product Variants** section (empty or with existing variants)
 
 **Verification Points:**
+
 - [ ] URL changes to `/products/{id}`
 - [ ] "Back to Products" button works
 - [ ] All product information displays correctly
@@ -45,6 +49,7 @@ PIN Code: 1234
 ### **Test 2: Create Product Variant**
 
 **Steps:**
+
 1. From product detail page, click **Add Variant** button
 2. Fill in the form:
    - **Variant Name:** "Small" or "Large" or "Red"
@@ -58,6 +63,7 @@ PIN Code: 1234
 4. Click **Create Variant**
 
 **Expected Results:**
+
 - [ ] Success toast: "Variant created successfully"
 - [ ] Modal closes
 - [ ] New variant appears in the variants table
@@ -66,6 +72,7 @@ PIN Code: 1234
 - [ ] Total Stock displays correctly
 
 **Error Cases to Test:**
+
 - [ ] Empty variant name → "Variant name is required"
 - [ ] Empty SKU → "SKU is required"
 - [ ] Invalid price → "Valid selling price is required"
@@ -75,6 +82,7 @@ PIN Code: 1234
 ### **Test 3: Edit Product Variant**
 
 **Steps:**
+
 1. Click **Edit** button on an existing variant
 2. Change values:
    - Variant Name: "Small Updated"
@@ -82,6 +90,7 @@ PIN Code: 1234
 3. Click **Update Variant**
 
 **Expected Results:**
+
 - [ ] Success toast: "Variant updated successfully"
 - [ ] Variant row updates with new values
 - [ ] Profit margin recalculates automatically
@@ -91,10 +100,12 @@ PIN Code: 1234
 ### **Test 4: Delete Product Variant**
 
 **Steps:**
+
 1. Click **Delete** button on a variant
 2. Confirm deletion
 
 **Expected Results:**
+
 - [ ] Success toast: "Variant deleted successfully"
 - [ ] Variant removed from table
 - [ ] Variant count updates
@@ -105,11 +116,13 @@ PIN Code: 1234
 ### **Test 5: Excel Export**
 
 **Steps:**
+
 1. Go to **Products** page
 2. Click **Export** dropdown button
 3. Select **📊 Export as Excel**
 
 **Expected Results:**
+
 - [ ] Success toast: "Products exported to Excel successfully"
 - [ ] File downloads: `products_export_YYYY-MM-DD.xlsx`
 - [ ] Open file in Excel:
@@ -122,11 +135,13 @@ PIN Code: 1234
 ### **Test 6: Excel Import Template Download**
 
 **Steps:**
+
 1. Click **Import** dropdown
 2. Select **📊 Import from Excel**
 3. In the dialog, click **Download Excel Template**
 
 **Expected Results:**
+
 - [ ] Success toast: "Template downloaded successfully"
 - [ ] File downloads: `product_import_template.xlsx`
 - [ ] Template has:
@@ -139,6 +154,7 @@ PIN Code: 1234
 ### **Test 7: Excel Import - Valid Data**
 
 **Steps:**
+
 1. Open the template in Excel
 2. Add test products:
    ```
@@ -158,6 +174,7 @@ PIN Code: 1234
 5. Click **Import Products**
 
 **Expected Results:**
+
 - [ ] Import results show:
   - [ ] "Successfully imported 1 product(s)"
   - [ ] Imported: 1
@@ -171,6 +188,7 @@ PIN Code: 1234
 ### **Test 8: Excel Import - Error Handling**
 
 **Steps:**
+
 1. Create Excel file with invalid data:
    - Missing required fields (Name, SKU)
    - Invalid CategoryId (9999)
@@ -179,6 +197,7 @@ PIN Code: 1234
 2. Import the file
 
 **Expected Results:**
+
 - [ ] Import results show error counts
 - [ ] Click "Show error details"
 - [ ] See specific errors for each row:
@@ -196,11 +215,13 @@ PIN Code: 1234
 ### **Test 9: Quick Sale Buttons**
 
 **Steps:**
+
 1. Navigate to **POS** page
 2. ✅ **Observe:** Quick Sale buttons appear above product grid
 3. Click any quick sale button
 
 **Expected Results:**
+
 - [ ] Quick sale buttons display in colored grid (2-4 columns)
 - [ ] Each button shows product name and price
 - [ ] Clicking button adds product to cart
@@ -208,6 +229,7 @@ PIN Code: 1234
 - [ ] Cart updates with quantity 1
 
 **Edge Cases:**
+
 - [ ] If no quick items configured → Shows "No quick sale items configured"
 - [ ] Inactive buttons don't appear
 
@@ -216,6 +238,7 @@ PIN Code: 1234
 ### **Test 10: Park Sale**
 
 **Steps:**
+
 1. Add 2-3 items to cart (use barcode scanner or product grid)
 2. Select a customer (optional)
 3. Click **🅿️ Park Sale** button
@@ -226,6 +249,7 @@ PIN Code: 1234
 5. Click **Park Sale**
 
 **Expected Results:**
+
 - [ ] Success toast: "Sale parked successfully"
 - [ ] Dialog closes
 - [ ] Cart clears
@@ -233,6 +257,7 @@ PIN Code: 1234
 - [ ] Sale saved to database
 
 **Verification:**
+
 - [ ] Dialog shows correct item count
 - [ ] Totals calculate correctly
 - [ ] Notes field accepts text
@@ -243,10 +268,12 @@ PIN Code: 1234
 ### **Test 11: View Parked Sales List**
 
 **Steps:**
+
 1. With some parked sales, click **📋 Parked** button
 2. ✅ **Observe:** Parked Sales List modal opens
 
 **Expected Results:**
+
 - [ ] Modal shows title "Parked Sales"
 - [ ] List displays all parked sales with:
   - [ ] Sale ID
@@ -259,6 +286,7 @@ PIN Code: 1234
 - [ ] Empty state shows if no parked sales
 
 **Status Indicators:**
+
 - [ ] Active sales: White background, blue total
 - [ ] Expired sales: Red background, "Expired" badge
 
@@ -267,11 +295,13 @@ PIN Code: 1234
 ### **Test 12: Resume Parked Sale**
 
 **Steps:**
+
 1. Open parked sales list
 2. Click **Resume** on any active parked sale
 3. ✅ **Observe:** Dialog closes
 
 **Expected Results:**
+
 - [ ] Success toast: "Parked sale resumed"
 - [ ] Cart populates with all items from parked sale
 - [ ] Quantities match
@@ -284,11 +314,13 @@ PIN Code: 1234
 ### **Test 13: Delete Parked Sale**
 
 **Steps:**
+
 1. Open parked sales list
 2. Click **Delete** on a parked sale
 3. Confirm deletion
 
 **Expected Results:**
+
 - [ ] Confirmation prompt appears
 - [ ] After confirming: "Parked sale deleted"
 - [ ] Sale removed from list
@@ -299,6 +331,7 @@ PIN Code: 1234
 ### **Test 14: Split Payment - Basic**
 
 **Steps:**
+
 1. Add items to cart (Total: $50.00)
 2. Click **🔀 Split Payment** button
 3. In dialog:
@@ -309,6 +342,7 @@ PIN Code: 1234
 5. Click **Confirm Split Payment**
 
 **Expected Results:**
+
 - [ ] Dialog shows total amount prominently
 - [ ] Can add up to 4 payment splits
 - [ ] Each split has method dropdown and amount input
@@ -325,35 +359,43 @@ PIN Code: 1234
 ### **Test 15: Split Payment - Validation**
 
 **Test Case A: Insufficient Payment**
+
 1. Total: $50.00
 2. Add only Cash: $30.00
 3. Try to confirm
 
 **Expected:**
+
 - [ ] Error toast: "Insufficient payment: $20.00 remaining"
 - [ ] Confirm button disabled
 
 **Test Case B: Overpayment**
+
 1. Total: $50.00
 2. Add Cash: $30.00 + Card: $25.00
 3. Try to confirm
 
 **Expected:**
+
 - [ ] Error toast: "Overpayment: $5.00 excess"
 
 **Test Case C: Duplicate Methods**
+
 1. Add Cash: $25.00
 2. Add another Cash: $25.00
 3. Try to confirm
 
 **Expected:**
+
 - [ ] Error toast: "Duplicate payment methods not allowed"
 
 **Test Case D: Zero Amount**
+
 1. Add Cash: $0.00
 2. Try to confirm
 
 **Expected:**
+
 - [ ] Error toast: "All payment amounts must be greater than zero"
 
 ---
@@ -361,10 +403,12 @@ PIN Code: 1234
 ### **Test 16: Split Payment - Remove Split**
 
 **Steps:**
+
 1. Add 3 payment splits
 2. Click delete (🗑️) button on middle split
 
 **Expected Results:**
+
 - [ ] Split removed
 - [ ] Remaining splits re-number automatically
 - [ ] Total recalculates
@@ -375,6 +419,7 @@ PIN Code: 1234
 ### **Test 17: Cart Actions - All Buttons**
 
 **Steps:**
+
 1. Add items to cart
 2. Verify all buttons present:
    - **💳 Process Payment** (green)
@@ -384,6 +429,7 @@ PIN Code: 1234
    - **🗑️ Clear Cart** (gray)
 
 **Expected Results:**
+
 - [ ] All buttons visible
 - [ ] Buttons disabled when cart empty (except Parked)
 - [ ] Button tooltips/labels clear
@@ -396,33 +442,39 @@ PIN Code: 1234
 **Complete POS Workflow:**
 
 1. **Start Fresh**
+
    - [ ] Login to POS
    - [ ] Cart is empty
 
 2. **Add Items**
+
    - [ ] Scan barcode: "1234567890"
    - [ ] Click product from grid
    - [ ] Use quick sale button
    - [ ] Verify cart shows 3+ items
 
 3. **Add Customer**
+
    - [ ] Enter phone number
    - [ ] Click search
    - [ ] Customer info displays
 
 4. **Park the Sale**
+
    - [ ] Click Park Sale
    - [ ] Add notes
    - [ ] Confirm
    - [ ] Verify cart clears
 
 5. **Resume Sale**
+
    - [ ] Click Parked button
    - [ ] Find parked sale
    - [ ] Click Resume
    - [ ] Verify cart restores
 
 6. **Complete with Split Payment**
+
    - [ ] Click Split Payment
    - [ ] Add Cash: $30
    - [ ] Add Card: $20
@@ -440,10 +492,12 @@ PIN Code: 1234
 ## 🐛 **Known Issues / Limitations**
 
 ### **Option 1:**
+
 - ⚠️ Product variant lookup by SKU/barcode not yet integrated into POS scanner
 - ⚠️ Variant images not yet supported
 
 ### **Option 2:**
+
 - ⚠️ Quick sale item configuration UI is placeholder (add via database)
 - ⚠️ Parked sales don't delete automatically after expiry (manual deletion required)
 - ⚠️ Split payment splits not stored separately in database (saved as MIXED)
@@ -453,12 +507,14 @@ PIN Code: 1234
 ## ✅ **Success Criteria**
 
 **Option 1 passes if:**
+
 - [ ] All 8 product variant tests pass
 - [ ] Excel import/export works with valid data
 - [ ] Error handling prevents invalid imports
 - [ ] Product detail page navigates correctly
 
 **Option 2 passes if:**
+
 - [ ] All 10 POS feature tests pass
 - [ ] Quick sale buttons add to cart
 - [ ] Park/resume workflow completes
@@ -470,23 +526,28 @@ PIN Code: 1234
 ## 🔧 **Troubleshooting**
 
 ### **Issue: Components not loading**
+
 - **Solution:** Hard refresh browser (Ctrl+Shift+R)
 - Check console for errors (F12)
 
 ### **Issue: API calls failing**
+
 - **Solution:** Verify backend running on port 5000
 - Check network tab in DevTools
 - Check backend console for errors
 
 ### **Issue: Import fails with valid data**
+
 - **Solution:** Check CategoryId and SupplierId exist in database
 - Verify column names match exactly (case-sensitive)
 
 ### **Issue: Parked sales not appearing**
+
 - **Solution:** Check database: `SELECT * FROM ParkedSale`
 - Verify employee ID matches logged-in user
 
 ### **Issue: Split payment total mismatch**
+
 - **Solution:** Clear browser cache
 - Check for rounding errors (use 2 decimal places)
 
@@ -529,10 +590,12 @@ Notes: ___________________
 ## 🎯 **Next Steps After Testing**
 
 1. **If all tests pass:**
+
    - ✅ Mark Options 1 & 2 as production-ready
    - Move to Option 3: Loyalty Program Dashboard
 
 2. **If issues found:**
+
    - Document each issue with steps to reproduce
    - Prioritize: Critical → High → Medium → Low
    - Fix critical bugs before proceeding

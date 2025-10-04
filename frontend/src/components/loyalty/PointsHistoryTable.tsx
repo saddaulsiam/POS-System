@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { ArrowUp, ArrowDown, Calendar, Filter, Download } from 'lucide-react';
-import { loyaltyAPI } from '../../services/api';
-import type { PointsTransaction, PointsTransactionType } from '../../types';
+import React, { useEffect, useState } from "react";
+import { ArrowUp, ArrowDown, Calendar, Filter, Download } from "lucide-react";
+import { loyaltyAPI } from "../../services/api";
+import type { PointsTransaction, PointsTransactionType } from "../../types";
 
 interface PointsHistoryTableProps {
   customerId: number;
 }
 
-type DateFilter = 'all' | 'week' | 'month' | 'year';
-type TypeFilter = 'all' | PointsTransactionType;
+type DateFilter = "all" | "week" | "month" | "year";
+type TypeFilter = "all" | PointsTransactionType;
 
 const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) => {
   const [transactions, setTransactions] = useState<PointsTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dateFilter, setDateFilter] = useState<DateFilter>('all');
-  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
+  const [dateFilter, setDateFilter] = useState<DateFilter>("all");
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
 
   useEffect(() => {
     fetchTransactions();
@@ -28,8 +28,8 @@ const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) =
       const data = await loyaltyAPI.getTransactions(customerId);
       setTransactions(data || []);
     } catch (err: any) {
-      setError(err.message || 'Failed to load transaction history');
-      console.error('Error fetching transactions:', err);
+      setError(err.message || "Failed to load transaction history");
+      console.error("Error fetching transactions:", err);
     } finally {
       setLoading(false);
     }
@@ -39,24 +39,24 @@ const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) =
     let filtered = [...transactions];
 
     // Filter by type
-    if (typeFilter !== 'all') {
-      filtered = filtered.filter(t => t.type === typeFilter);
+    if (typeFilter !== "all") {
+      filtered = filtered.filter((t) => t.type === typeFilter);
     }
 
     // Filter by date
-    if (dateFilter !== 'all') {
+    if (dateFilter !== "all") {
       const now = new Date();
       const filterDate = new Date();
 
-      if (dateFilter === 'week') {
+      if (dateFilter === "week") {
         filterDate.setDate(now.getDate() - 7);
-      } else if (dateFilter === 'month') {
+      } else if (dateFilter === "month") {
         filterDate.setMonth(now.getMonth() - 1);
-      } else if (dateFilter === 'year') {
+      } else if (dateFilter === "year") {
         filterDate.setFullYear(now.getFullYear() - 1);
       }
 
-      filtered = filtered.filter(t => new Date(t.createdAt) >= filterDate);
+      filtered = filtered.filter((t) => new Date(t.createdAt) >= filterDate);
     }
 
     // Sort by date (newest first)
@@ -67,39 +67,39 @@ const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) =
 
   const calculateRunningBalance = () => {
     let balance = 0;
-    return filteredTransactions.reverse().map(transaction => {
-      balance += transaction.points;
-      return { ...transaction, balance };
-    }).reverse();
+    return filteredTransactions
+      .reverse()
+      .map((transaction) => {
+        balance += transaction.points;
+        return { ...transaction, balance };
+      })
+      .reverse();
   };
 
   const transactionsWithBalance = calculateRunningBalance();
 
   const exportToCSV = () => {
-    const headers = ['Date', 'Type', 'Description', 'Points', 'Balance'];
-    const rows = transactionsWithBalance.map(t => [
+    const headers = ["Date", "Type", "Description", "Points", "Balance"];
+    const rows = transactionsWithBalance.map((t) => [
       new Date(t.createdAt).toLocaleDateString(),
       t.type,
-      t.description || '-',
+      t.description || "-",
       t.points.toString(),
       t.balance.toString(),
     ]);
 
-    const csv = [
-      headers.join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n');
+    const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `loyalty_points_history_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `loyalty_points_history_${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
   };
 
   const getTransactionIcon = (type: PointsTransactionType) => {
-    return type === 'EARNED' || type === 'BIRTHDAY_BONUS' || type === 'ADJUSTED' ? (
+    return type === "EARNED" || type === "BIRTHDAY_BONUS" || type === "ADJUSTED" ? (
       <ArrowUp className="w-4 h-4 text-green-500" />
     ) : (
       <ArrowDown className="w-4 h-4 text-red-500" />
@@ -107,34 +107,34 @@ const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) =
   };
 
   const getPointsColor = (points: number) => {
-    return points > 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+    return points > 0 ? "text-green-600 font-semibold" : "text-red-600 font-semibold";
   };
 
   const getTypeLabel = (type: PointsTransactionType) => {
     const labels: Record<PointsTransactionType, string> = {
-      EARNED: 'Earned',
-      REDEEMED: 'Redeemed',
-      EXPIRED: 'Expired',
-      BIRTHDAY_BONUS: 'Birthday Bonus',
-      ADJUSTED: 'Adjusted',
+      EARNED: "Earned",
+      REDEEMED: "Redeemed",
+      EXPIRED: "Expired",
+      BIRTHDAY_BONUS: "Birthday Bonus",
+      ADJUSTED: "Adjusted",
     };
     return labels[type];
   };
 
   const getTypeBadgeColor = (type: PointsTransactionType) => {
     const colors: Record<PointsTransactionType, string> = {
-      EARNED: 'bg-green-100 text-green-800',
-      REDEEMED: 'bg-blue-100 text-blue-800',
-      EXPIRED: 'bg-gray-100 text-gray-800',
-      BIRTHDAY_BONUS: 'bg-purple-100 text-purple-800',
-      ADJUSTED: 'bg-yellow-100 text-yellow-800',
+      EARNED: "bg-green-100 text-green-800",
+      REDEEMED: "bg-blue-100 text-blue-800",
+      EXPIRED: "bg-gray-100 text-gray-800",
+      BIRTHDAY_BONUS: "bg-purple-100 text-purple-800",
+      ADJUSTED: "bg-yellow-100 text-yellow-800",
     };
     return colors[type];
   };
 
   const totalPoints = transactions.reduce((sum, t) => sum + t.points, 0);
-  const earnedPoints = transactions.filter(t => t.points > 0).reduce((sum, t) => sum + t.points, 0);
-  const redeemedPoints = transactions.filter(t => t.points < 0).reduce((sum, t) => sum + Math.abs(t.points), 0);
+  const earnedPoints = transactions.filter((t) => t.points > 0).reduce((sum, t) => sum + t.points, 0);
+  const redeemedPoints = transactions.filter((t) => t.points < 0).reduce((sum, t) => sum + Math.abs(t.points), 0);
 
   if (loading) {
     return (
@@ -151,10 +151,7 @@ const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) =
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex flex-col items-center justify-center h-64 text-red-500">
           <p className="mb-4">{error}</p>
-          <button
-            onClick={fetchTransactions}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
+          <button onClick={fetchTransactions} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
             Retry
           </button>
         </div>
@@ -243,12 +240,8 @@ const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) =
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Description
                 </th>
@@ -264,30 +257,35 @@ const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) =
               {transactionsWithBalance.map((transaction) => (
                 <tr key={transaction.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(transaction.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
+                    {new Date(transaction.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
                     })}
                     <br />
                     <span className="text-xs text-gray-500">
-                      {new Date(transaction.createdAt).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
+                      {new Date(transaction.createdAt).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
                       })}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getTypeBadgeColor(transaction.type)}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getTypeBadgeColor(
+                        transaction.type
+                      )}`}
+                    >
                       {getTransactionIcon(transaction.type)}
                       {getTypeLabel(transaction.type)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {transaction.description || '-'}
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-right text-sm ${getPointsColor(transaction.points)}`}>
-                    {transaction.points > 0 ? '+' : ''}{transaction.points.toLocaleString()}
+                  <td className="px-6 py-4 text-sm text-gray-700">{transaction.description || "-"}</td>
+                  <td
+                    className={`px-6 py-4 whitespace-nowrap text-right text-sm ${getPointsColor(transaction.points)}`}
+                  >
+                    {transaction.points > 0 ? "+" : ""}
+                    {transaction.points.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
                     {transaction.balance.toLocaleString()}

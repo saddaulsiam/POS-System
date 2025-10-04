@@ -29,16 +29,13 @@ frontend/src/components/loyalty/
 ## 🚀 **Quick Start (3 Steps)**
 
 ### **Step 1: Import**
+
 ```typescript
-import {
-  LoyaltyDashboard,
-  PointsHistoryTable,
-  RewardsGallery,
-  RedeemPointsDialog,
-} from '../components/loyalty';
+import { LoyaltyDashboard, PointsHistoryTable, RewardsGallery, RedeemPointsDialog } from "../components/loyalty";
 ```
 
 ### **Step 2: Add to Customer Page**
+
 ```typescript
 <LoyaltyDashboard customer={customer} />
 <PointsHistoryTable customerId={customer.id} />
@@ -46,6 +43,7 @@ import {
 ```
 
 ### **Step 3: Add to POS Checkout**
+
 ```typescript
 <button onClick={() => setShowRedeem(true)}>
   🎁 Use Loyalty Points
@@ -70,6 +68,7 @@ import {
 ## 🎨 **Visual Preview**
 
 ### **LoyaltyDashboard:**
+
 ```
 ┌─────────────────────────────────────┐
 │ Loyalty Program       [Refresh]     │
@@ -91,6 +90,7 @@ import {
 ```
 
 ### **RedeemPointsDialog:**
+
 ```
 ┌──────────────────────────────────┐
 │ 🎁 Redeem Points          [X]   │
@@ -112,68 +112,74 @@ import {
 
 ## 📊 **Component Matrix**
 
-| Component | Customer Page | POS Page | Standalone | Modal |
-|-----------|--------------|----------|------------|-------|
-| LoyaltyDashboard | ✅ Main | ✅ Sidebar | ❌ | ❌ |
-| PointsHistoryTable | ✅ Tab | ❌ | ✅ | ❌ |
-| RewardsGallery | ✅ Tab | ❌ | ❌ | ❌ |
-| LoyaltyOffersList | ✅ Tab | ❌ | ✅ | ❌ |
-| TierBenefitsDisplay | ❌ | ❌ | ✅ | ❌ |
-| RedeemPointsDialog | ❌ | ✅ Checkout | ❌ | ✅ |
+| Component           | Customer Page | POS Page    | Standalone | Modal |
+| ------------------- | ------------- | ----------- | ---------- | ----- |
+| LoyaltyDashboard    | ✅ Main       | ✅ Sidebar  | ❌         | ❌    |
+| PointsHistoryTable  | ✅ Tab        | ❌          | ✅         | ❌    |
+| RewardsGallery      | ✅ Tab        | ❌          | ❌         | ❌    |
+| LoyaltyOffersList   | ✅ Tab        | ❌          | ✅         | ❌    |
+| TierBenefitsDisplay | ❌            | ❌          | ✅         | ❌    |
+| RedeemPointsDialog  | ❌            | ✅ Checkout | ❌         | ✅    |
 
 ---
 
 ## 🎯 **Props Cheat Sheet**
 
 ### **LoyaltyDashboard**
+
 ```typescript
 <LoyaltyDashboard
-  customer={customer}           // Required: Customer object
-  onRefresh={() => refresh()}   // Optional: Callback
+  customer={customer} // Required: Customer object
+  onRefresh={() => refresh()} // Optional: Callback
 />
 ```
 
 ### **PointsHistoryTable**
+
 ```typescript
 <PointsHistoryTable
-  customerId={123}              // Required: Customer ID
+  customerId={123} // Required: Customer ID
 />
 ```
 
 ### **RewardsGallery**
+
 ```typescript
 <RewardsGallery
-  customerId={123}              // Required: Customer ID
-  customerPoints={2500}         // Required: Available points
-  onRewardRedeemed={() => {}}   // Optional: Callback
+  customerId={123} // Required: Customer ID
+  customerPoints={2500} // Required: Available points
+  onRewardRedeemed={() => {}} // Optional: Callback
 />
 ```
 
 ### **LoyaltyOffersList**
+
 ```typescript
 <LoyaltyOffersList
-  customerTier="GOLD"           // Optional: Customer's tier
+  customerTier="GOLD" // Optional: Customer's tier
 />
 ```
 
 ### **TierBenefitsDisplay**
+
 ```typescript
 <TierBenefitsDisplay
-  currentTier="GOLD"            // Optional: Current tier
-  lifetimePoints={5000}         // Optional: Lifetime points
+  currentTier="GOLD" // Optional: Current tier
+  lifetimePoints={5000} // Optional: Lifetime points
 />
 ```
 
 ### **RedeemPointsDialog**
+
 ```typescript
 <RedeemPointsDialog
-  customerId={123}              // Required
-  customerName="John Doe"       // Required
-  availablePoints={2500}        // Required
-  cartTotal={75.00}             // Required
-  isOpen={true}                 // Required: Show/hide
-  onClose={() => {}}            // Required: Close handler
-  onRedeemed={(discount, pts) => {}}  // Required: Success callback
+  customerId={123} // Required
+  customerName="John Doe" // Required
+  availablePoints={2500} // Required
+  cartTotal={75.0} // Required
+  isOpen={true} // Required: Show/hide
+  onClose={() => {}} // Required: Close handler
+  onRedeemed={(discount, pts) => {}} // Required: Success callback
 />
 ```
 
@@ -183,33 +189,26 @@ import {
 
 ```typescript
 // CustomersPage.tsx
-import { useState } from 'react';
-import {
-  LoyaltyDashboard,
-  PointsHistoryTable,
-  RewardsGallery,
-} from '../components/loyalty';
+import { useState } from "react";
+import { LoyaltyDashboard, PointsHistoryTable, RewardsGallery } from "../components/loyalty";
 
 const CustomerDetailView = ({ customer }) => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   return (
     <div>
       {/* Tabs */}
       <div className="flex gap-4 mb-6">
-        <button onClick={() => setActiveTab('overview')}>Overview</button>
-        <button onClick={() => setActiveTab('loyalty')}>Loyalty</button>
+        <button onClick={() => setActiveTab("overview")}>Overview</button>
+        <button onClick={() => setActiveTab("loyalty")}>Loyalty</button>
       </div>
 
       {/* Loyalty Tab */}
-      {activeTab === 'loyalty' && (
+      {activeTab === "loyalty" && (
         <div className="space-y-6">
           <LoyaltyDashboard customer={customer} />
           <PointsHistoryTable customerId={customer.id} />
-          <RewardsGallery 
-            customerId={customer.id}
-            customerPoints={customer.loyaltyPoints}
-          />
+          <RewardsGallery customerId={customer.id} customerPoints={customer.loyaltyPoints} />
         </div>
       )}
     </div>
@@ -217,8 +216,8 @@ const CustomerDetailView = ({ customer }) => {
 };
 
 // POSPage.tsx
-import { useState } from 'react';
-import { RedeemPointsDialog } from '../components/loyalty';
+import { useState } from "react";
+import { RedeemPointsDialog } from "../components/loyalty";
 
 const POSPage = () => {
   const [showRedeem, setShowRedeem] = useState(false);
@@ -228,15 +227,13 @@ const POSPage = () => {
     <div>
       {/* Checkout Button */}
       {selectedCustomer && (
-        <button onClick={() => setShowRedeem(true)}>
-          🎁 Use Loyalty Points ({selectedCustomer.loyaltyPoints})
-        </button>
+        <button onClick={() => setShowRedeem(true)}>🎁 Use Loyalty Points ({selectedCustomer.loyaltyPoints})</button>
       )}
 
       {/* Dialog */}
       <RedeemPointsDialog
         customerId={selectedCustomer?.id || 0}
-        customerName={selectedCustomer?.name || ''}
+        customerName={selectedCustomer?.name || ""}
         availablePoints={selectedCustomer?.loyaltyPoints || 0}
         cartTotal={cartTotal}
         isOpen={showRedeem}
@@ -249,11 +246,7 @@ const POSPage = () => {
       />
 
       {/* Show Discount */}
-      {discount > 0 && (
-        <div className="text-green-600">
-          Loyalty Discount: -${discount.toFixed(2)}
-        </div>
-      )}
+      {discount > 0 && <div className="text-green-600">Loyalty Discount: -${discount.toFixed(2)}</div>}
     </div>
   );
 };

@@ -29,24 +29,10 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
     <div className="flex gap-2">
       {/* Export Dropdown */}
       <div className="relative">
-        <Button
-          variant="success"
-          onClick={() => setShowExportMenu(!showExportMenu)}
-          title="Export products"
-        >
+        <Button variant="success" onClick={() => setShowExportMenu(!showExportMenu)} title="Export products">
           📥 Export
-          <svg
-            className="w-4 h-4 ml-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
+          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </Button>
         {showExportMenu && (
@@ -75,24 +61,10 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
 
       {/* Import Dropdown */}
       <div className="relative">
-        <Button
-          variant="warning"
-          onClick={() => setShowImportMenu(!showImportMenu)}
-          title="Import products"
-        >
+        <Button variant="warning" onClick={() => setShowImportMenu(!showImportMenu)} title="Import products">
           📤 Import
-          <svg
-            className="w-4 h-4 ml-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
+          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </Button>
         {showImportMenu && (

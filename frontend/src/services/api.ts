@@ -640,12 +640,7 @@ export const quickSaleItemsAPI = {
     return response.data;
   },
 
-  create: async (data: {
-    productId: number;
-    displayName: string;
-    color: string;
-    sortOrder: number;
-  }) => {
+  create: async (data: { productId: number; displayName: string; color: string; sortOrder: number }) => {
     const response = await api.post("/quick-sale-items", data);
     return response.data;
   },
@@ -676,11 +671,7 @@ export const loyaltyAPI = {
     return response.data;
   },
 
-  awardPoints: async (data: {
-    customerId: number;
-    saleId: number;
-    amount: number;
-  }) => {
+  awardPoints: async (data: { customerId: number; saleId: number; amount: number }) => {
     const response = await api.post("/loyalty/award-points", data);
     return response.data;
   },
@@ -745,19 +736,12 @@ export const loyaltyAPI = {
 
 // OPTION 5: Advanced Reports & Analytics API
 export const analyticsAPI = {
-  getProfitMargin: async (params?: {
-    startDate?: string;
-    endDate?: string;
-    categoryId?: number;
-  }) => {
+  getProfitMargin: async (params?: { startDate?: string; endDate?: string; categoryId?: number }) => {
     const response = await api.get("/reports/profit-margin", { params });
     return response.data;
   },
 
-  getStockTurnover: async (params?: {
-    days?: number;
-    categoryId?: number;
-  }) => {
+  getStockTurnover: async (params?: { days?: number; categoryId?: number }) => {
     const response = await api.get("/reports/stock-turnover", { params });
     return response.data;
   },
@@ -771,11 +755,7 @@ export const analyticsAPI = {
     return response.data;
   },
 
-  getCustomerAnalytics: async (params?: {
-    startDate?: string;
-    endDate?: string;
-    limit?: number;
-  }) => {
+  getCustomerAnalytics: async (params?: { startDate?: string; endDate?: string; limit?: number }) => {
     const response = await api.get("/reports/customer-analytics", { params });
     return response.data;
   },
@@ -783,10 +763,7 @@ export const analyticsAPI = {
 
 // OPTION 6: Receipt & Printing API
 export const receiptsAPI = {
-  generate: async (
-    saleId: number,
-    format: "PDF" | "HTML" | "THERMAL" = "PDF"
-  ): Promise<Blob> => {
+  generate: async (saleId: number, format: "PDF" | "HTML" | "THERMAL" = "PDF"): Promise<Blob> => {
     const response = await api.get(`/receipts/${saleId}/generate`, {
       params: { format },
       responseType: format === "HTML" ? "text" : "blob",
@@ -799,12 +776,7 @@ export const receiptsAPI = {
     return response.data;
   },
 
-  send: async (data: {
-    saleId: number;
-    customerEmail: string;
-    customerName?: string;
-    includePDF?: boolean;
-  }) => {
+  send: async (data: { saleId: number; customerEmail: string; customerName?: string; includePDF?: boolean }) => {
     const response = await api.post("/receipts/send", data);
     return response.data;
   },
@@ -817,11 +789,7 @@ export const receiptsAPI = {
     return response.data;
   },
 
-  bulkSend: async (data: {
-    saleIds: number[];
-    customerEmail: string;
-    customerName?: string;
-  }) => {
+  bulkSend: async (data: { saleIds: number[]; customerEmail: string; customerName?: string }) => {
     const response = await api.post("/receipts/bulk-send", data);
     return response.data;
   },
@@ -865,11 +833,7 @@ export const returnsAPI = {
     return response.data;
   },
 
-  getReturnHistory: async (params?: {
-    customerId?: number;
-    startDate?: string;
-    endDate?: string;
-  }) => {
+  getReturnHistory: async (params?: { customerId?: number; startDate?: string; endDate?: string }) => {
     const response = await api.get("/sales/returns", { params });
     return response.data;
   },

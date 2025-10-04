@@ -10,11 +10,7 @@ interface ParkedSalesListProps {
   onResume: (parkedSale: ParkedSale) => void;
 }
 
-export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({
-  isOpen,
-  onClose,
-  onResume,
-}) => {
+export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({ isOpen, onClose, onResume }) => {
   const [parkedSales, setParkedSales] = useState<ParkedSale[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<number | null>(null);
@@ -55,9 +51,7 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({
       loadParkedSales();
     } catch (error: any) {
       console.error("Error deleting parked sale:", error);
-      toast.error(
-        error.response?.data?.error || "Failed to delete parked sale"
-      );
+      toast.error(error.response?.data?.error || "Failed to delete parked sale");
     } finally {
       setDeleting(null);
     }
@@ -92,19 +86,12 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl relative max-h-[90vh] overflow-y-auto">
-        <button
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl"
-          onClick={onClose}
-        >
+        <button className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl" onClick={onClose}>
           ×
         </button>
 
-        <h2 className="text-2xl font-bold mb-2 text-gray-800">
-          Parked Sales
-        </h2>
-        <p className="text-sm text-gray-600 mb-6">
-          Resume or manage your saved sales
-        </p>
+        <h2 className="text-2xl font-bold mb-2 text-gray-800">Parked Sales</h2>
+        <p className="text-sm text-gray-600 mb-6">Resume or manage your saved sales</p>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
@@ -113,12 +100,7 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({
           </div>
         ) : parkedSales.length === 0 ? (
           <div className="text-center py-12">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -126,12 +108,8 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({
                 d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
               />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              No parked sales
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Park a sale to resume it later
-            </p>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No parked sales</h3>
+            <p className="mt-1 text-sm text-gray-500">Park a sale to resume it later</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -143,23 +121,15 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({
                 <div
                   key={sale.id}
                   className={`border rounded-lg p-4 ${
-                    expired
-                      ? "border-red-200 bg-red-50"
-                      : "border-gray-200 bg-white hover:shadow-md"
+                    expired ? "border-red-200 bg-red-50" : "border-gray-200 bg-white hover:shadow-md"
                   } transition-shadow`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       {/* Header */}
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-semibold text-gray-900">
-                          Sale #{sale.id}
-                        </span>
-                        {sale.customer && (
-                          <span className="text-sm text-gray-600">
-                            • {sale.customer.name}
-                          </span>
-                        )}
+                        <span className="font-semibold text-gray-900">Sale #{sale.id}</span>
+                        {sale.customer && <span className="text-sm text-gray-600">• {sale.customer.name}</span>}
                         {expired && (
                           <span className="px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">
                             Expired
@@ -171,29 +141,19 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm mb-2">
                         <div>
                           <span className="text-gray-600">Items:</span>
-                          <p className="font-semibold text-gray-900">
-                            {itemCount}
-                          </p>
+                          <p className="font-semibold text-gray-900">{itemCount}</p>
                         </div>
                         <div>
                           <span className="text-gray-600">Total:</span>
-                          <p className="font-semibold text-blue-600">
-                            ${sale.subtotal.toFixed(2)}
-                          </p>
+                          <p className="font-semibold text-blue-600">${sale.subtotal.toFixed(2)}</p>
                         </div>
                         <div>
                           <span className="text-gray-600">Parked:</span>
-                          <p className="font-medium text-gray-900">
-                            {formatDate(sale.parkedAt)}
-                          </p>
+                          <p className="font-medium text-gray-900">{formatDate(sale.parkedAt)}</p>
                         </div>
                         <div>
                           <span className="text-gray-600">Expires in:</span>
-                          <p
-                            className={`font-medium ${
-                              expired ? "text-red-600" : "text-gray-900"
-                            }`}
-                          >
+                          <p className={`font-medium ${expired ? "text-red-600" : "text-gray-900"}`}>
                             {getTimeRemaining(sale.expiresAt)}
                           </p>
                         </div>
@@ -209,26 +169,15 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({
 
                       {/* Employee */}
                       {sale.employee && (
-                        <div className="mt-2 text-xs text-gray-500">
-                          Parked by: {sale.employee.name}
-                        </div>
+                        <div className="mt-2 text-xs text-gray-500">Parked by: {sale.employee.name}</div>
                       )}
                     </div>
 
                     {/* Actions */}
                     <div className="flex flex-col gap-2 ml-4">
                       {!expired && (
-                        <Button
-                          variant="primary"
-                          onClick={() => handleResume(sale)}
-                          className="text-sm"
-                        >
-                          <svg
-                            className="w-4 h-4 mr-1"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
+                        <Button variant="primary" onClick={() => handleResume(sale)} className="text-sm">
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"

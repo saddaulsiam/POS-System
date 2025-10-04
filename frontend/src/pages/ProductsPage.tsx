@@ -326,9 +326,7 @@ const ProductsPage: React.FC = () => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `products_export_${
-        new Date().toISOString().split("T")[0]
-      }.xlsx`;
+      link.download = `products_export_${new Date().toISOString().split("T")[0]}.xlsx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -54,14 +54,11 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
     }
   }, [variant, product]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
@@ -112,9 +109,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
       onClose();
     } catch (error: any) {
       console.error("Error saving variant:", error);
-      toast.error(
-        error.response?.data?.error || "Failed to save product variant"
-      );
+      toast.error(error.response?.data?.error || "Failed to save product variant");
     } finally {
       setIsSubmitting(false);
     }
@@ -125,16 +120,11 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
-        <button
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl"
-          onClick={onClose}
-        >
+        <button className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl" onClick={onClose}>
           ×
         </button>
 
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">
-          {variant ? "Edit" : "Add"} Product Variant
-        </h2>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">{variant ? "Edit" : "Add"} Product Variant</h2>
         <p className="text-sm text-gray-600 mb-6">
           Product: <span className="font-semibold">{product.name}</span>
         </p>
@@ -174,9 +164,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Barcode (Optional)
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Barcode (Optional)</label>
               <input
                 type="text"
                 name="barcode"
@@ -227,9 +215,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
 
           {/* Stock Quantity */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Initial Stock Quantity
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Initial Stock Quantity</label>
             <input
               type="number"
               name="stockQuantity"
@@ -247,17 +233,11 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
               <p className="text-sm text-gray-700">
                 <span className="font-semibold">Profit Margin:</span>{" "}
                 {(
-                  ((parseFloat(formData.sellingPrice) -
-                    parseFloat(formData.purchasePrice)) /
+                  ((parseFloat(formData.sellingPrice) - parseFloat(formData.purchasePrice)) /
                     parseFloat(formData.sellingPrice)) *
                   100
                 ).toFixed(2)}
-                % (${" "}
-                {(
-                  parseFloat(formData.sellingPrice) -
-                  parseFloat(formData.purchasePrice)
-                ).toFixed(2)}{" "}
-                per unit)
+                % ($ {(parseFloat(formData.sellingPrice) - parseFloat(formData.purchasePrice)).toFixed(2)} per unit)
               </p>
             </div>
           )}
@@ -271,27 +251,16 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
               onChange={handleChange}
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
             />
-            <label className="ml-2 block text-sm text-gray-700">
-              Active (available for sale)
-            </label>
+            <label className="ml-2 block text-sm text-gray-700">Active (available for sale)</label>
           </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-3 pt-4">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={onClose}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button type="submit" variant="primary" disabled={isSubmitting}>
-              {isSubmitting
-                ? "Saving..."
-                : variant
-                ? "Update Variant"
-                : "Create Variant"}
+              {isSubmitting ? "Saving..." : variant ? "Update Variant" : "Create Variant"}
             </Button>
           </div>
         </form>

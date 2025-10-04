@@ -10,12 +10,12 @@ interface CustomersTableProps {
   onViewDetails?: (customer: Customer) => void;
 }
 
-export const CustomersTable: React.FC<CustomersTableProps> = ({ 
-  customers, 
-  isLoading, 
-  onEdit, 
+export const CustomersTable: React.FC<CustomersTableProps> = ({
+  customers,
+  isLoading,
+  onEdit,
   onDelete,
-  onViewDetails 
+  onViewDetails,
 }) => {
   if (isLoading) {
     return (
@@ -73,10 +73,7 @@ export const CustomersTable: React.FC<CustomersTableProps> = ({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   {onViewDetails && (
-                    <button 
-                      onClick={() => onViewDetails(customer)} 
-                      className="text-blue-600 hover:text-blue-900 mr-4"
-                    >
+                    <button onClick={() => onViewDetails(customer)} className="text-blue-600 hover:text-blue-900 mr-4">
                       👁️ View
                     </button>
                   )}
