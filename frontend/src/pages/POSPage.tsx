@@ -373,7 +373,7 @@ const POSPage: React.FC = () => {
         })),
         paymentMethod: "MIXED" as any,
         paymentSplits: splits.map((split) => ({
-          method: split.method,
+          paymentMethod: split.method,
           amount: split.amount,
         })),
       };
