@@ -1,5 +1,6 @@
 // Export all shared components from a single file
 export { Button } from "./Button";
+export { BackButton } from "./BackButton";
 export { Modal } from "./Modal";
 export { Input, TextArea, Select } from "./Input";
 export { SearchBar } from "./SearchBar";

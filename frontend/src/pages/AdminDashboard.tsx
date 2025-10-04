@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { BackButton } from "../components/common";
 import { DashboardStatCard } from "../components/dashboard/DashboardStatCard";
 import { SimpleBarChart } from "../components/dashboard/SimpleBarChart";
 import { RecentTransactionsList } from "../components/dashboard/RecentTransactionsList";
@@ -273,12 +273,7 @@ const AdminDashboard: React.FC = () => {
           <p className="text-gray-600 mb-4">
             You don't have permission to access the admin dashboard.
           </p>
-          <Link
-            to="/"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-          >
-            Back to POS
-          </Link>
+          <BackButton to="/" label="Back to POS" />
         </div>
       </div>
     );

@@ -7,6 +7,7 @@ import {
   InventoryReport,
 } from "../types";
 import { formatDate } from "../utils/reportUtils";
+import { BackButton } from "../components/common";
 import { DateRangeFilter } from "../components/reports/DateRangeFilter";
 import { DailySalesCard } from "../components/reports/DailySalesCard";
 import { SalesRangeCard } from "../components/reports/SalesRangeCard";
@@ -64,12 +65,7 @@ const ReportsPage: React.FC = () => {
           <h1 className="text-4xl font-extrabold text-blue-900 tracking-tight">
             📊 Reports & Analytics
           </h1>
-          <a
-            href="/admin"
-            className="inline-block px-4 py-2 bg-blue-100 text-blue-800 font-semibold rounded hover:bg-blue-200 transition-all shadow-sm"
-          >
-            ← Back to Dashboard
-          </a>
+          <BackButton to="/admin" label="Back to Dashboard" />
         </div>
 
         {/* Date Range Filter */}

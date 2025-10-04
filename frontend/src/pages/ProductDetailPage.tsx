@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Product } from "../types";
 import { productsAPI } from "../services/api";
-import { Button } from "../components/common";
+import { BackButton } from "../components/common";
 import { ProductVariantList } from "../components/products";
 
 const ProductDetailPage: React.FC = () => {
@@ -47,10 +47,14 @@ const ProductDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-gray-600">Product not found</p>
-          <Button variant="primary" onClick={() => navigate("/products")} className="mt-4">
-            Back to Products
-          </Button>
+          <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+          </svg>
+          <p className="mt-4 text-xl font-semibold text-gray-900">Product not found</p>
+          <p className="mt-2 text-sm text-gray-600">The product you're looking for doesn't exist or has been removed.</p>
+          <div className="mt-6 flex justify-center">
+            <BackButton to="/products" label="Back to Products" />
+          </div>
         </div>
       </div>
     );
@@ -61,15 +65,7 @@ const ProductDetailPage: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <button
-            onClick={() => navigate("/products")}
-            className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Products
-          </button>
+          <BackButton to="/products" label="Back to Products" className="mb-4" />
 
           <div className="flex items-start justify-between">
             <div>
