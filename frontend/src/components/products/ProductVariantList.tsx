@@ -89,12 +89,14 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({ product 
           <h3 className="text-lg font-semibold text-gray-800">Product Variants</h3>
           <p className="text-sm text-gray-600 mt-1">Manage different sizes, colors, or variations of this product</p>
         </div>
-        <Button variant="primary" onClick={handleAddVariant}>
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add Variant
-        </Button>
+        {variants.length > 0 && (
+          <Button variant="primary" onClick={handleAddVariant} className="flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Variant
+          </Button>
+        )}
       </div>
 
       {/* Variants Table */}
@@ -111,8 +113,8 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({ product 
             </svg>
             <h3 className="mt-2 text-sm font-medium text-gray-900">No variants</h3>
             <p className="mt-1 text-sm text-gray-500">Get started by creating a new product variant.</p>
-            <div className="mt-6">
-              <Button variant="primary" onClick={handleAddVariant}>
+            <div className="mt-6 flex justify-center">
+              <Button variant="primary" onClick={handleAddVariant} className="flex items-center">
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
