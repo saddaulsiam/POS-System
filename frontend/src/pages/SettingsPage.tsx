@@ -5,14 +5,46 @@ import { BackButton } from "../components/common";
 
 interface POSSettings {
   id: number;
+  // Feature Toggles
   enableQuickSale: boolean;
   enableSplitPayment: boolean;
   enableParkSale: boolean;
   enableCustomerSearch: boolean;
   enableBarcodeScanner: boolean;
   enableLoyaltyPoints: boolean;
+
+  // Store Information
+  storeName: string;
+  storeAddress: string;
+  storePhone: string;
+  storeEmail: string;
+  taxId: string | null;
+
+  // Currency & Tax
   taxRate: number;
+  currencySymbol: string;
+  currencyPosition: string;
+
+  // Receipt Settings
   receiptFooterText: string | null;
+  returnPolicy: string | null;
+  printReceiptAuto: boolean;
+  emailReceiptAuto: boolean;
+
+  // Alerts & Notifications
+  enableLowStockAlerts: boolean;
+  lowStockThreshold: number;
+  enableEmailNotifications: boolean;
+  adminAlertEmail: string | null;
+
+  // System Settings
+  autoLogoutMinutes: number;
+  requirePasswordOnVoid: boolean;
+  enableAuditLog: boolean;
+  productsPerPage: number;
+  defaultView: string;
+  showProductImages: boolean;
+
   updatedAt: string;
   updatedByEmployee?: {
     id: number;
@@ -27,6 +59,7 @@ const SettingsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("features");
 
   useEffect(() => {
     loadSettings();
@@ -61,41 +94,65 @@ const SettingsPage: React.FC = () => {
     }
   };
 
-  const handleTaxRateChange = async (e: React.FocusEvent<HTMLInputElement>) => {
-    if (!settings) return;
-
-    const value = parseFloat(e.target.value);
-    if (isNaN(value) || value < 0 || value > 100) {
-      toast.error("Tax rate must be between 0 and 100");
-      return;
-    }
-
-    try {
-      setSaving(true);
-      const updatedSettings = await posSettingsAPI.update({ taxRate: value });
-      setSettings(updatedSettings);
-      toast.success("Tax rate updated successfully");
-    } catch (error) {
-      console.error("Error updating tax rate:", error);
-      toast.error("Failed to update tax rate");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleReceiptFooterChange = async (e: React.FocusEvent<HTMLTextAreaElement>) => {
+  const handleTextFieldChange = async (
+    field: keyof POSSettings,
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     if (!settings) return;
 
     const value = e.target.value.trim();
 
     try {
       setSaving(true);
-      const updatedSettings = await posSettingsAPI.update({ receiptFooterText: value || undefined });
+      const updatedSettings = await posSettingsAPI.update({ [field]: value || undefined });
       setSettings(updatedSettings);
-      toast.success("Receipt footer updated successfully");
+      toast.success("Settings updated successfully");
     } catch (error) {
-      console.error("Error updating receipt footer:", error);
-      toast.error("Failed to update receipt footer");
+      console.error("Error updating settings:", error);
+      toast.error("Failed to update settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleNumberFieldChange = async (
+    field: keyof POSSettings,
+    e: React.FocusEvent<HTMLInputElement>,
+    min?: number,
+    max?: number
+  ) => {
+    if (!settings) return;
+
+    const value = parseFloat(e.target.value);
+    if (isNaN(value) || (min !== undefined && value < min) || (max !== undefined && value > max)) {
+      toast.error(`Value must be between ${min || 0} and ${max || "unlimited"}`);
+      return;
+    }
+
+    try {
+      setSaving(true);
+      const updatedSettings = await posSettingsAPI.update({ [field]: value });
+      setSettings(updatedSettings);
+      toast.success("Settings updated successfully");
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      toast.error("Failed to update settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSelectChange = async (field: keyof POSSettings, value: string) => {
+    if (!settings) return;
+
+    try {
+      setSaving(true);
+      const updatedSettings = await posSettingsAPI.update({ [field]: value });
+      setSettings(updatedSettings);
+      toast.success("Settings updated successfully");
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      toast.error("Failed to update settings");
     } finally {
       setSaving(false);
     }
@@ -239,266 +296,745 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           <BackButton to="/admin" />
           <div className="flex items-center justify-between mt-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">POS Settings</h1>
-              <p className="text-gray-600 mt-1">Configure point of sale system features</p>
+              <h1 className="text-3xl font-bold text-gray-900">⚙️ POS Settings</h1>
+              <p className="text-gray-600 mt-1">Configure point of sale system features and preferences</p>
             </div>
             {settings.updatedByEmployee && (
               <div className="text-sm text-gray-500 text-right">
-                <p>Last updated by: {settings.updatedByEmployee.name}</p>
+                <p>
+                  Last updated by: <span className="font-medium">{settings.updatedByEmployee.name}</span>
+                </p>
                 <p>{new Date(settings.updatedAt).toLocaleString()}</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Feature Toggles */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Feature Controls</h2>
-            <p className="text-sm text-gray-600 mt-1">Enable or disable POS features</p>
-          </div>
-
-          <div className="divide-y divide-gray-200">
-            {featureToggles.map((feature) => (
-              <div
-                key={feature.key}
-                className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+        {/* Tabs */}
+        <div className="bg-white rounded-lg shadow mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="flex -mb-px overflow-x-auto" aria-label="Tabs">
+              <button
+                onClick={() => setActiveTab("features")}
+                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "features"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
               >
-                <div className="flex items-start space-x-4 flex-1">
-                  <div className="text-3xl">{feature.icon}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-medium text-gray-900">{feature.title}</h3>
-                      <button
-                        onClick={() => {
-                          setSelectedFeature(feature.key);
-                          setShowInfoModal(true);
-                        }}
-                        className="text-blue-600 hover:text-blue-800 transition-colors"
-                        title="View detailed information"
-                      >
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleToggle(feature.key, !settings[feature.key])}
-                  disabled={saving}
-                  className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    settings[feature.key] ? "bg-blue-600" : "bg-gray-200"
-                  }`}
-                  role="switch"
-                  aria-checked={!!settings[feature.key]}
+                🎯 POS Features
+              </button>
+              <button
+                onClick={() => setActiveTab("store")}
+                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "store"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                🏪 Store Info
+              </button>
+              <button
+                onClick={() => setActiveTab("receipt")}
+                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "receipt"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                🧾 Receipts
+              </button>
+              <button
+                onClick={() => setActiveTab("finance")}
+                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "finance"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                💰 Tax & Currency
+              </button>
+              <button
+                onClick={() => setActiveTab("alerts")}
+                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "alerts"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                🔔 Alerts
+              </button>
+              <button
+                onClick={() => setActiveTab("system")}
+                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "system"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                ⚙️ System
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === "features" && (
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">🎯 POS Feature Controls</h2>
+              <p className="text-sm text-gray-600 mt-1">Enable or disable core point of sale features</p>
+            </div>
+
+            <div className="divide-y divide-gray-200">
+              {featureToggles.map((feature) => (
+                <div
+                  key={feature.key}
+                  className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
-                  <span
-                    className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                      settings[feature.key] ? "translate-x-6" : "translate-x-0"
+                  <div className="flex items-start space-x-4 flex-1">
+                    <div className="text-3xl">{feature.icon}</div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-medium text-gray-900">{feature.title}</h3>
+                        <button
+                          onClick={() => {
+                            setSelectedFeature(feature.key);
+                            setShowInfoModal(true);
+                          }}
+                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                          title="View detailed information"
+                        >
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleToggle(feature.key, !settings[feature.key])}
+                    disabled={saving}
+                    className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                      settings[feature.key] ? "bg-blue-600" : "bg-gray-200"
                     }`}
+                    role="switch"
+                    aria-checked={!!settings[feature.key]}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        settings[feature.key] ? "translate-x-6" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Info Box */}
+            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 mx-6 mb-6">
+              <div className="flex items-start">
+                <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
                   />
-                </button>
+                </svg>
+                <div>
+                  <h4 className="text-sm font-medium text-blue-900">Quick Tip</h4>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Changes take effect immediately. Click the <strong>ℹ️ info icon</strong> next to each feature for
+                    detailed explanations.
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Additional Settings */}
-        <div className="mt-6 bg-white rounded-lg shadow">
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Additional Settings</h2>
-          </div>
-
-          <div className="p-6 space-y-6">
-            {/* Tax Rate */}
-            <div>
-              <label htmlFor="taxRate" className="block text-sm font-medium text-gray-700 mb-2">
-                Default Tax Rate (%)
-              </label>
-              <input
-                type="number"
-                id="taxRate"
-                min="0"
-                max="100"
-                step="0.01"
-                defaultValue={settings.taxRate}
-                onBlur={handleTaxRateChange}
-                disabled={saving}
-                className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                placeholder="0.00"
-              />
-              <p className="text-sm text-gray-500 mt-1">Applied to all products unless overridden</p>
-            </div>
-
-            {/* Receipt Footer */}
-            <div>
-              <label htmlFor="receiptFooter" className="block text-sm font-medium text-gray-700 mb-2">
-                Receipt Footer Text
-              </label>
-              <textarea
-                id="receiptFooter"
-                rows={3}
-                defaultValue={settings.receiptFooterText || ""}
-                onBlur={handleReceiptFooterChange}
-                disabled={saving}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                placeholder="Thank you for shopping with us!"
-              />
-              <p className="text-sm text-gray-500 mt-1">Displayed at the bottom of printed receipts</p>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Info Box */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-start">
-            <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <div>
-              <h4 className="text-sm font-medium text-blue-900">Note</h4>
-              <p className="text-sm text-blue-700 mt-1">
-                Changes take effect immediately. Disabled features will be hidden from the POS interface for all users.
-              </p>
+        {activeTab === "store" && (
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">🏪 Store Information</h2>
+              <p className="text-sm text-gray-600 mt-1">Business details displayed on receipts and reports</p>
+            </div>
+
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="storeName" className="block text-sm font-medium text-gray-700 mb-2">
+                  Store Name
+                </label>
+                <input
+                  type="text"
+                  id="storeName"
+                  defaultValue={settings.storeName}
+                  onBlur={(e) => handleTextFieldChange("storeName", e)}
+                  disabled={saving}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="storePhone" className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  id="storePhone"
+                  defaultValue={settings.storePhone}
+                  onBlur={(e) => handleTextFieldChange("storePhone", e)}
+                  disabled={saving}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="storeEmail" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="storeEmail"
+                  defaultValue={settings.storeEmail}
+                  onBlur={(e) => handleTextFieldChange("storeEmail", e)}
+                  disabled={saving}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="taxId" className="block text-sm font-medium text-gray-700 mb-2">
+                  Tax ID (Optional)
+                </label>
+                <input
+                  type="text"
+                  id="taxId"
+                  defaultValue={settings.taxId || ""}
+                  onBlur={(e) => handleTextFieldChange("taxId", e)}
+                  disabled={saving}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label htmlFor="storeAddress" className="block text-sm font-medium text-gray-700 mb-2">
+                  Store Address
+                </label>
+                <textarea
+                  id="storeAddress"
+                  rows={2}
+                  defaultValue={settings.storeAddress}
+                  onBlur={(e) => handleTextFieldChange("storeAddress", e)}
+                  disabled={saving}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Info Modal */}
-      {showInfoModal && selectedFeature && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            {(() => {
-              const feature = featureToggles.find((f) => f.key === selectedFeature);
-              if (!feature) return null;
+        {activeTab === "receipt" && (
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">🧾 Receipt Settings</h2>
+              <p className="text-sm text-gray-600 mt-1">Configure receipt printing and email options</p>
+            </div>
 
-              return (
-                <>
-                  {/* Modal Header */}
-                  <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-lg">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-4xl">{feature.icon}</span>
-                        <div>
-                          <h2 className="text-2xl font-bold">{feature.title}</h2>
-                          <p className="text-blue-100 text-sm mt-1">{feature.description}</p>
+            <div className="p-6 space-y-6">
+              {/* Receipt Toggles */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Auto-Print Receipt</h4>
+                    <p className="text-sm text-gray-500">Automatically print after sale</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggle("printReceiptAuto", !settings.printReceiptAuto)}
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.printReceiptAuto ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.printReceiptAuto ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Auto-Email Receipt</h4>
+                    <p className="text-sm text-gray-500">Email receipt to customer</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggle("emailReceiptAuto", !settings.emailReceiptAuto)}
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.emailReceiptAuto ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.emailReceiptAuto ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Receipt Footer */}
+              <div>
+                <label htmlFor="receiptFooter" className="block text-sm font-medium text-gray-700 mb-2">
+                  Receipt Footer Text
+                </label>
+                <textarea
+                  id="receiptFooter"
+                  rows={3}
+                  defaultValue={settings.receiptFooterText || ""}
+                  onBlur={(e) => handleTextFieldChange("receiptFooterText", e)}
+                  disabled={saving}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  placeholder="Thank you for shopping with us!"
+                />
+                <p className="text-sm text-gray-500 mt-1">Displayed at the bottom of printed receipts</p>
+              </div>
+
+              {/* Return Policy */}
+              <div>
+                <label htmlFor="returnPolicy" className="block text-sm font-medium text-gray-700 mb-2">
+                  Return Policy Text (Optional)
+                </label>
+                <textarea
+                  id="returnPolicy"
+                  rows={3}
+                  defaultValue={settings.returnPolicy || ""}
+                  onBlur={(e) => handleTextFieldChange("returnPolicy", e)}
+                  disabled={saving}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  placeholder="Returns accepted within 30 days with receipt"
+                />
+                <p className="text-sm text-gray-500 mt-1">Return policy displayed on receipts</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "finance" && (
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">💰 Tax & Currency</h2>
+              <p className="text-sm text-gray-600 mt-1">Configure pricing and tax settings</p>
+            </div>
+
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="taxRate" className="block text-sm font-medium text-gray-700 mb-2">
+                  Default Tax Rate (%)
+                </label>
+                <input
+                  type="number"
+                  id="taxRate"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  defaultValue={settings.taxRate}
+                  onBlur={(e) => handleNumberFieldChange("taxRate", e, 0, 100)}
+                  disabled={saving}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  placeholder="0.00"
+                />
+                <p className="text-sm text-gray-500 mt-1">Applied to all products unless overridden</p>
+              </div>
+
+              <div>
+                <label htmlFor="currencySymbol" className="block text-sm font-medium text-gray-700 mb-2">
+                  Currency Symbol
+                </label>
+                <input
+                  type="text"
+                  id="currencySymbol"
+                  defaultValue={settings.currencySymbol}
+                  onBlur={(e) => handleTextFieldChange("currencySymbol", e)}
+                  disabled={saving}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="currencyPosition" className="block text-sm font-medium text-gray-700 mb-2">
+                  Currency Symbol Position
+                </label>
+                <select
+                  id="currencyPosition"
+                  value={settings.currencyPosition}
+                  onChange={(e) => handleSelectChange("currencyPosition", e.target.value)}
+                  disabled={saving}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                >
+                  <option value="before">Before ($100)</option>
+                  <option value="after">After (100$)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "alerts" && (
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">🔔 Alerts & Notifications</h2>
+              <p className="text-sm text-gray-600 mt-1">Manage inventory alerts and notifications</p>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Alert Toggles */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Low Stock Alerts</h4>
+                    <p className="text-sm text-gray-500">Notify when inventory is low</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggle("enableLowStockAlerts", !settings.enableLowStockAlerts)}
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.enableLowStockAlerts ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.enableLowStockAlerts ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Email Notifications</h4>
+                    <p className="text-sm text-gray-500">Send email alerts to admin</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggle("enableEmailNotifications", !settings.enableEmailNotifications)}
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.enableEmailNotifications ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.enableEmailNotifications ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Low Stock Threshold */}
+              <div>
+                <label htmlFor="lowStockThreshold" className="block text-sm font-medium text-gray-700 mb-2">
+                  Low Stock Threshold
+                </label>
+                <input
+                  type="number"
+                  id="lowStockThreshold"
+                  min="1"
+                  max="1000"
+                  defaultValue={settings.lowStockThreshold}
+                  onBlur={(e) => handleNumberFieldChange("lowStockThreshold", e, 1, 1000)}
+                  disabled={saving}
+                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+                <p className="text-sm text-gray-500 mt-1">Alert when product stock falls below this number</p>
+              </div>
+
+              {/* Admin Email */}
+              {settings.enableEmailNotifications && (
+                <div>
+                  <label htmlFor="adminAlertEmail" className="block text-sm font-medium text-gray-700 mb-2">
+                    Admin Alert Email
+                  </label>
+                  <input
+                    type="email"
+                    id="adminAlertEmail"
+                    defaultValue={settings.adminAlertEmail || ""}
+                    onBlur={(e) => handleTextFieldChange("adminAlertEmail", e)}
+                    disabled={saving}
+                    className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    placeholder="admin@example.com"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">Email address for receiving alerts and notifications</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "system" && (
+          <div className="bg-white rounded-lg shadow">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">⚙️ System Settings</h2>
+              <p className="text-sm text-gray-600 mt-1">Security and system preferences</p>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* System Toggles */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Require Password on Void</h4>
+                    <p className="text-sm text-gray-500">Admin approval for void transactions</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggle("requirePasswordOnVoid", !settings.requirePasswordOnVoid)}
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.requirePasswordOnVoid ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.requirePasswordOnVoid ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Enable Audit Log</h4>
+                    <p className="text-sm text-gray-500">Track all system actions</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggle("enableAuditLog", !settings.enableAuditLog)}
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.enableAuditLog ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.enableAuditLog ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Show Product Images</h4>
+                    <p className="text-sm text-gray-500">Display images in POS</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggle("showProductImages", !settings.showProductImages)}
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.showProductImages ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.showProductImages ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Numeric Settings */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="autoLogoutMinutes" className="block text-sm font-medium text-gray-700 mb-2">
+                    Auto Logout (Minutes)
+                  </label>
+                  <input
+                    type="number"
+                    id="autoLogoutMinutes"
+                    min="5"
+                    max="240"
+                    defaultValue={settings.autoLogoutMinutes}
+                    onBlur={(e) => handleNumberFieldChange("autoLogoutMinutes", e, 5, 240)}
+                    disabled={saving}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">Auto-logout after inactivity</p>
+                </div>
+
+                <div>
+                  <label htmlFor="productsPerPage" className="block text-sm font-medium text-gray-700 mb-2">
+                    Products Per Page
+                  </label>
+                  <input
+                    type="number"
+                    id="productsPerPage"
+                    min="10"
+                    max="100"
+                    defaultValue={settings.productsPerPage}
+                    onBlur={(e) => handleNumberFieldChange("productsPerPage", e, 10, 100)}
+                    disabled={saving}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">Number of products per page</p>
+                </div>
+
+                <div>
+                  <label htmlFor="defaultView" className="block text-sm font-medium text-gray-700 mb-2">
+                    Default Product View
+                  </label>
+                  <select
+                    id="defaultView"
+                    value={settings.defaultView}
+                    onChange={(e) => handleSelectChange("defaultView", e.target.value)}
+                    disabled={saving}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    <option value="grid">Grid View</option>
+                    <option value="list">List View</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Info Modal */}
+        {showInfoModal && selectedFeature && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              {(() => {
+                const feature = featureToggles.find((f) => f.key === selectedFeature);
+                if (!feature) return null;
+
+                return (
+                  <>
+                    {/* Modal Header */}
+                    <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-lg">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-4xl">{feature.icon}</span>
+                          <div>
+                            <h2 className="text-2xl font-bold">{feature.title}</h2>
+                            <p className="text-blue-100 text-sm mt-1">{feature.description}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setShowInfoModal(false);
+                            setSelectedFeature(null);
+                          }}
+                          className="text-white hover:text-gray-200 transition-colors"
+                        >
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Modal Content */}
+                    <div className="p-6 space-y-6">
+                      {/* What is it? */}
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-3">
+                          <span className="text-blue-600">📘</span>
+                          What is it?
+                        </h3>
+                        <p className="text-gray-700 leading-relaxed">{feature.detailedInfo.whatIs}</p>
+                      </div>
+
+                      {/* How it works */}
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-3">
+                          <span className="text-green-600">⚙️</span>
+                          How it works
+                        </h3>
+                        <ol className="space-y-2">
+                          {feature.detailedInfo.howItWorks.map((step, index) => (
+                            <li key={index} className="flex gap-3">
+                              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                                {index + 1}
+                              </span>
+                              <span className="text-gray-700 pt-0.5">{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+
+                      {/* When to use */}
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h3 className="text-lg font-semibold text-green-900 flex items-center gap-2 mb-2">
+                          <span>✅</span>
+                          When to Enable
+                        </h3>
+                        <p className="text-green-800">{feature.detailedInfo.whenToUse}</p>
+                      </div>
+
+                      {/* When to disable */}
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <h3 className="text-lg font-semibold text-orange-900 flex items-center gap-2 mb-2">
+                          <span>⚠️</span>
+                          When to Disable
+                        </h3>
+                        <p className="text-orange-800">{feature.detailedInfo.whenToDisable}</p>
+                      </div>
+
+                      {/* Current Status */}
+                      <div
+                        className={`border-2 rounded-lg p-4 ${
+                          settings[feature.key] ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-gray-300"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold text-gray-900">Current Status</h3>
+                          <span
+                            className={`px-3 py-1 rounded-full text-sm font-medium ${
+                              settings[feature.key] ? "bg-green-100 text-green-800" : "bg-gray-200 text-gray-700"
+                            }`}
+                          >
+                            {settings[feature.key] ? "✓ Enabled" : "✗ Disabled"}
+                          </span>
                         </div>
                       </div>
+                    </div>
+
+                    {/* Modal Footer */}
+                    <div className="sticky bottom-0 bg-gray-50 px-6 py-4 rounded-b-lg border-t border-gray-200">
                       <button
                         onClick={() => {
                           setShowInfoModal(false);
                           setSelectedFeature(null);
                         }}
-                        className="text-white hover:text-gray-200 transition-colors"
+                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                       >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        Got it!
                       </button>
                     </div>
-                  </div>
-
-                  {/* Modal Content */}
-                  <div className="p-6 space-y-6">
-                    {/* What is it? */}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-3">
-                        <span className="text-blue-600">📘</span>
-                        What is it?
-                      </h3>
-                      <p className="text-gray-700 leading-relaxed">{feature.detailedInfo.whatIs}</p>
-                    </div>
-
-                    {/* How it works */}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-3">
-                        <span className="text-green-600">⚙️</span>
-                        How it works
-                      </h3>
-                      <ol className="space-y-2">
-                        {feature.detailedInfo.howItWorks.map((step, index) => (
-                          <li key={index} className="flex gap-3">
-                            <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                              {index + 1}
-                            </span>
-                            <span className="text-gray-700 pt-0.5">{step}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-
-                    {/* When to use */}
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <h3 className="text-lg font-semibold text-green-900 flex items-center gap-2 mb-2">
-                        <span>✅</span>
-                        When to Enable
-                      </h3>
-                      <p className="text-green-800">{feature.detailedInfo.whenToUse}</p>
-                    </div>
-
-                    {/* When to disable */}
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                      <h3 className="text-lg font-semibold text-orange-900 flex items-center gap-2 mb-2">
-                        <span>⚠️</span>
-                        When to Disable
-                      </h3>
-                      <p className="text-orange-800">{feature.detailedInfo.whenToDisable}</p>
-                    </div>
-
-                    {/* Current Status */}
-                    <div
-                      className={`border-2 rounded-lg p-4 ${
-                        settings[feature.key] ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-gray-300"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900">Current Status</h3>
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            settings[feature.key] ? "bg-green-100 text-green-800" : "bg-gray-200 text-gray-700"
-                          }`}
-                        >
-                          {settings[feature.key] ? "✓ Enabled" : "✗ Disabled"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Modal Footer */}
-                  <div className="sticky bottom-0 bg-gray-50 px-6 py-4 rounded-b-lg border-t border-gray-200">
-                    <button
-                      onClick={() => {
-                        setShowInfoModal(false);
-                        setSelectedFeature(null);
-                      }}
-                      className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                    >
-                      Got it!
-                    </button>
-                  </div>
-                </>
-              );
-            })()}
+                  </>
+                );
+              })()}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

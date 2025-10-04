@@ -189,12 +189,6 @@ export interface CashDrawer {
   employee?: Employee;
 }
 
-export interface SystemSetting {
-  id: number;
-  key: string;
-  value: string;
-}
-
 export interface DailySalesReport {
   date: string;
   summary: {
