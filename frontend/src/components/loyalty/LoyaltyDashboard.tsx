@@ -41,45 +41,92 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
       // Fetch customer loyalty data
       const loyaltyResponse = await loyaltyAPI.getCustomerLoyalty(customer.id);
 
-      // Fetch tier configurations
-      const tierConfigs = await loyaltyAPI.getTierConfig();
+      console.log("Loyalty Response:", loyaltyResponse);
 
-      // Get current tier config
-      const currentTierConfig = tierConfigs.find((tc: any) => tc.tier === loyaltyResponse.tier);
+      // The backend returns:
+      // {
+      //   customer: { id, name, tier, points, dateOfBirth },
+      //   points: { current, lifetime },
+      //   tier: { current, multiplier, discountPercentage, birthdayBonus, next: {...} },
+      //   recentTransactions: [...],
+      //   activeRewards: [...]
+      // }
 
-      // Calculate next tier
-      const tierOrder: LoyaltyTier[] = ["BRONZE", "SILVER", "GOLD", "PLATINUM"];
-      const currentTierIndex = tierOrder.indexOf(loyaltyResponse.tier);
-      const nextTier = currentTierIndex < tierOrder.length - 1 ? tierOrder[currentTierIndex + 1] : null;
-      const nextTierConfig = nextTier ? tierConfigs.find((tc: any) => tc.tier === nextTier) : null;
+      const currentPoints = loyaltyResponse.points?.current || 0;
+      const lifetimePoints = loyaltyResponse.points?.lifetime || 0;
+      const tierData = loyaltyResponse.tier || {};
 
-      // Calculate progress
-      const currentLifetimePoints = loyaltyResponse.lifetimePoints || 0;
-      const currentTierMin = currentTierConfig?.minimumPoints || 0;
-      const nextTierMin = nextTierConfig?.minimumPoints || currentTierMin;
-      const pointsToNextTier = nextTier ? Math.max(0, nextTierMin - currentLifetimePoints) : 0;
-      const progressPercentage = nextTier
-        ? ((currentLifetimePoints - currentTierMin) / (nextTierMin - currentTierMin)) * 100
-        : 100;
+      // Get tier minimums from tier order
+      const tierMinimums: Record<string, number> = {
+        BRONZE: 0,
+        SILVER: 500,
+        GOLD: 1500,
+        PLATINUM: 3000,
+      };
+
+      const currentTierMin = tierMinimums[tierData.current] || 0;
+      const nextTierMin = tierData.next ? tierData.next.minimumPoints : currentTierMin;
+
+      // Calculate progress percentage
+      let progressPercentage = 100;
+      let pointsToNextTier = 0;
+
+      if (tierData.next) {
+        pointsToNextTier = Math.max(0, tierData.next.pointsNeeded || 0);
+
+        // Progress = (current lifetime - current tier min) / (next tier min - current tier min) * 100
+        const pointsInCurrentTier = lifetimePoints - currentTierMin;
+        const pointsNeededForNextTier = nextTierMin - currentTierMin;
+
+        if (pointsNeededForNextTier > 0) {
+          progressPercentage = (pointsInCurrentTier / pointsNeededForNextTier) * 100;
+        }
+      }
+
+      // Debug: Log parsed data
+      console.log("Parsed Data:", {
+        currentPoints,
+        lifetimePoints,
+        currentTier: tierData.current,
+        currentTierMin,
+        nextTier: tierData.next?.tier,
+        nextTierMin,
+        pointsToNextTier,
+        pointsInCurrentTier: lifetimePoints - currentTierMin,
+        pointsNeededForNextTier: nextTierMin - currentTierMin,
+        progressPercentage: progressPercentage.toFixed(2) + "%",
+        backendPointsNeeded: tierData.next?.pointsNeeded,
+      });
 
       setLoyaltyData({
-        currentPoints: loyaltyResponse.points || 0,
-        lifetimePoints: loyaltyResponse.lifetimePoints || 0,
+        currentPoints,
+        lifetimePoints,
         currentTier: {
-          tier: loyaltyResponse.tier,
-          config: currentTierConfig,
+          tier: tierData.current as LoyaltyTier,
+          config: {
+            tier: tierData.current as LoyaltyTier,
+            minimumPoints: currentTierMin,
+            pointsMultiplier: tierData.multiplier || 1,
+            discountPercentage: tierData.discountPercentage || 0,
+            birthdayBonus: tierData.birthdayBonus || 0,
+          } as LoyaltyTierConfig,
         },
-        nextTier:
-          nextTier && nextTierConfig
-            ? {
-                tier: nextTier,
-                config: nextTierConfig,
-              }
-            : null,
-        pointsToNextTier,
+        nextTier: tierData.next
+          ? {
+              tier: tierData.next.tier as LoyaltyTier,
+              config: {
+                tier: tierData.next.tier as LoyaltyTier,
+                minimumPoints: nextTierMin,
+                pointsMultiplier: 1,
+                discountPercentage: 0,
+                birthdayBonus: 0,
+              } as LoyaltyTierConfig,
+            }
+          : null,
+        pointsToNextTier: Math.max(0, pointsToNextTier),
         progressPercentage: Math.min(Math.max(progressPercentage, 0), 100),
-        availableRewards: 0, // TODO: Fetch actual rewards count
-        pendingPoints: 0, // TODO: Fetch pending points
+        availableRewards: loyaltyResponse.activeRewards?.length || 0,
+        pendingPoints: 0,
       });
     } catch (err: any) {
       setError(err.message || "Failed to load loyalty data");

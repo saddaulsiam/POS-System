@@ -667,7 +667,7 @@ export const quickSaleItemsAPI = {
 export const loyaltyAPI = {
   // Customer Loyalty
   getCustomerLoyalty: async (customerId: number) => {
-    const response = await api.get(`/loyalty/customer/${customerId}`);
+    const response = await api.get(`/loyalty/customers/${customerId}/loyalty-status`);
     return response.data;
   },
 
@@ -688,12 +688,12 @@ export const loyaltyAPI = {
   },
 
   getTransactions: async (customerId: number) => {
-    const response = await api.get(`/loyalty/customer/${customerId}/transactions`);
+    const response = await api.get(`/loyalty/customers/${customerId}/points-history`);
     return response.data;
   },
 
   getRewards: async (customerId: number) => {
-    const response = await api.get(`/loyalty/customer/${customerId}/rewards`);
+    const response = await api.get(`/loyalty/customers/${customerId}/rewards`);
     return response.data;
   },
 

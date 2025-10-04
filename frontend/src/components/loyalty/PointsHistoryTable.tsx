@@ -26,6 +26,8 @@ const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) =
       setLoading(true);
       setError(null);
       const data = await loyaltyAPI.getTransactions(customerId);
+      console.log("Points History - Raw Data:", data);
+      console.log("Points History - Transaction Count:", data?.length || 0);
       setTransactions(data || []);
     } catch (err: any) {
       setError(err.message || "Failed to load transaction history");
@@ -65,18 +67,33 @@ const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) =
     return filtered;
   }, [transactions, typeFilter, dateFilter]);
 
-  const calculateRunningBalance = () => {
-    let balance = 0;
-    return filteredTransactions
-      .reverse()
-      .map((transaction) => {
-        balance += transaction.points;
-        return { ...transaction, balance };
-      })
-      .reverse();
-  };
+  const transactionsWithBalance = React.useMemo(() => {
+    // Create a copy to avoid mutating the original array
+    const sortedTransactions = [...filteredTransactions].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
 
-  const transactionsWithBalance = calculateRunningBalance();
+    let balance = 0;
+    const withBalance = sortedTransactions.map((transaction) => {
+      balance += transaction.points;
+      return { ...transaction, balance };
+    });
+
+    // Return in reverse order (newest first)
+    const result = withBalance.reverse();
+
+    console.log(
+      "Points History - Calculated Balances:",
+      result.map((t) => ({
+        date: new Date(t.createdAt).toLocaleDateString(),
+        type: t.type,
+        points: t.points,
+        balance: t.balance,
+      }))
+    );
+
+    return result;
+  }, [filteredTransactions]);
 
   const exportToCSV = () => {
     const headers = ["Date", "Type", "Description", "Points", "Balance"];
@@ -132,9 +149,18 @@ const PointsHistoryTable: React.FC<PointsHistoryTableProps> = ({ customerId }) =
     return colors[type];
   };
 
+  // Calculate summary statistics
   const totalPoints = transactions.reduce((sum, t) => sum + t.points, 0);
   const earnedPoints = transactions.filter((t) => t.points > 0).reduce((sum, t) => sum + t.points, 0);
-  const redeemedPoints = transactions.filter((t) => t.points < 0).reduce((sum, t) => sum + Math.abs(t.points), 0);
+  const redeemedPoints = Math.abs(transactions.filter((t) => t.points < 0).reduce((sum, t) => sum + t.points, 0));
+
+  console.log("Points History - Summary Stats:", {
+    totalTransactions: transactions.length,
+    earnedPoints,
+    redeemedPoints,
+    netBalance: totalPoints,
+    calculationCheck: `${earnedPoints} - ${redeemedPoints} = ${earnedPoints - redeemedPoints}`,
+  });
 
   if (loading) {
     return (
