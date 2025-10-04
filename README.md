@@ -133,6 +133,27 @@ A fully functional grocery store Point of Sale (POS) system built with modern we
 - Username: cashier
 - PIN: 5678
 
+## 📚 Documentation
+
+Comprehensive documentation is available in the **[docs/](./docs/)** folder:
+
+### Quick Links
+
+- **[Complete Project Summary](./docs/PROJECT_COMPLETE_SUMMARY.md)** - Full project overview
+- **[API Endpoints Guide](./docs/API_ENDPOINTS_GUIDE.md)** - Complete API reference
+- **[POS Page Documentation](./docs/POS_PAGE_DOCUMENTATION.md)** - POS interface guide
+- **[Shared Components Guide](./docs/SHARED_COMPONENTS_GUIDE.md)** - Reusable components
+
+### Documentation Categories
+
+- **Getting Started**: Project overview, setup, and architecture
+- **API Reference**: Complete endpoint documentation with examples
+- **Feature Guides**: Detailed feature documentation
+- **Component Library**: Shared component documentation
+- **Testing**: API and integration testing guides
+
+📖 **[View all documentation →](./docs/README.md)**
+
 ## API Documentation
 
 The REST API provides endpoints for:
@@ -143,6 +164,8 @@ The REST API provides endpoints for:
 - Customer management (`/api/customers`)
 - Employee management (`/api/employees`)
 - Reporting (`/api/reports`)
+
+For detailed API documentation, see **[API Endpoints Guide](./docs/API_ENDPOINTS_GUIDE.md)**
 
 ## Hardware Integration
 
@@ -195,4 +218,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 For support and questions, please create an issue in the GitHub repository.
+
 # POS-System
