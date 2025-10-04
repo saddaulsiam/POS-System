@@ -3,6 +3,8 @@ import { toast } from "react-hot-toast";
 import { QuickSaleItem, Product } from "../../types";
 import { quickSaleItemsAPI } from "../../services/api";
 import { Button } from "../common";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface QuickSaleButtonsProps {
   onProductSelect: (product: Product) => void;
@@ -12,6 +14,7 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
   const [quickItems, setQuickItems] = useState<QuickSaleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showManageModal, setShowManageModal] = useState(false);
+  const { settings } = useSettings();
 
   useEffect(() => {
     loadQuickItems();
@@ -149,7 +152,7 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
               <span className="text-white font-semibold text-sm leading-tight drop-shadow-md">{item.displayName}</span>
               {item.product && (
                 <span className="text-white text-xs mt-1 opacity-90 drop-shadow-sm">
-                  ${item.product.sellingPrice.toFixed(2)}
+                  {formatCurrency(item.product.sellingPrice, settings)}
                 </span>
               )}
             </div>

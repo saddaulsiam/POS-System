@@ -2,6 +2,8 @@ import React from "react";
 import { Sale } from "../../types";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { Badge } from "../common";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface SalesTableProps {
   sales: Sale[];
@@ -20,6 +22,8 @@ export const SalesTable: React.FC<SalesTableProps> = ({
   getCustomerName,
   getEmployeeName,
 }) => {
+  const { settings } = useSettings();
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -71,13 +75,13 @@ export const SalesTable: React.FC<SalesTableProps> = ({
                   <div className="text-sm text-gray-900">{getEmployeeName(sale.employeeId)}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">${sale.finalAmount.toFixed(2)}</div>
-                  <div className="text-sm text-gray-500">Tax: ${sale.taxAmount.toFixed(2)}</div>
+                  <div className="text-sm font-medium text-gray-900">{formatCurrency(sale.finalAmount, settings)}</div>
+                  <div className="text-sm text-gray-500">Tax: {formatCurrency(sale.taxAmount, settings)}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">{sale.paymentMethod}</div>
                   {sale.cashReceived && (
-                    <div className="text-sm text-gray-500">Cash: ${sale.cashReceived.toFixed(2)}</div>
+                    <div className="text-sm text-gray-500">Cash: {formatCurrency(sale.cashReceived, settings)}</div>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

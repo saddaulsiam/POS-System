@@ -2,6 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Product, Category, Supplier } from "../../types";
 import { Button, Badge } from "../common";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface ProductTableProps {
   products: Product[];
@@ -33,6 +35,8 @@ export const ProductTable: React.FC<ProductTableProps> = ({
   onQuickSale,
 }) => {
   const navigate = useNavigate();
+  const { settings } = useSettings();
+
   if (isLoading) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -171,8 +175,8 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 {/* Price Column */}
                 <td className="px-6 py-4">
                   <div className="text-sm">
-                    <p className="font-semibold text-green-700">${product.sellingPrice.toFixed(2)}</p>
-                    <p className="text-xs text-gray-500">Cost: ${product.purchasePrice.toFixed(2)}</p>
+                    <p className="font-semibold text-green-700">{formatCurrency(product.sellingPrice, settings)}</p>
+                    <p className="text-xs text-gray-500">Cost: {formatCurrency(product.purchasePrice, settings)}</p>
                   </div>
                 </td>
 

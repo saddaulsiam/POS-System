@@ -2,6 +2,7 @@ import React from "react";
 import { CartItem } from "../../types";
 import { Button } from "../common";
 import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface POSCartProps {
   cart: CartItem[];
@@ -69,7 +70,7 @@ export const POSCart: React.FC<POSCartProps> = ({
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900">{item.product.name}</h4>
-                    <p className="text-sm text-gray-500">${item.price.toFixed(2)} each</p>
+                    <p className="text-sm text-gray-500">{formatCurrency(item.price, settings)} each</p>
                     <p className="text-xs text-gray-500">Stock: {item.product.stockQuantity}</p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -84,7 +85,7 @@ export const POSCart: React.FC<POSCartProps> = ({
                       min="1"
                       max={item.product.stockQuantity}
                     />
-                    <div className="text-sm font-medium text-gray-900">${item.subtotal.toFixed(2)}</div>
+                    <div className="text-sm font-medium text-gray-900">{formatCurrency(item.subtotal, settings)}</div>
                     <button onClick={() => onRemoveItem(item.product.id)} className="text-red-600 hover:text-red-800">
                       ✕
                     </button>
@@ -101,21 +102,21 @@ export const POSCart: React.FC<POSCartProps> = ({
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Subtotal:</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>{formatCurrency(subtotal, settings)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Tax:</span>
-            <span>${tax.toFixed(2)}</span>
+            <span>{formatCurrency(tax, settings)}</span>
           </div>
           {loyaltyDiscount > 0 && (
             <div className="flex justify-between text-sm text-green-600">
               <span>🎁 Loyalty Discount:</span>
-              <span>-${loyaltyDiscount.toFixed(2)}</span>
+              <span>-{formatCurrency(loyaltyDiscount, settings)}</span>
             </div>
           )}
           <div className="flex justify-between font-medium text-lg border-t pt-2">
             <span>Total:</span>
-            <span>${(total - loyaltyDiscount).toFixed(2)}</span>
+            <span>{formatCurrency(total - loyaltyDiscount, settings)}</span>
           </div>
         </div>
 

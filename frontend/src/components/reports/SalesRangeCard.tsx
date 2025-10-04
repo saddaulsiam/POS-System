@@ -1,6 +1,7 @@
 import React from "react";
 import { formatCurrency } from "../../utils/reportUtils";
 import { exportTableToPDF, exportTableToCSV } from "../../utils/exportUtils";
+import { useSettings } from "../../context/SettingsContext";
 
 interface SalesRangeCardProps {
   salesRange: any;
@@ -9,6 +10,8 @@ interface SalesRangeCardProps {
 }
 
 export const SalesRangeCard: React.FC<SalesRangeCardProps> = ({ salesRange, startDate, endDate }) => {
+  const { settings } = useSettings();
+
   return (
     <div className="bg-white shadow-lg rounded-xl p-8 mb-10 border border-blue-100">
       <div className="flex justify-between items-center mb-4">
@@ -65,7 +68,9 @@ export const SalesRangeCard: React.FC<SalesRangeCardProps> = ({ salesRange, star
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-6">
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Total Sales</div>
-          <div className="text-2xl font-bold text-blue-900">{formatCurrency(salesRange.summary?.totalSales ?? 0)}</div>
+          <div className="text-2xl font-bold text-blue-900">
+            {formatCurrency(salesRange.summary?.totalSales ?? 0, settings || undefined)}
+          </div>
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Transactions</div>
@@ -73,12 +78,14 @@ export const SalesRangeCard: React.FC<SalesRangeCardProps> = ({ salesRange, star
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Tax</div>
-          <div className="text-2xl font-bold text-blue-900">{formatCurrency(salesRange.summary?.totalTax ?? 0)}</div>
+          <div className="text-2xl font-bold text-blue-900">
+            {formatCurrency(salesRange.summary?.totalTax ?? 0, settings || undefined)}
+          </div>
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Discount</div>
           <div className="text-2xl font-bold text-blue-900">
-            {formatCurrency(salesRange.summary?.totalDiscount ?? 0)}
+            {formatCurrency(salesRange.summary?.totalDiscount ?? 0, settings || undefined)}
           </div>
         </div>
       </div>

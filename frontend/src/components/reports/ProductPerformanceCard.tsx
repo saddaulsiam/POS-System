@@ -2,6 +2,7 @@ import React from "react";
 import { ProductPerformanceReport } from "../../types";
 import { formatCurrency } from "../../utils/reportUtils";
 import { exportTableToPDF, exportTableToCSV } from "../../utils/exportUtils";
+import { useSettings } from "../../context/SettingsContext";
 
 interface ProductPerformanceCardProps {
   productPerf: ProductPerformanceReport;
@@ -10,6 +11,8 @@ interface ProductPerformanceCardProps {
 }
 
 export const ProductPerformanceCard: React.FC<ProductPerformanceCardProps> = ({ productPerf, startDate, endDate }) => {
+  const { settings } = useSettings();
+
   return (
     <div className="bg-white shadow-lg rounded-xl p-8 mb-10 border border-blue-100">
       <div className="flex justify-between items-center mb-4">
@@ -80,9 +83,9 @@ export const ProductPerformanceCard: React.FC<ProductPerformanceCardProps> = ({ 
               <tr key={prod.product.id} className="border-b">
                 <td className="px-4 py-2">{prod.product.name}</td>
                 <td className="px-4 py-2 text-right">{prod.totalQuantitySold}</td>
-                <td className="px-4 py-2 text-right">{formatCurrency(prod.totalRevenue)}</td>
+                <td className="px-4 py-2 text-right">{formatCurrency(prod.totalRevenue, settings || undefined)}</td>
                 <td className="px-4 py-2 text-right">{prod.totalTransactions}</td>
-                <td className="px-4 py-2 text-right">{formatCurrency(prod.estimatedProfit)}</td>
+                <td className="px-4 py-2 text-right">{formatCurrency(prod.estimatedProfit, settings || undefined)}</td>
               </tr>
             ))}
           </tbody>

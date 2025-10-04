@@ -7,6 +7,8 @@ import { SimpleBarChart } from "../components/dashboard/SimpleBarChart";
 import { RecentTransactionsList } from "../components/dashboard/RecentTransactionsList";
 import { QuickActionsGrid } from "../components/dashboard/QuickActionsGrid";
 import { AlertsSection } from "../components/dashboard/AlertsSection";
+import { useSettings } from "../context/SettingsContext";
+import { formatCurrency } from "../utils/currencyUtils";
 
 interface DashboardStats {
   todaySales: number;
@@ -48,6 +50,7 @@ interface DashboardStats {
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
+  const { settings } = useSettings();
   const [stats, setStats] = useState<DashboardStats>({
     todaySales: 0,
     yesterdaySales: 0,
@@ -280,7 +283,7 @@ const AdminDashboard: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <DashboardStatCard
                   title="Today's Sales"
-                  value={`$${stats.todaySales.toFixed(2)}`}
+                  value={formatCurrency(stats.todaySales, settings)}
                   change={{ value: 12.5, isPositive: true }}
                   icon="💰"
                   color="green"
@@ -303,27 +306,27 @@ const AdminDashboard: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <DashboardStatCard
                   title="Yesterday"
-                  value={`$${stats.yesterdaySales.toFixed(2)}`}
+                  value={formatCurrency(stats.yesterdaySales, settings)}
                   icon="📅"
                   color="gray"
                 />
                 <DashboardStatCard
                   title="This Week"
-                  value={`$${stats.weekSales.toFixed(2)}`}
+                  value={formatCurrency(stats.weekSales, settings)}
                   change={{ value: 15.3, isPositive: true }}
                   icon="📊"
                   color="blue"
                 />
                 <DashboardStatCard
                   title="This Month"
-                  value={`$${stats.monthSales.toFixed(2)}`}
+                  value={formatCurrency(stats.monthSales, settings)}
                   change={{ value: 23.1, isPositive: true }}
                   icon="📈"
                   color="green"
                 />
                 <DashboardStatCard
                   title="Avg Order Value"
-                  value={`$${stats.averageOrderValue.toFixed(2)}`}
+                  value={formatCurrency(stats.averageOrderValue, settings)}
                   change={{ value: 5.7, isPositive: true }}
                   icon="💸"
                   color="purple"

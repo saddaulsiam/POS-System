@@ -17,6 +17,7 @@ import { SplitPaymentDialog } from "../components/pos/SplitPaymentDialog";
 import { RedeemPointsDialog } from "../components/loyalty";
 import { CustomerModal } from "../components/customers/CustomerModal";
 import { calculateSubtotal, calculateTax, calculateTotal, calculateChange } from "../utils/posUtils";
+import { formatCurrency } from "../utils/currencyUtils";
 
 const POSPage: React.FC = () => {
   const { user, logout } = useAuth();
@@ -356,7 +357,7 @@ const POSPage: React.FC = () => {
   const handlePointsRedeemed = (discountAmount: number, points: number) => {
     setLoyaltyDiscount(discountAmount);
     setShowRedeemPointsDialog(false);
-    toast.success(`Applied $${discountAmount.toFixed(2)} loyalty discount using ${points} points!`);
+    toast.success(`Applied ${formatCurrency(discountAmount, settings)} loyalty discount using ${points} points!`);
   };
 
   const handleConfirmSplitPayment = async (splits: any[]) => {

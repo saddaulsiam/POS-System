@@ -4,6 +4,8 @@ import { ProductVariant, Product } from "../../types";
 import { productVariantsAPI } from "../../services/api";
 import { Button } from "../common";
 import { ProductVariantModal } from "./ProductVariantModal";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface ProductVariantListProps {
   product: Product;
@@ -15,6 +17,7 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({ product 
   const [showModal, setShowModal] = useState(false);
   const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const { settings } = useSettings();
 
   const fetchVariants = async () => {
     try {
@@ -163,10 +166,12 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({ product 
                     <div className="text-sm text-gray-500">{variant.barcode || "-"}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">${variant.purchasePrice.toFixed(2)}</div>
+                    <div className="text-sm text-gray-900">{formatCurrency(variant.purchasePrice, settings)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold text-gray-900">${variant.sellingPrice.toFixed(2)}</div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      {formatCurrency(variant.sellingPrice, settings)}
+                    </div>
                     <div className="text-xs text-gray-500">
                       Margin:{" "}
                       {(((variant.sellingPrice - variant.purchasePrice) / variant.sellingPrice) * 100).toFixed(1)}%

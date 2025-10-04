@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Button } from "../common";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface CartItem {
   productId: number;
@@ -32,6 +34,7 @@ export const ParkSaleDialog: React.FC<ParkSaleDialogProps> = ({
   onConfirm,
 }) => {
   const [notes, setNotes] = useState("");
+  const { settings } = useSettings();
 
   const handleConfirm = () => {
     if (cartItems.length === 0) {
@@ -73,23 +76,23 @@ export const ParkSaleDialog: React.FC<ParkSaleDialogProps> = ({
           </div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-600">Subtotal:</span>
-            <span className="font-semibold text-gray-900">${subtotal.toFixed(2)}</span>
+            <span className="font-semibold text-gray-900">{formatCurrency(subtotal, settings)}</span>
           </div>
           {taxAmount > 0 && (
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-600">Tax:</span>
-              <span className="font-semibold text-gray-900">${taxAmount.toFixed(2)}</span>
+              <span className="font-semibold text-gray-900">{formatCurrency(taxAmount, settings)}</span>
             </div>
           )}
           {discountAmount > 0 && (
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-600">Discount:</span>
-              <span className="font-semibold text-red-600">-${discountAmount.toFixed(2)}</span>
+              <span className="font-semibold text-red-600">-{formatCurrency(discountAmount, settings)}</span>
             </div>
           )}
           <div className="flex items-center justify-between pt-2 border-t border-gray-300">
             <span className="text-sm font-semibold text-gray-700">Total:</span>
-            <span className="text-lg font-bold text-blue-600">${total.toFixed(2)}</span>
+            <span className="text-lg font-bold text-blue-600">{formatCurrency(total, settings)}</span>
           </div>
         </div>
 
@@ -105,10 +108,12 @@ export const ParkSaleDialog: React.FC<ParkSaleDialogProps> = ({
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">{item.productName}</p>
                   <p className="text-xs text-gray-500">
-                    Qty: {item.quantity} × ${item.price.toFixed(2)}
+                    Qty: {item.quantity} × {formatCurrency(item.price, settings)}
                   </p>
                 </div>
-                <span className="text-sm font-semibold text-gray-900">${(item.quantity * item.price).toFixed(2)}</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  {formatCurrency(item.quantity * item.price, settings)}
+                </span>
               </div>
             ))}
           </div>

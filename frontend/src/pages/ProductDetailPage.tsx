@@ -5,12 +5,15 @@ import { Product } from "../types";
 import { productsAPI } from "../services/api";
 import { BackButton } from "../components/common";
 import { ProductVariantList } from "../components/products";
+import { useSettings } from "../context/SettingsContext";
+import { formatCurrency } from "../utils/currencyUtils";
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const { settings } = useSettings();
 
   useEffect(() => {
     if (id) {
@@ -118,11 +121,11 @@ const ProductDetailPage: React.FC = () => {
             <div className="space-y-3">
               <div>
                 <span className="text-sm text-gray-600">Purchase Price:</span>
-                <p className="text-xl font-bold text-gray-900">${product.purchasePrice.toFixed(2)}</p>
+                <p className="text-xl font-bold text-gray-900">{formatCurrency(product.purchasePrice, settings)}</p>
               </div>
               <div>
                 <span className="text-sm text-gray-600">Selling Price:</span>
-                <p className="text-xl font-bold text-blue-600">${product.sellingPrice.toFixed(2)}</p>
+                <p className="text-xl font-bold text-blue-600">{formatCurrency(product.sellingPrice, settings)}</p>
               </div>
               <div>
                 <span className="text-sm text-gray-600">Profit Margin:</span>

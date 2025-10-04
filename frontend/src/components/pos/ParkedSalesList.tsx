@@ -3,6 +3,8 @@ import { toast } from "react-hot-toast";
 import { ParkedSale } from "../../types";
 import { parkedSalesAPI } from "../../services/api";
 import { Button } from "../common";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface ParkedSalesListProps {
   isOpen: boolean;
@@ -14,6 +16,7 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({ isOpen, onClos
   const [parkedSales, setParkedSales] = useState<ParkedSale[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<number | null>(null);
+  const { settings } = useSettings();
 
   useEffect(() => {
     if (isOpen) {
@@ -145,7 +148,7 @@ export const ParkedSalesList: React.FC<ParkedSalesListProps> = ({ isOpen, onClos
                         </div>
                         <div>
                           <span className="text-gray-600">Total:</span>
-                          <p className="font-semibold text-blue-600">${sale.subtotal.toFixed(2)}</p>
+                          <p className="font-semibold text-blue-600">{formatCurrency(sale.subtotal, settings)}</p>
                         </div>
                         <div>
                           <span className="text-gray-600">Parked:</span>

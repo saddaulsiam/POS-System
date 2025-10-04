@@ -1,5 +1,7 @@
 import React from "react";
 import { Sale } from "../../types";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface SaleDetailsModalProps {
   sale: Sale | null;
@@ -16,6 +18,8 @@ export const SaleDetailsModal: React.FC<SaleDetailsModalProps> = ({
   getCustomerName,
   getEmployeeName,
 }) => {
+  const { settings } = useSettings();
+
   if (!isOpen || !sale) return null;
 
   return (
@@ -69,8 +73,8 @@ export const SaleDetailsModal: React.FC<SaleDetailsModalProps> = ({
                     <tr key={item.id}>
                       <td className="px-4 py-2 text-sm text-gray-900">{item.product?.name || "Unknown Product"}</td>
                       <td className="px-4 py-2 text-sm text-gray-900">{item.quantity}</td>
-                      <td className="px-4 py-2 text-sm text-gray-900">${item.priceAtSale.toFixed(2)}</td>
-                      <td className="px-4 py-2 text-sm text-gray-900">${item.subtotal.toFixed(2)}</td>
+                      <td className="px-4 py-2 text-sm text-gray-900">{formatCurrency(item.priceAtSale, settings)}</td>
+                      <td className="px-4 py-2 text-sm text-gray-900">{formatCurrency(item.subtotal, settings)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -83,21 +87,21 @@ export const SaleDetailsModal: React.FC<SaleDetailsModalProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Subtotal:</span>
-                <span>${sale.subtotal.toFixed(2)}</span>
+                <span>{formatCurrency(sale.subtotal, settings)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span>Tax:</span>
-                <span>${sale.taxAmount.toFixed(2)}</span>
+                <span>{formatCurrency(sale.taxAmount, settings)}</span>
               </div>
               {sale.discountAmount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span>Discount:</span>
-                  <span>-${sale.discountAmount.toFixed(2)}</span>
+                  <span>-{formatCurrency(sale.discountAmount, settings)}</span>
                 </div>
               )}
               <div className="flex justify-between font-medium text-lg border-t pt-2">
                 <span>Total:</span>
-                <span>${sale.finalAmount.toFixed(2)}</span>
+                <span>{formatCurrency(sale.finalAmount, settings)}</span>
               </div>
             </div>
           </div>

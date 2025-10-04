@@ -1,5 +1,7 @@
 import React from "react";
 import { Product, Category } from "../../types";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface POSProductGridProps {
   products: Product[];
@@ -16,6 +18,8 @@ export const POSProductGrid: React.FC<POSProductGridProps> = ({
   onCategoryClick,
   onProductClick,
 }) => {
+  const { settings } = useSettings();
+
   return (
     <div className="flex-1 p-4 overflow-y-auto">
       <h3 className="text-lg font-medium text-gray-900 mb-4">Categories</h3>
@@ -68,7 +72,9 @@ export const POSProductGrid: React.FC<POSProductGridProps> = ({
                 <div>
                   <p className="text-sm font-medium text-gray-900 truncate">{product.name}</p>
                   <p className="text-xs text-gray-500 truncate">{product.sku}</p>
-                  <p className="text-sm font-semibold text-green-600">${product.sellingPrice.toFixed(2)}</p>
+                  <p className="text-sm font-semibold text-green-600">
+                    {formatCurrency(product.sellingPrice, settings)}
+                  </p>
                   <p className="text-xs text-gray-500">Stock: {product.stockQuantity}</p>
                 </div>
               </button>

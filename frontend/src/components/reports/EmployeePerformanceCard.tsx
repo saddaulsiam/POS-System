@@ -2,6 +2,7 @@ import React from "react";
 import { EmployeePerformanceReport } from "../../types";
 import { formatCurrency } from "../../utils/reportUtils";
 import { exportTableToPDF, exportTableToCSV } from "../../utils/exportUtils";
+import { useSettings } from "../../context/SettingsContext";
 
 interface EmployeePerformanceCardProps {
   employeePerf: EmployeePerformanceReport;
@@ -14,6 +15,8 @@ export const EmployeePerformanceCard: React.FC<EmployeePerformanceCardProps> = (
   startDate,
   endDate,
 }) => {
+  const { settings } = useSettings();
+
   return (
     <div className="bg-white shadow-lg rounded-xl p-8 mb-10 border border-blue-100">
       <div className="flex justify-between items-center mb-4">
@@ -70,9 +73,11 @@ export const EmployeePerformanceCard: React.FC<EmployeePerformanceCardProps> = (
             {employeePerf.performance.slice(0, 5).map((emp) => (
               <tr key={emp.employee.id} className="border-b">
                 <td className="px-4 py-2">{emp.employee.name}</td>
-                <td className="px-4 py-2 text-right">{formatCurrency(emp.totalSales)}</td>
+                <td className="px-4 py-2 text-right">{formatCurrency(emp.totalSales, settings || undefined)}</td>
                 <td className="px-4 py-2 text-right">{emp.totalTransactions}</td>
-                <td className="px-4 py-2 text-right">{formatCurrency(emp.averageTransaction)}</td>
+                <td className="px-4 py-2 text-right">
+                  {formatCurrency(emp.averageTransaction, settings || undefined)}
+                </td>
               </tr>
             ))}
           </tbody>

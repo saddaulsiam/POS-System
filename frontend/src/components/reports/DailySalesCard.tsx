@@ -2,12 +2,15 @@ import React from "react";
 import { DailySalesReport } from "../../types";
 import { formatCurrency } from "../../utils/reportUtils";
 import { exportTableToPDF, exportTableToCSV } from "../../utils/exportUtils";
+import { useSettings } from "../../context/SettingsContext";
 
 interface DailySalesCardProps {
   daily: DailySalesReport;
 }
 
 export const DailySalesCard: React.FC<DailySalesCardProps> = ({ daily }) => {
+  const { settings } = useSettings();
+
   return (
     <div className="bg-white shadow-lg rounded-xl p-8 mb-10 border border-blue-100">
       <div className="flex justify-between items-center mb-4">
@@ -47,7 +50,9 @@ export const DailySalesCard: React.FC<DailySalesCardProps> = ({ daily }) => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-6">
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Total Sales</div>
-          <div className="text-2xl font-bold text-blue-900">{formatCurrency(daily.summary.totalSales)}</div>
+          <div className="text-2xl font-bold text-blue-900">
+            {formatCurrency(daily.summary.totalSales, settings || undefined)}
+          </div>
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Transactions</div>
@@ -55,11 +60,15 @@ export const DailySalesCard: React.FC<DailySalesCardProps> = ({ daily }) => {
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Tax</div>
-          <div className="text-2xl font-bold text-blue-900">{formatCurrency(daily.summary.totalTax)}</div>
+          <div className="text-2xl font-bold text-blue-900">
+            {formatCurrency(daily.summary.totalTax, settings || undefined)}
+          </div>
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Discount</div>
-          <div className="text-2xl font-bold text-blue-900">{formatCurrency(daily.summary.totalDiscount)}</div>
+          <div className="text-2xl font-bold text-blue-900">
+            {formatCurrency(daily.summary.totalDiscount, settings || undefined)}
+          </div>
         </div>
       </div>
 

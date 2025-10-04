@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from "../common";
 import { Product } from "../../types";
 import { productsAPI } from "../../services/api";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface POSBarcodeScannerProps {
   barcode: string;
@@ -18,6 +20,7 @@ export const POSBarcodeScanner: React.FC<POSBarcodeScannerProps> = ({
 }) => {
   const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const { settings } = useSettings();
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
@@ -150,7 +153,9 @@ export const POSBarcodeScanner: React.FC<POSBarcodeScannerProps> = ({
                       </div>
                     </div>
                     <div className="text-right ml-4">
-                      <p className="text-lg font-bold text-green-600">${product.sellingPrice.toFixed(2)}</p>
+                      <p className="text-lg font-bold text-green-600">
+                        {formatCurrency(product.sellingPrice, settings)}
+                      </p>
                     </div>
                   </div>
                 </div>

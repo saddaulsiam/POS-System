@@ -1,4 +1,6 @@
 import React from "react";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface Transaction {
   id: number;
@@ -13,6 +15,8 @@ interface RecentTransactionsListProps {
 }
 
 export const RecentTransactionsList: React.FC<RecentTransactionsListProps> = ({ transactions }) => {
+  const { settings } = useSettings();
+
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">🔄 Recent Transactions</h3>
@@ -27,7 +31,7 @@ export const RecentTransactionsList: React.FC<RecentTransactionsListProps> = ({ 
               <p className="text-xs text-gray-500">{new Date(transaction.createdAt).toLocaleTimeString()}</p>
             </div>
             <div className="text-right">
-              <p className="font-bold text-green-600">${transaction.total.toFixed(2)}</p>
+              <p className="font-bold text-green-600">{formatCurrency(transaction.total, settings)}</p>
             </div>
           </div>
         ))}

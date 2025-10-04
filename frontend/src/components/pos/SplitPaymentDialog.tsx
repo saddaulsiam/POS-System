@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { PaymentMethod } from "../../types";
 import { Button } from "../common";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface PaymentSplit {
   method: PaymentMethod;
@@ -16,6 +18,7 @@ interface SplitPaymentDialogProps {
 }
 
 export const SplitPaymentDialog: React.FC<SplitPaymentDialogProps> = ({ isOpen, onClose, totalAmount, onConfirm }) => {
+  const { settings } = useSettings();
   const [splits, setSplits] = useState<PaymentSplit[]>([{ method: "CASH", amount: 0 }]);
 
   useEffect(() => {
@@ -85,12 +88,12 @@ export const SplitPaymentDialog: React.FC<SplitPaymentDialogProps> = ({ isOpen, 
     const totalSplit = getTotalSplitAmount();
 
     if (totalSplit < totalAmount) {
-      toast.error(`Insufficient payment: $${(totalAmount - totalSplit).toFixed(2)} remaining`);
+      toast.error(`Insufficient payment: ${formatCurrency(totalAmount - totalSplit, settings)} remaining`);
       return;
     }
 
     if (totalSplit > totalAmount) {
-      toast.error(`Overpayment: $${(totalSplit - totalAmount).toFixed(2)} excess`);
+      toast.error(`Overpayment: ${formatCurrency(totalSplit - totalAmount, settings)} excess`);
       return;
     }
 
@@ -130,7 +133,7 @@ export const SplitPaymentDialog: React.FC<SplitPaymentDialogProps> = ({ isOpen, 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-700">Total Amount:</span>
-            <span className="text-2xl font-bold text-blue-600">${totalAmount.toFixed(2)}</span>
+            <span className="text-2xl font-bold text-blue-600">{formatCurrency(totalAmount, settings)}</span>
           </div>
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-blue-200">
             <span className="text-sm text-gray-700">Remaining:</span>
@@ -139,7 +142,7 @@ export const SplitPaymentDialog: React.FC<SplitPaymentDialogProps> = ({ isOpen, 
                 isBalanced ? "text-green-600" : remaining > 0 ? "text-orange-600" : "text-red-600"
               }`}
             >
-              ${Math.abs(remaining).toFixed(2)}
+              {formatCurrency(Math.abs(remaining), settings)}
               {remaining > 0 && " left"}
               {remaining < 0 && " over"}
             </span>

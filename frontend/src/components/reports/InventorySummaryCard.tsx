@@ -2,12 +2,15 @@ import React from "react";
 import { InventoryReport } from "../../types";
 import { formatCurrency } from "../../utils/reportUtils";
 import { exportTableToPDF, exportTableToCSV } from "../../utils/exportUtils";
+import { useSettings } from "../../context/SettingsContext";
 
 interface InventorySummaryCardProps {
   inventory: InventoryReport;
 }
 
 export const InventorySummaryCard: React.FC<InventorySummaryCardProps> = ({ inventory }) => {
+  const { settings } = useSettings();
+
   return (
     <div className="bg-white shadow-lg rounded-xl p-8 mb-10 border border-blue-100">
       <div className="flex justify-between items-center mb-4">
@@ -70,7 +73,9 @@ export const InventorySummaryCard: React.FC<InventorySummaryCardProps> = ({ inve
         </div>
         <div className="bg-blue-50 rounded-lg p-4 text-center">
           <div className="text-gray-500 text-xs">Inventory Value</div>
-          <div className="text-2xl font-bold text-blue-900">{formatCurrency(inventory.totalInventoryValue)}</div>
+          <div className="text-2xl font-bold text-blue-900">
+            {formatCurrency(inventory.totalInventoryValue, settings || undefined)}
+          </div>
         </div>
       </div>
     </div>

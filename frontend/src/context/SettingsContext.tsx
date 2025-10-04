@@ -2,14 +2,49 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { posSettingsAPI } from "../services/api";
 
 interface POSSettings {
+  id: number;
+  // Feature Toggles
   enableQuickSale: boolean;
   enableSplitPayment: boolean;
   enableParkSale: boolean;
   enableCustomerSearch: boolean;
   enableBarcodeScanner: boolean;
   enableLoyaltyPoints: boolean;
+  // Store Information
+  storeName: string;
+  storeAddress: string;
+  storePhone: string;
+  storeEmail: string;
+  taxId: string | null;
+  // Tax & Currency
   taxRate: number;
+  currencySymbol: string;
+  currencyPosition: string;
+  // Receipt Settings
   receiptFooterText: string | null;
+  returnPolicy: string | null;
+  printReceiptAuto: boolean;
+  emailReceiptAuto: boolean;
+  // Alerts & Notifications
+  enableLowStockAlerts: boolean;
+  lowStockThreshold: number;
+  enableEmailNotifications: boolean;
+  adminAlertEmail: string | null;
+  // System Settings
+  autoLogoutMinutes: number;
+  requirePasswordOnVoid: boolean;
+  enableAuditLog: boolean;
+  productsPerPage: number;
+  defaultView: string;
+  showProductImages: boolean;
+  // Metadata
+  updatedAt: string;
+  updatedBy: number | null;
+  updatedByEmployee?: {
+    id: number;
+    name: string;
+    username: string;
+  };
 }
 
 interface SettingsContextType {
@@ -44,14 +79,37 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       console.error("Failed to load POS settings:", error);
       // Set default values if loading fails
       setSettings({
+        id: 0,
         enableQuickSale: true,
         enableSplitPayment: true,
         enableParkSale: true,
         enableCustomerSearch: true,
         enableBarcodeScanner: true,
         enableLoyaltyPoints: true,
+        storeName: "POS System",
+        storeAddress: "123 Main St, City, Country",
+        storePhone: "(123) 456-7890",
+        storeEmail: "info@possystem.com",
+        taxId: null,
         taxRate: 0,
+        currencySymbol: "$",
+        currencyPosition: "before",
         receiptFooterText: null,
+        returnPolicy: null,
+        printReceiptAuto: false,
+        emailReceiptAuto: false,
+        enableLowStockAlerts: true,
+        lowStockThreshold: 10,
+        enableEmailNotifications: true,
+        adminAlertEmail: null,
+        autoLogoutMinutes: 30,
+        requirePasswordOnVoid: true,
+        enableAuditLog: true,
+        productsPerPage: 20,
+        defaultView: "grid",
+        showProductImages: true,
+        updatedAt: new Date().toISOString(),
+        updatedBy: null,
       });
     } finally {
       setLoading(false);

@@ -1,5 +1,7 @@
 import React from "react";
 import { Input } from "../common";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface POSPaymentModalProps {
   isOpen: boolean;
@@ -30,6 +32,8 @@ export const POSPaymentModal: React.FC<POSPaymentModalProps> = ({
   onCashReceivedChange,
   onConfirm,
 }) => {
+  const { settings } = useSettings();
+
   if (!isOpen) return null;
 
   return (
@@ -41,15 +45,15 @@ export const POSPaymentModal: React.FC<POSPaymentModalProps> = ({
           <div className="bg-gray-50 p-3 rounded-lg">
             <div className="flex justify-between text-sm">
               <span>Subtotal:</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>{formatCurrency(subtotal, settings)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Tax:</span>
-              <span>${tax.toFixed(2)}</span>
+              <span>{formatCurrency(tax, settings)}</span>
             </div>
             <div className="flex justify-between font-medium text-lg border-t border-gray-200 pt-2 mt-2">
               <span>Total:</span>
-              <span>${total.toFixed(2)}</span>
+              <span>{formatCurrency(total, settings)}</span>
             </div>
           </div>
 
@@ -90,7 +94,7 @@ export const POSPaymentModal: React.FC<POSPaymentModalProps> = ({
           {cashReceived && (
             <div className="mt-2 text-sm">
               <span className="text-gray-600">Change: </span>
-              <span className="font-medium">${changeAmount.toFixed(2)}</span>
+              <span className="font-medium">{formatCurrency(changeAmount, settings)}</span>
             </div>
           )}
 

@@ -1,10 +1,21 @@
 /**
- * Format a number as currency (USD)
+ * Format a number as currency using POS Settings
  * @param n - Number to format
- * @returns Formatted currency string (e.g., "$1,234.56")
+ * @param settings - Optional POS settings object with currencySymbol and currencyPosition
+ * @returns Formatted currency string (e.g., "$1,234.56" or "1,234.56€")
  */
-export const formatCurrency = (n: number): string => {
-  return `$${n.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+export const formatCurrency = (
+  n: number,
+  settings?: { currencySymbol?: string; currencyPosition?: string }
+): string => {
+  const symbol = settings?.currencySymbol || "$";
+  const position = settings?.currencyPosition || "before";
+  const formatted = n.toLocaleString(undefined, { minimumFractionDigits: 2 });
+
+  if (position === "after") {
+    return `${formatted}${symbol}`;
+  }
+  return `${symbol}${formatted}`;
 };
 
 /**
