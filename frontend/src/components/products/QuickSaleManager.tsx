@@ -76,7 +76,7 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({ isOpen, onCl
 
     try {
       setIsSubmitting(true);
-      
+
       if (editingItem) {
         // Update existing item
         await quickSaleItemsAPI.update(editingItem.id, {
@@ -99,7 +99,7 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({ isOpen, onCl
 
       loadQuickItems();
       onSuccess();
-      
+
       // Reset form
       setDisplayName("");
       setSelectedColor("#3B82F6");
@@ -132,7 +132,7 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({ isOpen, onCl
     setSelectedColor(item.color);
     setSortOrder(item.sortOrder);
     // Scroll to top to show the form
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleCancelEdit = () => {
@@ -183,19 +183,20 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({ isOpen, onCl
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {editingItem 
-                      ? "✏️ Edit Quick Sale Item" 
-                      : isProductInQuickSale 
-                      ? "⚡ Already in Quick Sale" 
+                    {editingItem
+                      ? "✏️ Edit Quick Sale Item"
+                      : isProductInQuickSale
+                      ? "⚡ Already in Quick Sale"
                       : "➕ Add to Quick Sale"}
                   </h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    Product: <span className="font-semibold text-gray-900">
+                    Product:{" "}
+                    <span className="font-semibold text-gray-900">
                       {editingItem ? editingItem.product?.name || `ID: ${editingItem.productId}` : product?.name}
                     </span>
                   </p>
 
-                  {(!isProductInQuickSale || editingItem) ? (
+                  {!isProductInQuickSale || editingItem ? (
                     <div className="space-y-4">
                       {/* Display Name */}
                       <div>
@@ -277,13 +278,16 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({ isOpen, onCl
                               d={editingItem ? "M5 13l4 4L19 7" : "M13 10V3L4 14h7v7l9-11h-7z"}
                             />
                           </svg>
-                          {isSubmitting ? (editingItem ? "Updating..." : "Adding...") : (editingItem ? "Update Item" : "Add to Quick Sale")}
+                          {isSubmitting
+                            ? editingItem
+                              ? "Updating..."
+                              : "Adding..."
+                            : editingItem
+                            ? "Update Item"
+                            : "Add to Quick Sale"}
                         </Button>
                         {editingItem && (
-                          <Button
-                            variant="secondary"
-                            onClick={handleCancelEdit}
-                          >
+                          <Button variant="secondary" onClick={handleCancelEdit}>
                             Cancel
                           </Button>
                         )}
