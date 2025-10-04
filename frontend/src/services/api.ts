@@ -727,9 +727,37 @@ export const loyaltyAPI = {
     return response.data;
   },
 
+  deleteOffer: async (id: number) => {
+    await api.delete(`/loyalty/offers/${id}`);
+  },
+
   // Tier Configuration
   getTierConfig: async () => {
     const response = await api.get("/loyalty/tiers");
+    return response.data;
+  },
+
+  updateTierConfig: async (data: {
+    tier: "BRONZE" | "SILVER" | "GOLD" | "PLATINUM";
+    minimumPoints: number;
+    pointsMultiplier: number;
+    discountPercentage: number;
+    birthdayBonus: number;
+    description?: string;
+  }) => {
+    const response = await api.post("/loyalty/tiers/config", data);
+    return response.data;
+  },
+
+  // Customer Loyalty Status
+  getLoyaltyStatus: async (customerId: number) => {
+    const response = await api.get(`/loyalty/customers/${customerId}/loyalty-status`);
+    return response.data;
+  },
+
+  // Statistics (Admin)
+  getStatistics: async () => {
+    const response = await api.get("/loyalty/statistics");
     return response.data;
   },
 };
