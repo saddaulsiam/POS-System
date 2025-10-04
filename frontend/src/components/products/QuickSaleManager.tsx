@@ -32,18 +32,14 @@ const COLOR_OPTIONS = [
   { value: "#F97316", label: "Amber", class: "bg-amber-500" },
 ];
 
-export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
-  isOpen,
-  onClose,
-  product,
-  onSuccess,
-}) => {
+export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({ isOpen, onClose, product, onSuccess }) => {
   const [quickItems, setQuickItems] = useState<QuickSaleItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [selectedColor, setSelectedColor] = useState("#3B82F6");
   const [sortOrder, setSortOrder] = useState(0);
+  const [editingItem, setEditingItem] = useState<QuickSaleItem | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -51,7 +47,7 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
       if (product) {
         setDisplayName(product.name);
         // Find next available sort order
-        const maxOrder = quickItems.length > 0 ? Math.max(...quickItems.map(i => i.sortOrder)) : -1;
+        const maxOrder = quickItems.length > 0 ? Math.max(...quickItems.map((i) => i.sortOrder)) : -1;
         setSortOrder(maxOrder + 1);
       }
     }
@@ -71,7 +67,7 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
   };
 
   const handleAddToQuickSale = async () => {
-    if (!product) return;
+    if (!product && !editingItem) return;
 
     if (!displayName.trim()) {
       toast.error("Display name is required");
@@ -80,19 +76,37 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
 
     try {
       setIsSubmitting(true);
-      await quickSaleItemsAPI.create({
-        productId: product.id,
-        displayName: displayName.trim(),
-        color: selectedColor,
-        sortOrder,
-      });
+      
+      if (editingItem) {
+        // Update existing item
+        await quickSaleItemsAPI.update(editingItem.id, {
+          displayName: displayName.trim(),
+          color: selectedColor,
+          sortOrder,
+        });
+        toast.success("Quick Sale item updated!");
+        setEditingItem(null);
+      } else if (product) {
+        // Create new item
+        await quickSaleItemsAPI.create({
+          productId: product.id,
+          displayName: displayName.trim(),
+          color: selectedColor,
+          sortOrder,
+        });
+        toast.success("Added to Quick Sale!");
+      }
 
-      toast.success("Added to Quick Sale!");
+      loadQuickItems();
       onSuccess();
-      onClose();
+      
+      // Reset form
+      setDisplayName("");
+      setSelectedColor("#3B82F6");
+      setSortOrder(0);
     } catch (error: any) {
-      console.error("Error adding to quick sale:", error);
-      toast.error(error.response?.data?.error || "Failed to add to quick sale");
+      console.error("Error saving quick sale item:", error);
+      toast.error(error.response?.data?.error || "Failed to save");
     } finally {
       setIsSubmitting(false);
     }
@@ -112,10 +126,32 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
     }
   };
 
+  const handleEditQuickSale = (item: QuickSaleItem) => {
+    setEditingItem(item);
+    setDisplayName(item.displayName);
+    setSelectedColor(item.color);
+    setSortOrder(item.sortOrder);
+    // Scroll to top to show the form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingItem(null);
+    if (product) {
+      setDisplayName(product.name);
+      const maxOrder = quickItems.length > 0 ? Math.max(...quickItems.map((i) => i.sortOrder)) : -1;
+      setSortOrder(maxOrder + 1);
+    } else {
+      setDisplayName("");
+      setSortOrder(0);
+    }
+    setSelectedColor("#3B82F6");
+  };
+
   if (!isOpen) return null;
 
   // Check if current product is already in quick sale
-  const isProductInQuickSale = product && quickItems.some(item => item.productId === product.id);
+  const isProductInQuickSale = product && quickItems.some((item) => item.productId === product.id);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -142,18 +178,24 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
 
         <div className="flex-1 overflow-y-auto p-6">
           {/* Add Product Section */}
-          {product && (
+          {(product || editingItem) && (
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 mb-6 border-2 border-blue-200">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {isProductInQuickSale ? "⚡ Already in Quick Sale" : "➕ Add to Quick Sale"}
+                    {editingItem 
+                      ? "✏️ Edit Quick Sale Item" 
+                      : isProductInQuickSale 
+                      ? "⚡ Already in Quick Sale" 
+                      : "➕ Add to Quick Sale"}
                   </h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    Product: <span className="font-semibold text-gray-900">{product.name}</span>
+                    Product: <span className="font-semibold text-gray-900">
+                      {editingItem ? editingItem.product?.name || `ID: ${editingItem.productId}` : product?.name}
+                    </span>
                   </p>
 
-                  {!isProductInQuickSale ? (
+                  {(!isProductInQuickSale || editingItem) ? (
                     <div className="space-y-4">
                       {/* Display Name */}
                       <div>
@@ -196,9 +238,7 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
 
                       {/* Sort Order */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Sort Order
-                        </label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
                         <input
                           type="number"
                           value={sortOrder}
@@ -222,7 +262,7 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
                       </div>
 
                       {/* Action Button */}
-                      <div className="flex justify-end pt-2">
+                      <div className="flex justify-end pt-2 space-x-3">
                         <Button
                           variant="primary"
                           onClick={handleAddToQuickSale}
@@ -230,10 +270,23 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
                           className="flex items-center"
                         >
                           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d={editingItem ? "M5 13l4 4L19 7" : "M13 10V3L4 14h7v7l9-11h-7z"}
+                            />
                           </svg>
-                          {isSubmitting ? "Adding..." : "Add to Quick Sale"}
+                          {isSubmitting ? (editingItem ? "Updating..." : "Adding...") : (editingItem ? "Update Item" : "Add to Quick Sale")}
                         </Button>
+                        {editingItem && (
+                          <Button
+                            variant="secondary"
+                            onClick={handleCancelEdit}
+                          >
+                            Cancel
+                          </Button>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -258,7 +311,12 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                />
               </svg>
               Current Quick Sale Items ({quickItems.length})
             </h3>
@@ -270,8 +328,18 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
               </div>
             ) : quickItems.length === 0 ? (
               <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                <svg
+                  className="w-16 h-16 text-gray-400 mx-auto mb-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                  />
                 </svg>
                 <p className="text-gray-600 font-medium">No Quick Sale items yet</p>
                 <p className="text-sm text-gray-500 mt-1">Add products to enable fast checkout</p>
@@ -309,6 +377,12 @@ export const QuickSaleManager: React.FC<QuickSaleManagerProps> = ({
 
                         {/* Actions */}
                         <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleEditQuickSale(item)}
+                            className="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                          >
+                            Edit
+                          </button>
                           <button
                             onClick={() => handleRemoveFromQuickSale(item.id)}
                             className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
