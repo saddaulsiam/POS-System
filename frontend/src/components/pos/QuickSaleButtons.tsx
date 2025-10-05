@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { QuickSaleItem, Product } from "../../types";
 import { quickSaleItemsAPI } from "../../services/api";
 import { Button } from "../common";
-import { useSettings } from "../../context/SettingsContext";
-import { formatCurrency } from "../../utils/currencyUtils";
 
 interface QuickSaleButtonsProps {
   onProductSelect: (product: Product) => void;
@@ -14,7 +13,7 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
   const [quickItems, setQuickItems] = useState<QuickSaleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showManageModal, setShowManageModal] = useState(false);
-  const { settings } = useSettings();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadQuickItems();
@@ -38,6 +37,11 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
       onProductSelect(item.product);
       toast.success(`Added ${item.displayName} to cart`);
     }
+  };
+
+  const handleConfigureClick = () => {
+    navigate("/products");
+    toast.success("Opening Products page to configure quick sale items");
   };
 
   if (loading) {
@@ -98,7 +102,7 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
 
           {/* Action Button */}
           <button
-            onClick={() => setShowManageModal(true)}
+            onClick={handleConfigureClick}
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,7 +156,7 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
               <span className="text-white font-semibold text-sm leading-tight drop-shadow-md">{item.displayName}</span>
               {item.product && (
                 <span className="text-white text-xs mt-1 opacity-90 drop-shadow-sm">
-                  {formatCurrency(item.product.sellingPrice, settings)}
+                  ${item.product.sellingPrice.toFixed(2)}
                 </span>
               )}
             </div>
@@ -258,8 +262,8 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
 
             {/* Footer */}
             <div className="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end">
-              <Button variant="primary" onClick={() => setShowManageModal(false)} className="px-6">
-                Got it!
+              <Button variant="primary" onClick={handleConfigureClick} className="px-6">
+                Lets Go!
               </Button>
             </div>
           </div>

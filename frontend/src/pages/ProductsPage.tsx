@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { productsAPI, categoriesAPI, suppliersAPI } from "../services/api";
 import { Product, Category, Supplier } from "../types";
 import { useAuth } from "../context/AuthContext";
+import { useSettings } from "../context/SettingsContext";
 import toast from "react-hot-toast";
 import { ProductFilters } from "../components/products/ProductFilters";
 import { ProductActions } from "../components/products/ProductActions";
@@ -13,6 +14,7 @@ import { printBarcodeLabel } from "../utils/productUtils";
 
 const ProductsPage: React.FC = () => {
   const { user } = useAuth();
+  const { settings } = useSettings();
   const canWrite = user?.role === "ADMIN" || user?.role === "MANAGER";
 
   // State management
@@ -422,7 +424,7 @@ const ProductsPage: React.FC = () => {
           onToggleStatus={handleToggleStatus}
           onDelete={handleDeleteProduct}
           onAddNew={() => setShowAddModal(true)}
-          onQuickSale={handleQuickSale}
+          onQuickSale={settings?.enableQuickSale ? handleQuickSale : undefined}
         />
 
         {/* All Modals */}
