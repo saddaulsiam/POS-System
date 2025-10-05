@@ -13,6 +13,7 @@ import { analyticsAPI } from "../services/api";
 import toast from "react-hot-toast";
 import { useSettings } from "../context/SettingsContext";
 import { formatCurrency } from "../utils/currencyUtils";
+import { RefreshButton } from "../components/common";
 import {
   LineChart,
   Line,
@@ -160,14 +161,7 @@ const AnalyticsPage: React.FC = () => {
         </div>
 
         <div className="mt-4 md:mt-0 flex items-center gap-3">
-          <button
-            onClick={fetchAnalytics}
-            disabled={refreshing}
-            className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-            title="Refresh"
-          >
-            <RefreshCw className={`w-5 h-5 ${refreshing ? "animate-spin" : ""}`} />
-          </button>
+          <RefreshButton onClick={fetchAnalytics} loading={refreshing} />
         </div>
       </div>
 

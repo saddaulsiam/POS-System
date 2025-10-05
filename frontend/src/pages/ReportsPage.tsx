@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { reportsAPI } from "../services/api";
 import { DailySalesReport, EmployeePerformanceReport, ProductPerformanceReport, InventoryReport } from "../types";
 import { formatDate } from "../utils/reportUtils";
-import { BackButton } from "../components/common";
+import { RefreshButton } from "../components/common";
 import { DateRangeFilter } from "../components/reports/DateRangeFilter";
 import { DailySalesCard } from "../components/reports/DailySalesCard";
 import { SalesRangeCard } from "../components/reports/SalesRangeCard";
@@ -23,29 +23,30 @@ const ReportsPage: React.FC = () => {
   const [productPerf, setProductPerf] = useState<ProductPerformanceReport | null>(null);
   const [inventory, setInventory] = useState<InventoryReport | null>(null);
 
+  const fetchReports = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const [d, r, emp, prod, inv] = await Promise.all([
+        reportsAPI.getDailySales(range.end),
+        reportsAPI.getSalesRange(range.start, range.end),
+        reportsAPI.getEmployeePerformance(range.start, range.end),
+        reportsAPI.getProductPerformance(range.start, range.end, 5),
+        reportsAPI.getInventory(),
+      ]);
+      setDaily(d);
+      setSalesRange(r);
+      setEmployeePerf(emp);
+      setProductPerf(prod);
+      setInventory(inv);
+    } catch (e: any) {
+      setError(e?.message || "Failed to load reports");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchReports = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const [d, r, emp, prod, inv] = await Promise.all([
-          reportsAPI.getDailySales(range.end),
-          reportsAPI.getSalesRange(range.start, range.end),
-          reportsAPI.getEmployeePerformance(range.start, range.end),
-          reportsAPI.getProductPerformance(range.start, range.end, 5),
-          reportsAPI.getInventory(),
-        ]);
-        setDaily(d);
-        setSalesRange(r);
-        setEmployeePerf(emp);
-        setProductPerf(prod);
-        setInventory(inv);
-      } catch (e: any) {
-        setError(e?.message || "Failed to load reports");
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchReports();
     // eslint-disable-next-line
   }, [range.start, range.end]);
@@ -56,7 +57,7 @@ const ReportsPage: React.FC = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-4xl font-extrabold text-blue-900 tracking-tight">📊 Reports & Analytics</h1>
-          <BackButton to="/admin" label="Back to Dashboard" />
+          <RefreshButton onClick={fetchReports} loading={isLoading} />
         </div>
 
         {/* Date Range Filter */}

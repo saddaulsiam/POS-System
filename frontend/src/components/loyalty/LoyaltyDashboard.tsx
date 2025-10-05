@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Trophy, TrendingUp, Gift, Star, Award, Zap } from "lucide-react";
 import { loyaltyAPI } from "../../services/api";
+import { RefreshButton } from "../common";
 import type { Customer, LoyaltyTier, LoyaltyTierConfig } from "../../types";
 
 interface LoyaltyDashboardProps {
@@ -193,15 +194,13 @@ const LoyaltyDashboard: React.FC<LoyaltyDashboardProps> = ({ customer, onRefresh
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Loyalty Program</h2>
-        <button
+        <RefreshButton
           onClick={() => {
             fetchLoyaltyData();
             onRefresh?.();
           }}
-          className="px-3 py-1 text-sm bg-white text-blue-600 border border-blue-300 rounded hover:bg-blue-50"
-        >
-          Refresh
-        </button>
+          loading={loading}
+        />
       </div>
 
       {/* Current Tier Badge */}
