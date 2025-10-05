@@ -6,8 +6,8 @@ import { formatCurrency } from "../../utils/currencyUtils";
 
 interface POSCartProps {
   cart: CartItem[];
-  onUpdateQuantity: (productId: number, quantity: number) => void;
-  onRemoveItem: (productId: number) => void;
+  onUpdateQuantity: (productId: number, quantity: number, variantId?: number) => void;
+  onRemoveItem: (productId: number, variantId?: number) => void;
   onClearCart: () => void;
   onProcessPayment: () => void;
   onSplitPayment?: () => void;
@@ -66,32 +66,42 @@ export const POSCart: React.FC<POSCartProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              {cart.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{item.product.name}</h4>
-                    <p className="text-sm text-gray-500">{formatCurrency(item.price, settings)} each</p>
-                    <p className="text-xs text-gray-500">Stock: {item.product.stockQuantity}</p>
+              {cart.map((item) => {
+                const itemKey = item.variant ? `${item.product.id}-${item.variant.id}` : `${item.product.id}`;
+                const displayName = item.variant ? `${item.product.name} - ${item.variant.name}` : item.product.name;
+                const stockQuantity = item.variant ? item.variant.stockQuantity || 0 : item.product.stockQuantity;
+
+                return (
+                  <div key={itemKey} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900">{displayName}</h4>
+                      {item.variant && <p className="text-xs text-blue-600">SKU: {item.variant.sku}</p>}
+                      <p className="text-sm text-gray-500">{formatCurrency(item.price, settings)} each</p>
+                      <p className="text-xs text-gray-500">Stock: {stockQuantity}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) => {
+                          const newQuantity = parseInt(e.target.value) || 1;
+                          onUpdateQuantity(item.product.id, newQuantity, item.variant?.id);
+                        }}
+                        className="w-16 px-2 py-1 border border-gray-300 rounded text-center"
+                        min="1"
+                        max={stockQuantity}
+                      />
+                      <div className="text-sm font-medium text-gray-900">{formatCurrency(item.subtotal, settings)}</div>
+                      <button
+                        onClick={() => onRemoveItem(item.product.id, item.variant?.id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="number"
-                      value={item.quantity}
-                      onChange={(e) => {
-                        const newQuantity = parseInt(e.target.value) || 1;
-                        onUpdateQuantity(item.product.id, newQuantity);
-                      }}
-                      className="w-16 px-2 py-1 border border-gray-300 rounded text-center"
-                      min="1"
-                      max={item.product.stockQuantity}
-                    />
-                    <div className="text-sm font-medium text-gray-900">{formatCurrency(item.subtotal, settings)}</div>
-                    <button onClick={() => onRemoveItem(item.product.id)} className="text-red-600 hover:text-red-800">
-                      ✕
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

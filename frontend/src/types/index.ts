@@ -103,6 +103,7 @@ export interface CartItem {
   price: number;
   subtotal: number;
   discount?: number;
+  variant?: ProductVariant;
 }
 
 export interface Sale {

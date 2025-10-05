@@ -7,3 +7,4 @@ export { POSCart } from "./POSCart";
 export { POSCustomerSearch } from "./POSCustomerSearch";
 export { POSPaymentModal } from "./POSPaymentModal";
 export { POSProductGrid } from "./POSProductGrid";
+export { VariantSelectorModal } from "./VariantSelectorModal";

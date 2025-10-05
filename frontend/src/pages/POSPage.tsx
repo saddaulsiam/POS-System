@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useSettings } from "../context/SettingsContext";
 import { productsAPI, customersAPI, salesAPI, categoriesAPI, parkedSalesAPI } from "../services/api";
-import { Product, Customer, Category, CartItem, ParkedSale, CreateCustomerRequest } from "../types";
+import { Product, Customer, Category, CartItem, ParkedSale, CreateCustomerRequest, ProductVariant } from "../types";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { POSBarcodeScanner } from "../components/pos/POSBarcodeScanner";
@@ -14,6 +14,7 @@ import { QuickSaleButtons } from "../components/pos/QuickSaleButtons";
 import { ParkSaleDialog } from "../components/pos/ParkSaleDialog";
 import { ParkedSalesList } from "../components/pos/ParkedSalesList";
 import { SplitPaymentDialog } from "../components/pos/SplitPaymentDialog";
+import { VariantSelectorModal } from "../components/pos/VariantSelectorModal";
 import { RedeemPointsDialog } from "../components/loyalty";
 import { CustomerModal } from "../components/customers/CustomerModal";
 import { calculateSubtotal, calculateTax, calculateTotal, calculateChange } from "../utils/posUtils";
@@ -50,6 +51,10 @@ const POSPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<"CASH" | "CARD">("CASH");
   const [cashReceived, setCashReceived] = useState("");
   const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
+
+  // Variant selection state
+  const [showVariantSelector, setShowVariantSelector] = useState(false);
+  const [selectedProductForVariant, setSelectedProductForVariant] = useState<Product | null>(null);
 
   useEffect(() => {
     loadCategories();
@@ -132,12 +137,20 @@ const POSPage: React.FC = () => {
   };
 
   const addToCart = (product: Product) => {
+    // Check if product has variants
+    if (product.hasVariants) {
+      setSelectedProductForVariant(product);
+      setShowVariantSelector(true);
+      return;
+    }
+
+    // Standard product without variants
     if (product.stockQuantity <= 0) {
       toast.error("Product is out of stock");
       return;
     }
 
-    const existingItem = cart.find((item) => item.product.id === product.id);
+    const existingItem = cart.find((item) => item.product.id === product.id && !item.variant);
 
     if (existingItem) {
       if (existingItem.quantity >= product.stockQuantity) {
@@ -147,7 +160,7 @@ const POSPage: React.FC = () => {
 
       setCart(
         cart.map((item) =>
-          item.product.id === product.id
+          item.product.id === product.id && !item.variant
             ? {
                 ...item,
                 quantity: item.quantity + 1,
@@ -169,21 +182,70 @@ const POSPage: React.FC = () => {
     toast.success(`${product.name} added to cart`);
   };
 
-  const updateCartItemQuantity = (productId: number, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
+  const addVariantToCart = (variant: ProductVariant) => {
+    const product = selectedProductForVariant;
+    if (!product) return;
+
+    if ((variant.stockQuantity || 0) <= 0) {
+      toast.error("Variant is out of stock");
       return;
     }
 
-    const item = cart.find((item) => item.product.id === productId);
-    if (item && quantity > item.product.stockQuantity) {
+    // Check if this specific variant is already in cart
+    const existingItem = cart.find((item) => item.product.id === product.id && item.variant?.id === variant.id);
+
+    if (existingItem) {
+      if (existingItem.quantity >= (variant.stockQuantity || 0)) {
+        toast.error("Not enough stock available");
+        return;
+      }
+
+      setCart(
+        cart.map((item) =>
+          item.product.id === product.id && item.variant?.id === variant.id
+            ? {
+                ...item,
+                quantity: item.quantity + 1,
+                subtotal: (item.quantity + 1) * item.price,
+              }
+            : item
+        )
+      );
+    } else {
+      const newItem: CartItem = {
+        product,
+        variant,
+        quantity: 1,
+        price: variant.sellingPrice,
+        subtotal: variant.sellingPrice,
+      };
+      setCart([...cart, newItem]);
+    }
+
+    toast.success(`${product.name} - ${variant.name} added to cart`);
+  };
+
+  const updateCartItemQuantity = (productId: number, quantity: number, variantId?: number) => {
+    if (quantity <= 0) {
+      removeFromCart(productId, variantId);
+      return;
+    }
+
+    const item = cart.find(
+      (item) => item.product.id === productId && (variantId ? item.variant?.id === variantId : !item.variant)
+    );
+
+    if (!item) return;
+
+    const maxStock = item.variant ? item.variant.stockQuantity || 0 : item.product.stockQuantity;
+    if (quantity > maxStock) {
       toast.error("Not enough stock available");
       return;
     }
 
     setCart(
       cart.map((item) =>
-        item.product.id === productId
+        item.product.id === productId && (variantId ? item.variant?.id === variantId : !item.variant)
           ? {
               ...item,
               quantity,
@@ -194,8 +256,12 @@ const POSPage: React.FC = () => {
     );
   };
 
-  const removeFromCart = (productId: number) => {
-    setCart(cart.filter((item) => item.product.id !== productId));
+  const removeFromCart = (productId: number, variantId?: number) => {
+    setCart(
+      cart.filter(
+        (item) => !(item.product.id === productId && (variantId ? item.variant?.id === variantId : !item.variant))
+      )
+    );
   };
 
   const searchCustomer = async () => {
@@ -284,7 +350,9 @@ const POSPage: React.FC = () => {
           productName: item.product.name,
           productSku: item.product.sku,
           productBarcode: item.product.barcode,
-          productVariantId: undefined,
+          productVariantId: item.variant?.id,
+          productVariantName: item.variant?.name,
+          productVariantSku: item.variant?.sku,
           quantity: item.quantity,
           price: item.price,
           taxRate: item.product.taxRate || 0,
@@ -370,6 +438,7 @@ const POSPage: React.FC = () => {
         customerId: customer?.id,
         items: cart.map((item) => ({
           productId: item.product.id,
+          productVariantId: item.variant?.id,
           quantity: item.quantity,
           price: item.price,
           discount: item.discount || 0,
@@ -429,6 +498,7 @@ const POSPage: React.FC = () => {
         customerId: customer?.id,
         items: cart.map((item) => ({
           productId: item.product.id,
+          productVariantId: item.variant?.id,
           quantity: item.quantity,
           price: item.price,
           discount: item.discount || 0,
@@ -624,6 +694,19 @@ const POSPage: React.FC = () => {
           availablePoints={customer.loyaltyPoints || 0}
           cartTotal={total}
           onRedeemed={handlePointsRedeemed}
+        />
+      )}
+
+      {/* Variant Selector Modal */}
+      {selectedProductForVariant && (
+        <VariantSelectorModal
+          isOpen={showVariantSelector}
+          onClose={() => {
+            setShowVariantSelector(false);
+            setSelectedProductForVariant(null);
+          }}
+          product={selectedProductForVariant}
+          onSelectVariant={addVariantToCart}
         />
       )}
 
