@@ -420,7 +420,7 @@ export const salesAPI = {
   },
 
   getByReceiptId: async (receiptId: string): Promise<Sale> => {
-    const response = await api.get(`/sales/receipt/${receiptId}`);
+    const response = await api.get(`/sales/${receiptId}`);
     return response.data;
   },
 

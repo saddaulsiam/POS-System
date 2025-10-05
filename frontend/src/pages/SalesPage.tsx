@@ -30,10 +30,12 @@ const SalesPage: React.FC = () => {
   const [selectedEmployee, setSelectedEmployee] = useState<number | "">("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [receiptId, setReceiptId] = useState("");
 
   useEffect(() => {
     loadSales();
-  }, [currentPage, dateFrom, dateTo, selectedCustomer, selectedEmployee]);
+  }, [currentPage, dateFrom, dateTo, selectedCustomer, selectedEmployee, receiptId]);
 
   useEffect(() => {
     loadCustomers();
@@ -43,17 +45,34 @@ const SalesPage: React.FC = () => {
   const loadSales = async () => {
     setIsLoading(true);
     try {
-      const response = await salesAPI.getAll({
-        page: currentPage,
-        limit: 20,
-        startDate: dateFrom || undefined,
-        endDate: dateTo || undefined,
-        customerId: selectedCustomer || undefined,
-        employeeId: selectedEmployee || undefined,
-      });
+      let response;
+      if (receiptId.trim() !== "") {
+        // Search by receipt ID
+        const sale = await salesAPI.getByReceiptId(receiptId.trim());
+        response = { data: sale ? [sale] : [], pagination: { totalPages: 1 } };
+      } else {
+        response = await salesAPI.getAll({
+          page: currentPage,
+          limit: 20,
+          startDate: dateFrom || undefined,
+          endDate: dateTo || undefined,
+          customerId: selectedCustomer || undefined,
+          employeeId: selectedEmployee || undefined,
+        });
+      }
       const { data = [], pagination } = response || {};
       setSales(data);
-      setTotalPages(pagination?.totalPages || 1);
+      // Map backend keys to frontend state for pagination
+      let pages = 1;
+      let items = 0;
+      if (pagination) {
+        if ("pages" in pagination) pages = Number((pagination as any).pages);
+        else if ("totalPages" in pagination) pages = Number((pagination as any).totalPages);
+        if ("total" in pagination) items = Number((pagination as any).total);
+        else if ("totalItems" in pagination) items = Number((pagination as any).totalItems);
+      }
+      setTotalPages(pages);
+      setTotalItems(items);
     } catch (error: any) {
       console.error("Error loading sales:", error);
       toast.error(error?.response?.data?.error || "Failed to load sales");
@@ -142,6 +161,7 @@ const SalesPage: React.FC = () => {
     setDateTo("");
     setSelectedCustomer("");
     setSelectedEmployee("");
+    setReceiptId("");
     setCurrentPage(1);
   };
 
@@ -157,12 +177,14 @@ const SalesPage: React.FC = () => {
           dateTo={dateTo}
           selectedCustomer={selectedCustomer}
           selectedEmployee={selectedEmployee}
+          receiptId={receiptId}
           customers={customers}
           employees={employees}
           onDateFromChange={setDateFrom}
           onDateToChange={setDateTo}
           onCustomerChange={setSelectedCustomer}
           onEmployeeChange={setSelectedEmployee}
+          onReceiptIdChange={setReceiptId}
           onClearFilters={clearFilters}
         />
 
@@ -180,7 +202,12 @@ const SalesPage: React.FC = () => {
           />
 
           {/* Pagination */}
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
 
