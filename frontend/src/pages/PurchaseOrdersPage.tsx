@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useSettings } from "../context/SettingsContext";
 import { inventoryAPI, suppliersAPI, productsAPI } from "../services/api";
 import toast from "react-hot-toast";
 import ReceiveItemsModal from "../components/inventory/ReceiveItemsModal";
 import EditPOModal from "../components/inventory/EditPOModal";
+import { formatCurrency } from "../utils/currencyUtils";
 
 interface PurchaseOrder {
   id: number;
@@ -70,6 +72,7 @@ interface POStats {
 
 const PurchaseOrdersPage: React.FC = () => {
   const { user } = useAuth();
+  const { settings } = useSettings();
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -375,13 +378,6 @@ const PurchaseOrdersPage: React.FC = () => {
     setCurrentItem({ productId: "", quantity: "1", unitPrice: "" });
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
-
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString();
   };
@@ -451,7 +447,7 @@ const PurchaseOrdersPage: React.FC = () => {
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-sm font-medium text-gray-500">Total Value</h3>
-            <p className="mt-2 text-3xl font-bold text-gray-900">{formatCurrency(stats.totalValue)}</p>
+            <p className="mt-2 text-3xl font-bold text-gray-900">{formatCurrency(stats.totalValue, settings)}</p>
           </div>
         </div>
       )}
@@ -547,7 +543,7 @@ const PurchaseOrdersPage: React.FC = () => {
                         {po.expectedDate ? formatDate(po.expectedDate) : "-"}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
-                        {formatCurrency(po.totalAmount)}
+                        {formatCurrency(po.totalAmount, settings)}
                       </td>
                       <td className="px-6 py-4 text-center">{getStatusBadge(po.status)}</td>
                       <td className="px-6 py-4 text-right text-sm space-x-2">
@@ -606,8 +602,20 @@ const PurchaseOrdersPage: React.FC = () => {
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200">
+            <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <h3 className="text-xl font-semibold text-gray-900">Create Purchase Order</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCreateModal(false);
+                  resetForm();
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
 
             <form onSubmit={handleCreatePO} className="px-6 py-4">
@@ -750,10 +758,10 @@ const PurchaseOrdersPage: React.FC = () => {
                               <td className="px-4 py-2 text-sm text-gray-900">{product?.name}</td>
                               <td className="px-4 py-2 text-sm text-gray-900 text-right">{item.quantity}</td>
                               <td className="px-4 py-2 text-sm text-gray-900 text-right">
-                                {formatCurrency(item.unitPrice)}
+                                {formatCurrency(item.unitPrice, settings)}
                               </td>
                               <td className="px-4 py-2 text-sm text-gray-900 text-right font-medium">
-                                {formatCurrency(item.quantity * item.unitPrice)}
+                                {formatCurrency(item.quantity * item.unitPrice, settings)}
                               </td>
                               <td className="px-4 py-2 text-right">
                                 <button
@@ -772,7 +780,7 @@ const PurchaseOrdersPage: React.FC = () => {
                             Total Amount:
                           </td>
                           <td className="px-4 py-2 text-sm font-bold text-gray-900 text-right">
-                            {formatCurrency(getTotalAmount())}
+                            {formatCurrency(getTotalAmount(), settings)}
                           </td>
                           <td></td>
                         </tr>
@@ -811,9 +819,21 @@ const PurchaseOrdersPage: React.FC = () => {
       {showViewModal && selectedPO && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-900">Purchase Order {selectedPO.poNumber}</h3>
-              {getStatusBadge(selectedPO.status)}
+            <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-semibold text-gray-900">Purchase Order {selectedPO.poNumber}</h3>
+                <div className="flex items-center gap-3">
+                  {getStatusBadge(selectedPO.status)}
+                  <button
+                    onClick={() => setShowViewModal(false)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="px-6 py-4">
@@ -866,10 +886,10 @@ const PurchaseOrdersPage: React.FC = () => {
                           <td className="px-4 py-2 text-sm text-gray-900 text-right">{item.quantity}</td>
                           <td className="px-4 py-2 text-sm text-gray-900 text-right">{item.receivedQuantity}</td>
                           <td className="px-4 py-2 text-sm text-gray-900 text-right">
-                            {formatCurrency(item.unitCost)}
+                            {formatCurrency(item.unitCost, settings)}
                           </td>
                           <td className="px-4 py-2 text-sm text-gray-900 text-right font-medium">
-                            {formatCurrency(item.totalCost)}
+                            {formatCurrency(item.totalCost, settings)}
                           </td>
                         </tr>
                       ))}
@@ -878,7 +898,7 @@ const PurchaseOrdersPage: React.FC = () => {
                           Total Amount:
                         </td>
                         <td className="px-4 py-2 text-sm font-bold text-gray-900 text-right">
-                          {formatCurrency(selectedPO.totalAmount)}
+                          {formatCurrency(selectedPO.totalAmount, settings)}
                         </td>
                       </tr>
                     </tbody>
