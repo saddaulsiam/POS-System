@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
+import { RefreshButton } from "../components/common/RefreshButton";
 
 interface CashDrawer {
   id: number;
@@ -90,9 +91,11 @@ const CashDrawerPage: React.FC = () => {
   const fetchDrawerHistory = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/cash-drawer?page=${page}&limit=10`);
+      // Always fetch from page 1 when refreshing
+      const response = await api.get(`/cash-drawer?page=1&limit=10`);
       setDrawerHistory(response.data.cashDrawers);
       setTotalPages(response.data.pagination.pages);
+      setPage(1);
     } catch (err: any) {
       setError("Failed to fetch drawer history");
     } finally {
@@ -183,8 +186,20 @@ const CashDrawerPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Cash Drawer Management</h1>
-        <p className="text-gray-600 mt-2">Manage your cash drawer and track shifts</p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Cash Drawer Management</h1>
+            <p className="text-gray-600 mt-2">Manage your cash drawer and track shifts</p>
+          </div>
+          <RefreshButton
+            onClick={() => {
+              fetchCurrentDrawer();
+              setSuccess("");
+              setError("");
+            }}
+            className="mt-2"
+          />
+        </div>
       </div>
 
       {error && (
@@ -423,16 +438,18 @@ const CashDrawerPage: React.FC = () => {
           </div>
 
           {reconciliation && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-6 h-36">
               <h3 className="font-semibold text-gray-900 mb-4">Recent Transactions</h3>
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {reconciliation.recentTransactions.length === 0 ? (
                   <p className="text-sm text-gray-500">No transactions yet</p>
                 ) : (
-                  reconciliation.recentTransactions.slice(0, 5).map((transaction) => (
-                    <div key={transaction.id} className="flex justify-between text-sm">
+                  reconciliation.recentTransactions.slice(0, 3).map((transaction) => (
+                    <div key={transaction.receiptId} className="flex justify-between text-sm">
                       <span className="text-gray-600">#{transaction.receiptId}</span>
-                      <span className="font-medium">{formatCurrency(transaction.total)}</span>
+                      <span className="font-medium">
+                        {formatCurrency(typeof transaction.finalAmount === "number" ? transaction.finalAmount : 0)}
+                      </span>
                     </div>
                   ))
                 )}
@@ -447,9 +464,6 @@ const CashDrawerPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900 flex items-center">🕐 Drawer History</h2>
-            <button onClick={fetchDrawerHistory} className="text-blue-600 hover:text-blue-700 flex items-center">
-              🔄 Refresh
-            </button>
           </div>
 
           {loading && drawerHistory.length === 0 ? (
