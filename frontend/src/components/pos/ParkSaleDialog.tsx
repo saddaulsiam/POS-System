@@ -57,7 +57,7 @@ export const ParkSaleDialog: React.FC<ParkSaleDialogProps> = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
         <button className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl" onClick={handleClose}>
           ×
         </button>
@@ -154,7 +154,12 @@ export const ParkSaleDialog: React.FC<ParkSaleDialogProps> = ({
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleConfirm} disabled={cartItems.length === 0}>
+          <Button
+            variant="primary"
+            onClick={handleConfirm}
+            disabled={cartItems.length === 0}
+            className="flex items-center"
+          >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"

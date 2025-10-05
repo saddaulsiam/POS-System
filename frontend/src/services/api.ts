@@ -160,7 +160,7 @@ export const productsAPI = {
   },
 
   getByBarcode: async (barcode: string): Promise<Product> => {
-    const response = await api.get(`/products/barcode/${barcode}`);
+    const response = await api.get(`/products/lookup/${barcode}`);
     return response.data;
   },
 
