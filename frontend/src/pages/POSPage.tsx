@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useSettings } from "../context/SettingsContext";
-import { productsAPI, customersAPI, salesAPI, categoriesAPI, parkedSalesAPI } from "../services/api";
+import {
+  productsAPI,
+  customersAPI,
+  salesAPI,
+  categoriesAPI,
+  parkedSalesAPI,
+  productVariantsAPI,
+} from "../services/api";
 import { Product, Customer, Category, CartItem, ParkedSale, CreateCustomerRequest, ProductVariant } from "../types";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -93,9 +100,29 @@ const POSPage: React.FC = () => {
     if (!barcode.trim()) return;
 
     try {
+      // STEP 1: Check if barcode matches a product variant (silently)
+      if (barcode.match(/^\d+$/)) {
+        try {
+          const variant = await productVariantsAPI.lookup(barcode);
+
+          // Found a variant! Get the parent product and add variant directly
+          if (variant && variant.productId) {
+            const product = await productsAPI.getById(variant.productId);
+            addVariantToCart(variant, product);
+            setBarcode("");
+            return;
+          }
+        } catch (variantError: any) {
+          // Silently ignore 404 - variant not found, will try product lookup
+          // Only show error if it's a server error (500)
+          if (variantError.response?.status >= 500) {
+            toast.error("Error looking up variant");
+          }
+          // Continue to regular product lookup
+        }
+      } // STEP 2: Try to find regular product by barcode or name
       let product: Product;
 
-      // Try to find by barcode first
       if (barcode.match(/^\d+$/)) {
         try {
           product = await productsAPI.getByBarcode(barcode);
@@ -182,9 +209,10 @@ const POSPage: React.FC = () => {
     toast.success(`${product.name} added to cart`);
   };
 
-  const addVariantToCart = (variant: ProductVariant) => {
-    const product = selectedProductForVariant;
-    if (!product) return;
+  const addVariantToCart = (variant: ProductVariant, product?: Product) => {
+    // Use provided product or fallback to selectedProductForVariant
+    const parentProduct = product || selectedProductForVariant;
+    if (!parentProduct) return;
 
     if ((variant.stockQuantity || 0) <= 0) {
       toast.error("Variant is out of stock");
@@ -192,7 +220,7 @@ const POSPage: React.FC = () => {
     }
 
     // Check if this specific variant is already in cart
-    const existingItem = cart.find((item) => item.product.id === product.id && item.variant?.id === variant.id);
+    const existingItem = cart.find((item) => item.product.id === parentProduct.id && item.variant?.id === variant.id);
 
     if (existingItem) {
       if (existingItem.quantity >= (variant.stockQuantity || 0)) {
@@ -202,7 +230,7 @@ const POSPage: React.FC = () => {
 
       setCart(
         cart.map((item) =>
-          item.product.id === product.id && item.variant?.id === variant.id
+          item.product.id === parentProduct.id && item.variant?.id === variant.id
             ? {
                 ...item,
                 quantity: item.quantity + 1,
@@ -213,7 +241,7 @@ const POSPage: React.FC = () => {
       );
     } else {
       const newItem: CartItem = {
-        product,
+        product: parentProduct,
         variant,
         quantity: 1,
         price: variant.sellingPrice,
@@ -222,7 +250,7 @@ const POSPage: React.FC = () => {
       setCart([...cart, newItem]);
     }
 
-    toast.success(`${product.name} - ${variant.name} added to cart`);
+    toast.success(`${parentProduct.name} - ${variant.name} added to cart`);
   };
 
   const updateCartItemQuantity = (productId: number, quantity: number, variantId?: number) => {

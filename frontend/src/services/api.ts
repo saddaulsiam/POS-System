@@ -76,6 +76,10 @@ api.interceptors.response.use(
       message: error.message,
     });
 
+    // Don't show toast for 404 on variant lookup (used for barcode scanning)
+    const isVariantLookup404 =
+      error.config?.url?.includes("/product-variants/lookup/") && error.response?.status === 404;
+
     if (error.response?.status === 401) {
       console.log("🚪 401 Unauthorized - Clearing auth data");
       localStorage.removeItem("token");
@@ -84,9 +88,10 @@ api.interceptors.response.use(
       toast.error("Session expired. Please log in again.");
     } else if (error.response?.status >= 500) {
       toast.error("Server error. Please try again later.");
-    } else if (error.response?.data?.error) {
+    } else if (error.response?.data?.error && !isVariantLookup404) {
+      // Show error toast unless it's a variant lookup 404
       toast.error(error.response.data.error);
-    } else if (error.message) {
+    } else if (error.message && !isVariantLookup404) {
       toast.error(error.message);
     }
     return Promise.reject(error);
