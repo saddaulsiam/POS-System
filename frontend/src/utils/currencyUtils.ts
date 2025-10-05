@@ -87,13 +87,16 @@ export const formatCurrencyWithSign = (
  * Parse a currency string back to a number
  * @param currencyString - The currency string to parse
  * @param settings - Currency settings
+/**
+ * Parse a currency string back to a number
+ * @param currencyString - The currency string to parse
  * @returns Numeric value
  *
  * @example
- * parseCurrency("$1,234.56", settings) // 1234.56
- * parseCurrency("৳1,234.56", settings) // 1234.56
+ * parseCurrency("$1,234.56") // 1234.56
+ * parseCurrency("৳1,234.56") // 1234.56
  */
-export const parseCurrency = (currencyString: string, settings?: CurrencySettings | null): number => {
+export const parseCurrency = (currencyString: string): number => {
   // Remove all non-numeric characters except decimal point and minus sign
   const cleanString = currencyString.replace(/[^0-9.-]/g, "");
   return parseFloat(cleanString) || 0;
