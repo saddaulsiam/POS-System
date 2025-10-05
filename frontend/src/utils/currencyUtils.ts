@@ -1,9 +1,12 @@
 /**
  * Currency formatting utilities
- * Uses POS Settings for currency symbol and position
+ * Uses POS Settings with full currency support (USD, BDT, etc.)
  */
 
+import { getCurrencyConfig, formatWithSymbol } from "../config/currencyConfig";
+
 interface CurrencySettings {
+  currencyCode?: string;
   currencySymbol?: string;
   currencyPosition?: string;
 }
@@ -11,20 +14,38 @@ interface CurrencySettings {
 /**
  * Format a number as currency using POS settings
  * @param amount - The numeric amount to format
- * @param settings - Currency settings (symbol and position)
- * @param decimals - Number of decimal places (default: 2)
+ * @param settings - Currency settings (with currencyCode preferred, or fallback to symbol/position)
+ * @param decimals - Number of decimal places (optional, uses currency config default)
  * @returns Formatted currency string
  *
  * @example
- * formatCurrency(100, { currencySymbol: "$", currencyPosition: "before" }) // "$100.00"
- * formatCurrency(100, { currencySymbol: "€", currencyPosition: "after" })  // "100.00€"
+ * formatCurrency(1234.56, { currencyCode: "USD" }) // "$1,234.56"
+ * formatCurrency(1234.56, { currencyCode: "BDT" }) // "৳1,234.56"
+ * formatCurrency(1234.56, { currencySymbol: "€", currencyPosition: "after" }) // "1,234.56€"
  */
-export const formatCurrency = (amount: number, settings?: CurrencySettings | null, decimals: number = 2): string => {
-  // Default to $ before if settings not available
+export const formatCurrency = (amount: number, settings?: CurrencySettings | null, decimals?: number): string => {
+  // If currencyCode is provided, use the currency configuration system
+  if (settings?.currencyCode) {
+    const config = getCurrencyConfig(settings.currencyCode);
+
+    // Override decimals if provided
+    if (decimals !== undefined) {
+      const customConfig = { ...config, decimals };
+      return formatWithSymbol(amount, customConfig);
+    }
+
+    return formatWithSymbol(amount, config);
+  }
+
+  // Fallback to legacy symbol/position format for backward compatibility
   const symbol = settings?.currencySymbol || "$";
   const position = settings?.currencyPosition || "before";
+  const decimalPlaces = decimals !== undefined ? decimals : 2;
 
-  const formattedAmount = amount.toFixed(decimals);
+  const formattedAmount = amount.toLocaleString("en-US", {
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces,
+  });
 
   if (position === "after") {
     return `${formattedAmount}${symbol}`;
@@ -41,17 +62,16 @@ export const formatCurrency = (amount: number, settings?: CurrencySettings | nul
  * @returns Formatted currency string with sign
  *
  * @example
- * formatCurrencyWithSign(-10, settings) // "-$10.00"
- * formatCurrencyWithSign(10, settings, true) // "+$10.00"
+ * formatCurrencyWithSign(-10, { currencyCode: "USD" }) // "-$10.00"
+ * formatCurrencyWithSign(10, { currencyCode: "BDT" }, true) // "+৳10.00"
  */
 export const formatCurrencyWithSign = (
   amount: number,
   settings?: CurrencySettings | null,
   showPositiveSign: boolean = false
 ): string => {
-  const symbol = settings?.currencySymbol || "$";
-  const position = settings?.currencyPosition || "before";
-  const absAmount = Math.abs(amount).toFixed(2);
+  const absAmount = Math.abs(amount);
+  let formattedAmount = formatCurrency(absAmount, settings);
 
   let sign = "";
   if (amount < 0) {
@@ -60,11 +80,7 @@ export const formatCurrencyWithSign = (
     sign = "+";
   }
 
-  if (position === "after") {
-    return `${sign}${absAmount}${symbol}`;
-  }
-
-  return `${sign}${symbol}${absAmount}`;
+  return sign + formattedAmount;
 };
 
 /**
@@ -74,14 +90,11 @@ export const formatCurrencyWithSign = (
  * @returns Numeric value
  *
  * @example
- * parseCurrency("$100.00", settings) // 100
- * parseCurrency("100.00€", settings) // 100
+ * parseCurrency("$1,234.56", settings) // 1234.56
+ * parseCurrency("৳1,234.56", settings) // 1234.56
  */
 export const parseCurrency = (currencyString: string, settings?: CurrencySettings | null): number => {
-  const symbol = settings?.currencySymbol || "$";
-
-  // Remove currency symbol and any whitespace
-  const cleanString = currencyString.replace(symbol, "").replace(/\s/g, "").trim();
-
+  // Remove all non-numeric characters except decimal point and minus sign
+  const cleanString = currencyString.replace(/[^0-9.-]/g, "");
   return parseFloat(cleanString) || 0;
 };

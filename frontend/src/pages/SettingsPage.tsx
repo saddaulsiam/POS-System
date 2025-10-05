@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { posSettingsAPI } from "../services/api";
 import { BackButton } from "../components/common";
+import { getCurrencyOptions, getCurrencyConfig } from "../config/currencyConfig";
 
 interface POSSettings {
   id: number;
@@ -22,6 +23,7 @@ interface POSSettings {
 
   // Currency & Tax
   taxRate: number;
+  currencyCode: string;
   currencySymbol: string;
   currencyPosition: string;
 
@@ -661,33 +663,73 @@ const SettingsPage: React.FC = () => {
               </div>
 
               <div>
-                <label htmlFor="currencySymbol" className="block text-sm font-medium text-gray-700 mb-2">
-                  Currency Symbol
-                </label>
-                <input
-                  type="text"
-                  id="currencySymbol"
-                  defaultValue={settings.currencySymbol}
-                  onBlur={(e) => handleTextFieldChange("currencySymbol", e)}
-                  disabled={saving}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="currencyPosition" className="block text-sm font-medium text-gray-700 mb-2">
-                  Currency Symbol Position
+                <label htmlFor="currencyCode" className="block text-sm font-medium text-gray-700 mb-2">
+                  Currency
                 </label>
                 <select
-                  id="currencyPosition"
-                  value={settings.currencyPosition}
-                  onChange={(e) => handleSelectChange("currencyPosition", e.target.value)}
+                  id="currencyCode"
+                  value={settings.currencyCode || "USD"}
+                  onChange={(e) => {
+                    const currencyCode = e.target.value;
+                    const config = getCurrencyConfig(currencyCode);
+
+                    // Update currency code and sync symbol/position
+                    handleSelectChange("currencyCode", currencyCode);
+                    handleSelectChange("currencySymbol", config.symbol);
+                    handleSelectChange("currencyPosition", config.symbolPosition);
+
+                    toast.success(`Currency changed to ${config.name}`);
+                  }}
                   disabled={saving}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                 >
-                  <option value="before">Before ($100)</option>
-                  <option value="after">After (100$)</option>
+                  {getCurrencyOptions().map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
+                <p className="text-sm text-gray-500 mt-1">
+                  Preview: {getCurrencyConfig(settings.currencyCode).symbol}1,234.56
+                  {getCurrencyConfig(settings.currencyCode).symbolPosition === "after" &&
+                    getCurrencyConfig(settings.currencyCode).symbol}
+                </p>
+              </div>
+
+              <div className="col-span-2">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="ml-3 flex-1">
+                      <h3 className="text-sm font-medium text-blue-800">Currency System</h3>
+                      <div className="mt-2 text-sm text-blue-700">
+                        <p>Select your preferred currency from the dropdown. Each currency includes:</p>
+                        <ul className="list-disc list-inside mt-1 space-y-1">
+                          <li>
+                            <strong>USD</strong> - US Dollar ($) with standard formatting
+                          </li>
+                          <li>
+                            <strong>BDT</strong> - Bangladeshi Taka (৳) with proper locale support
+                          </li>
+                          <li>
+                            <strong>EUR, GBP, INR, JPY</strong> - Additional currencies available
+                          </li>
+                        </ul>
+                        <p className="mt-2">
+                          The currency will be applied across all prices, reports, and receipts in the system.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

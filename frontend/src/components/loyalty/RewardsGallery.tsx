@@ -3,6 +3,8 @@ import { Gift, Star, ShoppingBag, Sparkles, X } from "lucide-react";
 import { loyaltyAPI } from "../../services/api";
 import toast from "react-hot-toast";
 import type { LoyaltyReward } from "../../types";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface RewardsGalleryProps {
   customerId: number;
@@ -16,6 +18,7 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({ customerId, customerPoi
   const [error, setError] = useState<string | null>(null);
   const [selectedReward, setSelectedReward] = useState<LoyaltyReward | null>(null);
   const [redeeming, setRedeeming] = useState(false);
+  const { settings } = useSettings();
 
   useEffect(() => {
     fetchRewards();
@@ -85,7 +88,7 @@ const RewardsGallery: React.FC<RewardsGalleryProps> = ({ customerId, customerPoi
     if (reward.rewardType === "DISCOUNT") {
       return `${reward.rewardValue}% OFF`;
     } else if (reward.rewardType === "STORE_CREDIT") {
-      return `$${reward.rewardValue.toFixed(2)} Credit`;
+      return `${formatCurrency(reward.rewardValue, settings)} Credit`;
     }
     return reward.description;
   };

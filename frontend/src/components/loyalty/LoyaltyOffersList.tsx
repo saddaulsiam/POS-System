@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Tag, Calendar, TrendingUp, X } from "lucide-react";
 import { loyaltyAPI } from "../../services/api";
 import type { LoyaltyOffer, LoyaltyTier } from "../../types";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface LoyaltyOffersListProps {
   customerTier?: LoyaltyTier;
@@ -12,6 +14,7 @@ const LoyaltyOffersList: React.FC<LoyaltyOffersListProps> = ({ customerTier }) =
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<LoyaltyOffer | null>(null);
+  const { settings } = useSettings();
 
   useEffect(() => {
     fetchOffers();
@@ -81,7 +84,7 @@ const LoyaltyOffersList: React.FC<LoyaltyOffersListProps> = ({ customerTier }) =
     if (offer.offerType === "PERCENTAGE") {
       return `${offer.discountValue}% OFF`;
     } else if (offer.offerType === "FIXED_AMOUNT") {
-      return `$${offer.discountValue.toFixed(2)} OFF`;
+      return `${formatCurrency(offer.discountValue, settings)} OFF`;
     }
     return offer.title;
   };
@@ -175,7 +178,7 @@ const LoyaltyOffersList: React.FC<LoyaltyOffersListProps> = ({ customerTier }) =
                           {offer.minimumPurchase && (
                             <div className="flex items-center gap-1">
                               <TrendingUp className="w-4 h-4" />
-                              <span>Min. purchase: ${offer.minimumPurchase.toFixed(2)}</span>
+                              <span>Min. purchase: {formatCurrency(offer.minimumPurchase, settings)}</span>
                             </div>
                           )}
 
@@ -242,7 +245,7 @@ const LoyaltyOffersList: React.FC<LoyaltyOffersListProps> = ({ customerTier }) =
                   <TrendingUp className="w-5 h-5 text-blue-500" />
                   <div>
                     <div className="font-medium">Minimum Purchase</div>
-                    <div className="text-gray-600">${selectedOffer.minimumPurchase.toFixed(2)}</div>
+                    <div className="text-gray-600">{formatCurrency(selectedOffer.minimumPurchase, settings)}</div>
                   </div>
                 </div>
               )}

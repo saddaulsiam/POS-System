@@ -18,6 +18,7 @@ interface POSSettings {
   taxId: string | null;
   // Tax & Currency
   taxRate: number;
+  currencyCode: string;
   currencySymbol: string;
   currencyPosition: string;
   // Receipt Settings
@@ -92,6 +93,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         storeEmail: "info@possystem.com",
         taxId: null,
         taxRate: 0,
+        currencyCode: "USD",
         currencySymbol: "$",
         currencyPosition: "before",
         receiptFooterText: null,

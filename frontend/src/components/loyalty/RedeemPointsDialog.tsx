@@ -3,6 +3,8 @@ import { Gift, AlertCircle, X } from "lucide-react";
 import { loyaltyAPI } from "../../services/api";
 import toast from "react-hot-toast";
 import type { RewardType } from "../../types";
+import { useSettings } from "../../context/SettingsContext";
+import { formatCurrency } from "../../utils/currencyUtils";
 
 interface RedeemPointsDialogProps {
   customerId: number;
@@ -35,6 +37,7 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
   const [selectedOption, setSelectedOption] = useState<RedemptionOption | null>(null);
   const [customPoints, setCustomPoints] = useState<string>("");
   const [redeeming, setRedeeming] = useState(false);
+  const { settings } = useSettings();
 
   if (!isOpen) return null;
 
@@ -110,7 +113,7 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
         rewardValue: discountValue,
         description: selectedOption
           ? selectedOption.label
-          : `Custom redemption: ${pointsToRedeem} points for $${discountValue.toFixed(2)}`,
+          : `Custom redemption: ${pointsToRedeem} points for ${formatCurrency(discountValue, settings)}`,
       });
 
       toast.success(`Successfully redeemed ${pointsToRedeem} points!`);
@@ -151,12 +154,12 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
               <div className="text-xs text-gray-600 mb-1">Available Points</div>
               <div className="text-2xl font-bold text-blue-600">{availablePoints.toLocaleString()}</div>
               <div className="text-xs text-gray-500 mt-1">
-                = ${calculateCustomDiscount(availablePoints).toFixed(2)} value
+                = {formatCurrency(calculateCustomDiscount(availablePoints), settings)} value
               </div>
             </div>
             <div className="bg-white rounded-lg p-4 border border-green-200">
               <div className="text-xs text-gray-600 mb-1">Cart Total</div>
-              <div className="text-2xl font-bold text-green-600">${cartTotal.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-green-600">{formatCurrency(cartTotal, settings)}</div>
               <div className="text-xs text-gray-500 mt-1">Current purchase amount</div>
             </div>
           </div>
@@ -233,7 +236,7 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
               {customPointsValue > 0 && (
                 <div className="mt-3 flex items-center justify-between text-sm">
                   <span className="text-gray-600">Discount Value:</span>
-                  <span className="font-bold text-green-600 text-lg">${customDiscount.toFixed(2)}</span>
+                  <span className="font-bold text-green-600 text-lg">{formatCurrency(customDiscount, settings)}</span>
                 </div>
               )}
               {customPointsValue > availablePoints && (

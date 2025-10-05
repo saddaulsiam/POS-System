@@ -1,13 +1,22 @@
+import { getCurrencyConfig, formatWithSymbol } from "../config/currencyConfig";
+
 /**
  * Format a number as currency using POS Settings
  * @param n - Number to format
- * @param settings - Optional POS settings object with currencySymbol and currencyPosition
- * @returns Formatted currency string (e.g., "$1,234.56" or "1,234.56€")
+ * @param settings - Optional POS settings object with currencyCode or currencySymbol/currencyPosition
+ * @returns Formatted currency string (e.g., "$1,234.56", "৳1,234.56", or "1,234.56€")
  */
 export const formatCurrency = (
   n: number,
-  settings?: { currencySymbol?: string; currencyPosition?: string }
+  settings?: { currencyCode?: string; currencySymbol?: string; currencyPosition?: string }
 ): string => {
+  // If currencyCode is provided, use the currency configuration system
+  if (settings?.currencyCode) {
+    const config = getCurrencyConfig(settings.currencyCode);
+    return formatWithSymbol(n, config);
+  }
+
+  // Fallback to legacy symbol/position format for backward compatibility
   const symbol = settings?.currencySymbol || "$";
   const position = settings?.currencyPosition || "before";
   const formatted = n.toLocaleString(undefined, { minimumFractionDigits: 2 });
