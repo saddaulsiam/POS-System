@@ -69,14 +69,27 @@ export const SaleDetailsModal: React.FC<SaleDetailsModalProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {(sale.saleItems ?? []).map((item: any) => (
-                    <tr key={item.id}>
-                      <td className="px-4 py-2 text-sm text-gray-900">{item.product?.name || "Unknown Product"}</td>
-                      <td className="px-4 py-2 text-sm text-gray-900">{item.quantity}</td>
-                      <td className="px-4 py-2 text-sm text-gray-900">{formatCurrency(item.priceAtSale, settings)}</td>
-                      <td className="px-4 py-2 text-sm text-gray-900">{formatCurrency(item.subtotal, settings)}</td>
-                    </tr>
-                  ))}
+                  {(sale.saleItems ?? []).map((item: any) => {
+                    const productName = item.product?.name || "Unknown Product";
+                    const variantName = item.productVariant?.name;
+                    const displayName = variantName ? `${productName} - ${variantName}` : productName;
+
+                    return (
+                      <tr key={item.id}>
+                        <td className="px-4 py-2 text-sm text-gray-900">
+                          {displayName}
+                          {item.productVariant && (
+                            <div className="text-xs text-gray-500">SKU: {item.productVariant.sku}</div>
+                          )}
+                        </td>
+                        <td className="px-4 py-2 text-sm text-gray-900">{item.quantity}</td>
+                        <td className="px-4 py-2 text-sm text-gray-900">
+                          {formatCurrency(item.priceAtSale, settings)}
+                        </td>
+                        <td className="px-4 py-2 text-sm text-gray-900">{formatCurrency(item.subtotal, settings)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
