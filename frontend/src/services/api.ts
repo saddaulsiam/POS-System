@@ -443,6 +443,18 @@ export const salesAPI = {
   void: async (id: number, reason?: string): Promise<void> => {
     await api.post(`/sales/${id}/void`, { reason });
   },
+
+  voidSale: async (
+    id: number,
+    data: {
+      reason: string;
+      password?: string;
+      restoreStock?: boolean;
+    }
+  ): Promise<{ message: string; sale: Sale }> => {
+    const response = await api.post(`/sales/${id}/void`, data);
+    return response.data;
+  },
 };
 
 // Employees API
@@ -600,6 +612,79 @@ export const inventoryAPI = {
     }>;
   }) => {
     const response = await api.post("/inventory/receive-po", data);
+    return response.data;
+  },
+
+  // Purchase Orders CRUD
+  getAllPurchaseOrders: async (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    supplierId?: number;
+    startDate?: string;
+    endDate?: string;
+  }) => {
+    const response = await api.get("/inventory/purchase-orders", { params });
+    return response.data;
+  },
+
+  getPurchaseOrderById: async (id: number) => {
+    const response = await api.get(`/inventory/purchase-orders/${id}`);
+    return response.data;
+  },
+
+  createPurchaseOrder: async (data: {
+    supplierId: number;
+    orderDate: string;
+    expectedDate?: string;
+    items: Array<{
+      productId: number;
+      variantId?: number;
+      quantity: number;
+      unitPrice: number;
+    }>;
+    notes?: string;
+  }) => {
+    const response = await api.post("/inventory/purchase-orders", data);
+    return response.data;
+  },
+
+  updatePurchaseOrder: async (
+    id: number,
+    data: {
+      supplierId?: number;
+      orderDate?: string;
+      expectedDate?: string;
+      notes?: string;
+      items?: Array<{
+        productId: number;
+        quantity: number;
+        unitPrice: number;
+      }>;
+    }
+  ) => {
+    const response = await api.put(`/inventory/purchase-orders/${id}`, data);
+    return response.data;
+  },
+
+  receiveItems: async (
+    id: number,
+    items: Array<{
+      itemId: number;
+      receivedQuantity: number;
+    }>
+  ) => {
+    const response = await api.post(`/inventory/purchase-orders/${id}/receive`, { items });
+    return response.data;
+  },
+
+  cancelPurchaseOrder: async (id: number) => {
+    const response = await api.delete(`/inventory/purchase-orders/${id}`);
+    return response.data;
+  },
+
+  getPurchaseOrderStats: async (params?: { startDate?: string; endDate?: string; supplierId?: number }) => {
+    const response = await api.get("/inventory/purchase-orders/stats/summary", { params });
     return response.data;
   },
 };
@@ -927,6 +1012,58 @@ export const posSettingsAPI = {
     receiptFooterText?: string;
   }) => {
     const response = await api.put("/pos-settings", settings);
+    return response.data;
+  },
+};
+
+// Cash Drawer API
+export const cashDrawerAPI = {
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    employeeId?: number;
+    startDate?: string;
+    endDate?: string;
+  }) => {
+    const response = await api.get("/cash-drawer", { params });
+    return response.data;
+  },
+
+  getCurrent: async () => {
+    const response = await api.get("/cash-drawer/current");
+    return response.data;
+  },
+
+  getById: async (id: number) => {
+    const response = await api.get(`/cash-drawer/${id}`);
+    return response.data;
+  },
+
+  getReconciliation: async (id: number) => {
+    const response = await api.get(`/cash-drawer/${id}/reconciliation`);
+    return response.data;
+  },
+
+  open: async (data: { openingBalance: number }) => {
+    const response = await api.post("/cash-drawer/open", data);
+    return response.data;
+  },
+
+  close: async (
+    id: number,
+    data: {
+      closingBalance: number;
+      actualCash?: number;
+      notes?: string;
+    }
+  ) => {
+    const response = await api.post(`/cash-drawer/close/${id}`, data);
+    return response.data;
+  },
+
+  getStats: async (params?: { startDate?: string; endDate?: string; employeeId?: number }) => {
+    const response = await api.get("/cash-drawer/stats/summary", { params });
     return response.data;
   },
 };

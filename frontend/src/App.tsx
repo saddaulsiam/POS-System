@@ -23,6 +23,8 @@ import SuppliersPage from "./pages/SuppliersPage";
 import LoyaltyAdminPage from "./pages/LoyaltyAdminPage";
 import SettingsPage from "./pages/SettingsPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
+import CashDrawerPage from "./pages/CashDrawerPage";
+import PurchaseOrdersPage from "./pages/PurchaseOrdersPage";
 
 const adminPaths = [
   "/admin",
@@ -39,6 +41,8 @@ const adminPaths = [
   "/audit-logs",
   "/loyalty-admin",
   "/settings",
+  "/purchase-orders",
+  "/cash-drawer",
 ];
 
 const App: React.FC = () => {
@@ -93,6 +97,8 @@ const App: React.FC = () => {
                 <Route path="/audit-logs" element={<AuditLogsPage />} />
                 <Route path="/loyalty-admin" element={<LoyaltyAdminPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/cash-drawer" element={<CashDrawerPage />} />
+                <Route path="/purchase-orders" element={<PurchaseOrdersPage />} />
               </>
             )}
 

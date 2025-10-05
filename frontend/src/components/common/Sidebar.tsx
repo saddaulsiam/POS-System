@@ -9,6 +9,8 @@ const navLinks = [
   { to: "/categories", label: "Categories", icon: "🗂️", roles: ["ADMIN", "MANAGER"] },
   { to: "/suppliers", label: "Suppliers", icon: "🏪", roles: ["ADMIN", "MANAGER"] },
   { to: "/inventory", label: "Inventory", icon: "📋", roles: ["ADMIN", "MANAGER", "STAFF"] },
+  { to: "/purchase-orders", label: "Purchase Orders", icon: "📋", roles: ["ADMIN", "MANAGER"] },
+  { to: "/cash-drawer", label: "Cash Drawer", icon: "💵", roles: ["ADMIN", "MANAGER", "CASHIER"] },
   { to: "/sales", label: "Sales", icon: "💰", roles: ["ADMIN", "MANAGER", "CASHIER"] },
   { to: "/reports", label: "Reports", icon: "📊", roles: ["ADMIN", "MANAGER"] },
   { to: "/analytics", label: "Analytics", icon: "📈", roles: ["ADMIN", "MANAGER"] },

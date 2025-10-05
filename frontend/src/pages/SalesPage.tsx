@@ -2,19 +2,26 @@ import React, { useState, useEffect } from "react";
 import { salesAPI, customersAPI, employeesAPI } from "../services/api";
 import { Sale, Customer, Employee } from "../types";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
+import { useSettings } from "../context/SettingsContext";
 import { SalesFilters } from "../components/sales/SalesFilters";
 import { SalesTable } from "../components/sales/SalesTable";
 import { SaleDetailsModal } from "../components/sales/SaleDetailsModal";
+import { VoidSaleModal } from "../components/sales/VoidSaleModal";
 import { Pagination } from "../components/sales/Pagination";
 import { getCustomerName, getEmployeeName } from "../utils/salesUtils";
 
 const SalesPage: React.FC = () => {
+  const { user } = useAuth();
+  const { settings } = useSettings();
   const [sales, setSales] = useState<Sale[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [showVoidModal, setShowVoidModal] = useState(false);
+  const [voidLoading, setVoidLoading] = useState(false);
 
   // Filters
   const [dateFrom, setDateFrom] = useState("");
@@ -107,6 +114,29 @@ const SalesPage: React.FC = () => {
     }
   };
 
+  const handleVoidSale = (sale: Sale) => {
+    setSelectedSale(sale);
+    setShowVoidModal(true);
+  };
+
+  const handleVoidConfirm = async (reason: string, password: string, restoreStock: boolean) => {
+    if (!selectedSale) return;
+
+    try {
+      setVoidLoading(true);
+      await salesAPI.voidSale(selectedSale.id, { reason, password, restoreStock });
+      toast.success(`Sale #${selectedSale.receiptId} has been voided`);
+      setShowVoidModal(false);
+      setSelectedSale(null);
+      loadSales();
+    } catch (error: any) {
+      console.error("Error voiding sale:", error);
+      toast.error(error?.response?.data?.error || "Failed to void sale");
+    } finally {
+      setVoidLoading(false);
+    }
+  };
+
   const clearFilters = () => {
     setDateFrom("");
     setDateTo("");
@@ -143,6 +173,8 @@ const SalesPage: React.FC = () => {
             isLoading={isLoading}
             onViewDetails={handleViewDetails}
             onRefund={handleRefund}
+            onVoid={handleVoidSale}
+            userRole={user?.role}
             getCustomerName={(customerId) => getCustomerName(customerId, customers)}
             getEmployeeName={(employeeId) => getEmployeeName(employeeId, employees)}
           />
@@ -159,6 +191,19 @@ const SalesPage: React.FC = () => {
         onClose={() => setShowDetails(false)}
         getCustomerName={(customerId) => getCustomerName(customerId, customers)}
         getEmployeeName={(employeeId) => getEmployeeName(employeeId, employees)}
+      />
+
+      {/* Void Sale Modal */}
+      <VoidSaleModal
+        sale={selectedSale}
+        isOpen={showVoidModal}
+        onClose={() => {
+          setShowVoidModal(false);
+          setSelectedSale(null);
+        }}
+        onConfirm={handleVoidConfirm}
+        requirePassword={settings?.requirePasswordOnVoid || false}
+        isLoading={voidLoading}
       />
     </div>
   );

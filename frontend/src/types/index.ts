@@ -117,6 +117,7 @@ export interface Sale {
   finalAmount: number;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
+  status?: string;
   cashReceived?: number;
   changeGiven?: number;
   notes?: string;

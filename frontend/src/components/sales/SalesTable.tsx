@@ -10,6 +10,8 @@ interface SalesTableProps {
   isLoading: boolean;
   onViewDetails: (sale: Sale) => void;
   onRefund: (sale: Sale) => void;
+  onVoid?: (sale: Sale) => void;
+  userRole?: string;
   getCustomerName: (customerId?: number) => string;
   getEmployeeName: (employeeId: number) => string;
 }
@@ -19,6 +21,8 @@ export const SalesTable: React.FC<SalesTableProps> = ({
   isLoading,
   onViewDetails,
   onRefund,
+  onVoid,
+  userRole,
   getCustomerName,
   getEmployeeName,
 }) => {
@@ -102,11 +106,17 @@ export const SalesTable: React.FC<SalesTableProps> = ({
                   <button onClick={() => onViewDetails(sale)} className="text-blue-600 hover:text-blue-900 mr-4">
                     View
                   </button>
-                  {sale.paymentStatus === "COMPLETED" && (
-                    <button onClick={() => onRefund(sale)} className="text-red-600 hover:text-red-900">
+                  {sale.paymentStatus === "COMPLETED" && sale.status !== "VOIDED" && (
+                    <button onClick={() => onRefund(sale)} className="text-orange-600 hover:text-orange-900 mr-4">
                       Refund
                     </button>
                   )}
+                  {sale.status !== "VOIDED" && (userRole === "ADMIN" || userRole === "MANAGER") && onVoid && (
+                    <button onClick={() => onVoid(sale)} className="text-red-600 hover:text-red-900">
+                      Void
+                    </button>
+                  )}
+                  {sale.status === "VOIDED" && <span className="text-red-500 font-medium">VOIDED</span>}
                 </td>
               </tr>
             ))
