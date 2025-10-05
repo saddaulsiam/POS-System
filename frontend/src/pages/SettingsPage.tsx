@@ -34,6 +34,7 @@ interface POSSettings {
   returnPolicy: string | null;
   printReceiptAuto: boolean;
   emailReceiptAuto: boolean;
+  autoPrintThermal: boolean;
 
   // Alerts & Notifications
   enableLowStockAlerts: boolean;
@@ -598,6 +599,48 @@ const SettingsPage: React.FC = () => {
                     />
                   </button>
                 </div>
+
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Auto-Print Thermal Receipt</h4>
+                    <p className="text-sm text-gray-500">Automatically print thermal receipt after sale</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggle("autoPrintThermal", !settings.autoPrintThermal)}
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.autoPrintThermal ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.autoPrintThermal ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-yellow-800">
+                  <strong>Which option should I enable?</strong>
+                  <br />
+                  <ul className="list-disc list-inside mt-1 mb-1">
+                    <li>
+                      <strong>Auto-Print Receipt</strong>: Enable if you use a regular (A4/Letter) printer for full-page
+                      receipts.
+                    </li>
+                    <li>
+                      <strong>Auto-Print Thermal Receipt</strong>: Enable if you use a thermal receipt printer
+                      (80mm/58mm) for narrow, text-based receipts.
+                    </li>
+                    <li>
+                      <strong>Both</strong>: Enable both only if you want both receipts to print automatically after
+                      each sale.
+                    </li>
+                  </ul>
+                  Most users only need to enable the one that matches their printer.
+                </p>
               </div>
 
               {/* Receipt Footer */}
@@ -1087,28 +1130,10 @@ const SettingsPage: React.FC = () => {
                       {/* When to disable */}
                       <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                         <h3 className="text-lg font-semibold text-orange-900 flex items-center gap-2 mb-2">
-                          <span>⚠️</span>
+                          <span>❌</span>
                           When to Disable
                         </h3>
                         <p className="text-orange-800">{feature.detailedInfo.whenToDisable}</p>
-                      </div>
-
-                      {/* Current Status */}
-                      <div
-                        className={`border-2 rounded-lg p-4 ${
-                          settings[feature.key] ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-gray-300"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-lg font-semibold text-gray-900">Current Status</h3>
-                          <span
-                            className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              settings[feature.key] ? "bg-green-100 text-green-800" : "bg-gray-200 text-gray-700"
-                            }`}
-                          >
-                            {settings[feature.key] ? "✓ Enabled" : "✗ Disabled"}
-                          </span>
-                        </div>
                       </div>
                     </div>
 

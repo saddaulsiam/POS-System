@@ -926,6 +926,13 @@ export const receiptsAPI = {
     return response.data;
   },
 
+  getHTML: async (saleId: number): Promise<string> => {
+    const response = await api.get(`/receipts/${saleId}/html`, {
+      responseType: "text",
+    });
+    return response.data;
+  },
+
   send: async (data: { saleId: number; customerEmail: string; customerName?: string; includePDF?: boolean }) => {
     const response = await api.post("/receipts/send", data);
     return response.data;
@@ -958,6 +965,13 @@ export const receiptsAPI = {
     returnPolicy?: string;
   }) => {
     const response = await api.put("/receipts/store-settings", data);
+    return response.data;
+  },
+
+  getThermal: async (saleId: number): Promise<string> => {
+    const response = await api.get(`/receipts/${saleId}/thermal`, {
+      responseType: "text",
+    });
     return response.data;
   },
 };
@@ -1011,6 +1025,11 @@ export const posSettingsAPI = {
     taxRate?: number;
     receiptFooterText?: string;
   }) => {
+    const response = await api.put("/pos-settings", settings);
+    return response.data;
+  },
+
+  updatePOSSettings: async (settings: any) => {
     const response = await api.put("/pos-settings", settings);
     return response.data;
   },

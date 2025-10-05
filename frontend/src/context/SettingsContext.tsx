@@ -40,6 +40,8 @@ interface POSSettings {
   productsPerPage: number;
   defaultView: string;
   showProductImages: boolean;
+  // Add new setting for auto thermal print
+  autoPrintThermal?: boolean;
   // Metadata
   updatedAt: string;
   updatedBy: number | null;
@@ -121,6 +123,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         productsPerPage: 20,
         defaultView: "grid",
         showProductImages: true,
+        autoPrintThermal: false,
         updatedAt: new Date().toISOString(),
         updatedBy: null,
       });
