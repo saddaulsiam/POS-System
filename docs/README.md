@@ -1,464 +1,605 @@
-# 📚 POS System Documentation# 📚 POS System Documentation
+# 📚 POS System - User Guide# 📚 POS System Documentation
 
-Welcome to the comprehensive documentation for the Grocery Store POS System.Welcome to the POS System documentation
-directory. All project documentation has been organized here for easy access and
+Complete guide for using the Grocery Store POS System.Welcome to the comprehensive documentation for the Grocery Store
+POS System.
 
-maintenance.
+---**Last Updated:** October 5, 2025
 
-**Last Updated:** October 5, 2025
+**Status:** Production Ready ✅
 
-**Status:** Production Ready ✅## 📖 Quick Navigation
+## 🚀 Quick Start
 
----### Getting Started
+---
 
-## 🗂️ Documentation Structure- **[PROJECT_COMPLETE_SUMMARY.md](./PROJECT_COMPLETE_SUMMARY.md)** - Complete overview of the entire project
+### Installation
 
-- **[PROJECT_STATUS_REPORT.md](./PROJECT_STATUS_REPORT.md)** - Current project status and progress
+## 🚀 Essential Documentation
 
-```- **[BACKEND_COMPLETE_SUMMARY.md](./BACKEND_COMPLETE_SUMMARY.md)** - Backend architecture and implementation details
+````bash
 
-docs/
+# 1. Clone and installStart here for quick access to everything you need:
 
-├── README.md                           ⭐ You are here### API Documentation
+git clone https://github.com/saddaulsiam/POS-System.git
 
-├── core-docs/                          📘 Core System Documentation
+cd POS-System### 📖 Core Guides
 
-├── features/                           📗 Feature Guides- **[API_ENDPOINTS_GUIDE.md](./API_ENDPOINTS_GUIDE.md)** - Complete API reference with examples
+npm install
 
-├── future-features/                    📙 Future Development Plans- **[API_TESTING_GUIDE.md](./API_TESTING_GUIDE.md)** - How to test API endpoints
+npm run install:all1. **[QUICK_START.md](./QUICK_START.md)** - 🏁 Get up and running in 5 minutes
 
-├── recent-updates/                     📕 Recent Changes & Fixes- **[INTEGRATION_TESTING_GUIDE.md](./INTEGRATION_TESTING_GUIDE.md)** - Integration testing strategies
+   - Installation steps
 
-├── operations/                         🔧 Operational Guides
+# 2. Setup database   - First-time setup
 
-└── archive/                            📦 Historical Development Docs### Feature Documentation
+npm run db:migrate   - Default credentials
 
+npm run db:seed   - Common commands
+
+
+
+# 3. Start the system2. **[FEATURES.md](./FEATURES.md)** - ⭐ Complete feature guide
+
+npm run dev   - POS System
+
+```   - Inventory Management
+
+   - Customer Management
+
+### Access the System   - Loyalty Program
+
+   - Analytics & Reports
+
+- **Frontend:** http://localhost:3000
+
+- **Backend API:** http://localhost:50003. **[API_REFERENCE.md](./API_REFERENCE.md)** - 🌐 Complete API documentation
+
+- **Database Studio:** http://localhost:5555 (run `npm run db:studio`)   - All endpoints
+
+   - Request/response examples
+
+### Default Login   - Authentication
+
+   - Error handling
+
+**Admin:**
+
+- Username: `admin`4. **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - 🔧 Common issues & solutions
+
+- PIN: `1234`   - Installation problems
+
+   - Database issues
+
+**Cashier:**   - API errors
+
+- Username: `cashier`   - UI bugs
+
+- PIN: `5678`
+
+5. **[CHANGELOG.md](./CHANGELOG.md)** - 📝 Recent updates
+
+---   - Latest changes
+
+   - Bug fixes
+
+## 💡 How to Use   - New features
+
+   - Version history
+
+### For Cashiers - POS Interface
+
+---
+
+1. **Login** at http://localhost:3000
+
+   - Enter username and PIN## 📁 Documentation Structure
+
+
+
+2. **Process a Sale:**```
+
+   - Search products (by name or scan barcode)docs/
+
+   - Click products to add to cart├── README.md              ⭐ You are here
+
+   - Adjust quantities if needed├── QUICK_START.md         🏁 Setup guide
+
+   - Select customer (optional - for loyalty points)├── API_REFERENCE.md       🌐 API documentation
+
+   - Choose payment method (Cash/Card/Mobile)├── FEATURES.md            ⭐ Feature guide
+
+   - Enter amount paid├── TROUBLESHOOTING.md     🔧 Common issues
+
+   - Click "Complete Sale"├── CHANGELOG.md           📝 Updates
+
+   - Print receipt├── CLEANUP_SUMMARY.md     📊 Cleanup report
+
+└── archive/               📦 Archived docs
+
+3. **Customer Lookup:**    ├── INDEX.md
+
+   - Click "Add Customer" button    ├── old-docs/          Previous documentation
+
+   - Search by name or phone    └── fixes-history/     Historical fixes
+
+   - Select customer to apply loyalty benefits```
+
+
+
+### For Managers/Admin - Dashboard---
+
+
+
+1. **Login** at http://localhost:3000/admin## 🎯 Quick Links by Role
+
+   - Use admin credentials
+
+### 👨‍💻 Developers
+
+2. **Main Dashboard:**- Start with **[QUICK_START.md](./QUICK_START.md)** for setup
+
+   - View today's sales- Read **[API_REFERENCE.md](./API_REFERENCE.md)** for backend
+
+   - See customer count- Check **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** for issues
+
+   - Monitor inventory status
+
+   - Check top products### 👥 End Users
+
+- Read **[FEATURES.md](./FEATURES.md)** to learn features
+
+3. **Product Management:**- Check **[CHANGELOG.md](./CHANGELOG.md)** for updates
+
+   - Admin → Products
+
+   - Add/Edit/Delete products### 🏢 Business Owners
+
+   - Set prices and stock levels- Review **[FEATURES.md](./FEATURES.md)** for capabilities
+
+   - Upload product images- See **[CHANGELOG.md](./CHANGELOG.md)** for improvements
+
+   - Assign categories
+
+---
+
+4. **Customer Management:**
+
+   - Admin → Customers## 📦 Archived Documentation
+
+   - Add/Edit customer profiles
+
+   - View purchase historyPrevious documentation (110+ files) has been archived to `archive/` folder:
+
+   - Manage loyalty points
+
+   - Track birthday rewards- **[archive/INDEX.md](./archive/INDEX.md)** - Archive navigation
+
+- **archive/old-docs/** - Previous organization structure
+
+5. **Inventory:**- **archive/fixes-history/** - Historical bug fixes and updates
+
+   - Admin → Inventory
+
+   - View stock levelsTo access archived content, see the archive folder or restore from backup: `docs-backup-20251005-175013/`
+
+   - Adjust stock (add/remove)
+
+   - Set low stock alerts---
+
+   - Track inventory value
+
+## 🔍 Finding Information
+
+6. **Reports:**
+
+   - Admin → Reports/Analytics### By Topic
+
+   - Daily sales reports
+
+   - Employee performance| Topic | Document |
+
+   - Product performance|-------|----------|
+
+   - Date range reports| Installation | [QUICK_START.md](./QUICK_START.md) |
+
+   - Export to CSV| API Endpoints | [API_REFERENCE.md](./API_REFERENCE.md) |
+
+| Features | [FEATURES.md](./FEATURES.md) |
+
+7. **Settings:**| Problems | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) |
+
+   - Admin → Settings| Updates | [CHANGELOG.md](./CHANGELOG.md) |
+
+   - Currency settings| Loyalty Program | [FEATURES.md#loyalty-program](./FEATURES.md#loyalty-program) |
+
+   - Tax configuration| Product Variants | [FEATURES.md#product-variants](./FEATURES.md#product-variants) |
+
+   - Store information| Currency System | [FEATURES.md#currency-system](./FEATURES.md#currency-system) |
+
+   - Loyalty program settings
+
+---
+
+---
+
+## 📊 Cleanup Summary
+
+## ⭐ Key Features
+
+**Cleanup Date:** October 5, 2025
+
+### 1. POS System
+
+- Fast checkout process- **Files Archived:** 110+
+
+- Barcode scanning support- **Folders Archived:** 5
+
+- Multiple payment methods (Cash, Card, Mobile, Loyalty Points)- **Files Remaining:** 6 essential guides
+
+- Receipt printing- **Backup Location:** `docs-backup-20251005-175013/`
+
+- Customer lookup during checkout
+
+- Real-time inventory updates**Benefits:**
+
+- 🎯 Simpler navigation (6 files vs 110+)
+
+### 2. Product Management- 📖 Easier to find information
+
+- Unlimited products- 🔍 Less duplication
+
+- Product categories- 👥 Better for new users
+
+- Product images
+
+- Price and cost tracking---
+
+- Stock management
+
+- Barcode support## 🚀 Quick Start
+
+- **Product Variants** - Different sizes, colors, flavors per product
+
+```bash
+
+### 3. Customer Management# Clone repository
+
+- Customer profiles (name, phone, email, birthday)git clone https://github.com/saddaulsiam/POS-System.git
+
+- Purchase historycd POS-System
+
+- Loyalty points tracking
+
+- Quick search# Install dependencies
+
+- Birthday field for rewardsnpm install
+
+npm run install:all
+
+### 4. Loyalty Program
+
+- **3 Tiers:** Bronze, Silver, Gold# Setup database
+
+  - Bronze (0-499 points): 1x multipliernpm run db:migrate
+
+  - Silver (500-999 points): 1.2x multipliernpm run db:seed
+
+  - Gold (1000+ points): 1.5x multiplier
+
+- Earn points on every purchase# Start development servers
+
+- Redeem points for discountsnpm run dev
+
+- Automatic tier upgrades```
+
+- Configurable point rates
+
+**Access the app:**
+
+### 5. Birthday Rewards- Frontend: http://localhost:3000
+
+- Automatic daily check for customer birthdays- Backend: http://localhost:5000
+
+- Auto-award bonus points on birthdays- Admin login: `admin` / `1234`
+
+- Email notifications
+
+- Birthday badge shown to cashiers (🎂)**For detailed setup, see [QUICK_START.md](./QUICK_START.md)**
+
+- Configurable reward amount
+
+---
+
+### 6. Inventory Tracking
+
+- Real-time stock updates## 📚 Documentation Index
+
+- Low stock alerts
+
+- Stock adjustment history### Core Documentation
+
+- Inventory value reporting- [README.md](./README.md) - This file
+
+- Out of stock tracking- [QUICK_START.md](./QUICK_START.md) - Installation & setup
+
+- [API_REFERENCE.md](./API_REFERENCE.md) - API documentation
+
+### 7. Reports & Analytics- [FEATURES.md](./FEATURES.md) - Features guide
+
+- **Daily Sales:** Today's performance- [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Common issues
+
+- **Sales Range:** Custom date periods- [CHANGELOG.md](./CHANGELOG.md) - Recent updates
+
+- **Employee Performance:** Sales by cashier
+
+- **Product Performance:** Best sellers### Administrative
+
+- **Inventory Reports:** Stock value and levels- [CLEANUP_SUMMARY.md](./CLEANUP_SUMMARY.md) - Documentation cleanup report
+
+- Interactive charts and graphs
+
+- Export to CSV/Excel### Archived
+
+- [archive/](./archive/) - Previous documentation (110+ files)
+
+### 8. Multi-Currency Support  - [archive/INDEX.md](./archive/INDEX.md) - Archive navigation
+
+- Support for USD, BDT, EUR, GBP, etc.  - [archive/old-docs/](./archive/old-docs/) - Old structure
+
+- Custom currency symbols (৳, $, €, £)  - [archive/fixes-history/](./archive/fixes-history/) - Historical fixes
+
+- Symbol position (before/after)
+
+- Configurable decimal places---
+
+- English numerals (0-9) always used
+
+## 🆘 Getting Help
+
+### 9. User Management
+
+- **Roles:** Admin, Manager, Cashier### Find Answers
+
+- **Admin:** Full access
+
+- **Manager:** Reports and inventory (no user management)1. **Check [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** for common issues
+
+- **Cashier:** Sales and customer lookup only2. **Search this documentation** for your topic
+
+- PIN-based login for fast access3. **Check archived docs** if looking for historical information
+
+- Session management4. **Create a GitHub issue** for bugs or feature requests
+
+
+
+### 10. Hardware Integration### Documentation Tips
+
+- USB/Bluetooth barcode scanners
+
+- Thermal receipt printers- Use Ctrl+F to search within documents
+
+- Electronic scales (for weighted items)- Check the table of contents in each guide
+
+- Cash drawers- Related documents are linked at the bottom of each page
+
+- Card payment terminals- Archive contains detailed historical documentation
+
+
+
+------
+
+
+
+## 🎯 Common Tasks## 🔄 Maintenance
+
+
+
+### Add a New Product### Keeping Documentation Updated
+
+1. Admin → Products → "Add Product"
+
+2. Enter name, barcode, price, cost- **Add to CHANGELOG.md** when making changes
+
+3. Set stock quantity- **Update FEATURES.md** for new features
+
+4. Choose category- **Update API_REFERENCE.md** for API changes
+
+5. Upload image (optional)- **Update TROUBLESHOOTING.md** for new issues/solutions
+
+6. Set low stock threshold
+
+7. Click "Save"### Backup
+
+
+
+### Process a Return/RefundOriginal documentation backup: `docs-backup-20251005-175013/`
+
+1. Admin → Sales
+
+2. Find the sale---
+
+3. Click "Refund"
+
+4. Select items to return## 📝 Contributing
+
+5. Choose refund method
+
+6. Confirm refundWhen adding documentation:
+
+
+
+### Add a Customer1. Use clear, concise language
+
+1. POS or Admin → Customers → "Add Customer"2. Include code examples where helpful
+
+2. Enter name (required)3. Add to the appropriate core document
+
+3. Add phone, email, birthday (optional)4. Update this README if adding new sections
+
+4. Click "Save"5. Keep formatting consistent
+
+5. Customer gets loyalty account automatically
+
+---
+
+### Award Loyalty Points Manually
+
+1. Admin → Customers## ✨ Recent Changes
+
+2. Find customer
+
+3. Click "Adjust Points"**October 5, 2025:**
+
+4. Enter points to add/remove- ✅ Cleaned up documentation structure
+
+5. Add reason- ✅ Created 5 essential core guides
+
+6. Click "Save"- ✅ Archived 110+ previous docs
+
+- ✅ Improved navigation and findability
+
+### View Reports
+
+1. Admin → Analytics or ReportsFor full change history, see [CHANGELOG.md](./CHANGELOG.md)
+
+2. Select date range
+
+3. View charts and tables---
+
+4. Click "Export" for CSV
+
+**Happy coding! 🚀**
+
+### Change Currency
+
+1. Admin → SettingsFor questions or issues, please create a GitHub issue.
+
+2. Select currency from dropdown
+3. Choose symbol position
+4. Set decimal places
+5. Click "Save"
+6. All prices update automatically
+
+### Configure Birthday Rewards
+1. Admin → Settings → Loyalty
+2. Enable birthday rewards
+3. Set reward points amount (default: 500)
+4. Configure email template
+5. Scheduler runs automatically at midnight
+
+---
+
+## 🔧 Troubleshooting
+
+### Can't Login
+- Check username and PIN are correct
+- Default admin: `admin` / `1234`
+- Default cashier: `cashier` / `5678`
+- Reset database if needed: `npm run db:reset`
+
+### Products Not Showing
+- Check if products exist: `npm run db:studio`
+- Reseed database: `npm run db:seed`
+- Check backend is running on port 5000
+
+### Port Already in Use
+```bash
+# Kill port 3000 or 5000
+npx kill-port 3000
+npx kill-port 5000
+````
+
+### Database Issues
+
+```bash
+# Reset database (deletes all data!)
+npm run db:reset
+
+# Or just migrate
+npm run db:migrate
 ```
 
-#### Core Features
+### Frontend Not Connecting to Backend
+
+1. Make sure backend is running (port 5000)
+2. Check browser console (F12) for errors
+3. Verify `backend/.env` has correct settings
+
+### Barcode Scanner Not Working
+
+1. Test scanner in notepad first
+2. Scanner should be in keyboard emulation mode
+3. Check USB connection
+4. Ensure scanner sends Enter after barcode
 
 ---
 
-- **[OPTION_1_ENHANCED_PRODUCT_MANAGEMENT.md](./OPTION_1_ENHANCED_PRODUCT_MANAGEMENT.md)** - Product management features
+## 🛠️ Maintenance
 
-## 📘 Core System Documentation- **[OPTION_2_ADVANCED_POS_FEATURES.md](./OPTION_2_ADVANCED_POS_FEATURES.md)** - Advanced POS functionality
+### Database Commands
 
-- **[OPTION_6_RECEIPT_AND_PRINTING.md](./OPTION_6_RECEIPT_AND_PRINTING.md)** - Receipt generation and printing
+```bash
+npm run db:studio      # Browse database
+npm run db:migrate     # Apply migrations
+npm run db:reset       # Reset database (⚠️ deletes data)
+npm run db:seed        # Add sample data
+```
 
-**Location:** `/docs/core-docs/`- **[OPTION_7_RETURNS_AND_REFUNDS.md](./OPTION_7_RETURNS_AND_REFUNDS.md)** - Returns and
-refunds system
+### Development Commands
 
-Essential documentation for understanding the system architecture and APIs:#### Page Documentation
+```bash
+npm run dev            # Start both servers
+npm run dev:frontend   # Frontend only
+npm run dev:backend    # Backend only
+```
 
-- **[PROJECT_COMPLETE_SUMMARY.md](./core-docs/PROJECT_COMPLETE_SUMMARY.md)** - Complete system overview and
-  architecture- **[POS_PAGE_DOCUMENTATION.md](./POS_PAGE_DOCUMENTATION.md)** - POS page features and usage
+### Production Build
 
-- **[BACKEND_COMPLETE_SUMMARY.md](./core-docs/BACKEND_COMPLETE_SUMMARY.md)** - Backend implementation details-
-  **[PRODUCTS_PAGE_DOCUMENTATION.md](./PRODUCTS_PAGE_DOCUMENTATION.md)** - Products page documentation
-
-- **[API_ENDPOINTS_GUIDE.md](./core-docs/API_ENDPOINTS_GUIDE.md)** - Complete API reference with examples
-
-### Shared Components
-
-**Start here if you're new to the project!**
-
-- **[SHARED_COMPONENTS_GUIDE.md](./SHARED_COMPONENTS_GUIDE.md)** - Reusable component library
-
----- **[SHARED_COMPONENTS_MIGRATION_SUMMARY.md](./SHARED_COMPONENTS_MIGRATION_SUMMARY.md)** - Component migration guide
-
-- **[BUTTON_MIGRATION_SUMMARY.md](./BUTTON_MIGRATION_SUMMARY.md)** - Button component migration
-
-## 📗 Feature Guides
-
-### Implementation Status
-
-**Location:** `/docs/features/`
-
-- **[IMPLEMENTATION_STATUS.md](./IMPLEMENTATION_STATUS.md)** - Feature implementation tracking
-
-Comprehensive guides for each major feature:-
-**[IMPLEMENTATION_STATUS_COMPLETE.md](./IMPLEMENTATION_STATUS_COMPLETE.md)** - Completed implementations
-
-### Loyalty Program### Page Refactoring Documentation
-
-- **[LOYALTY_PROGRAM_COMPLETE_GUIDE.md](./features/LOYALTY_PROGRAM_COMPLETE_GUIDE.md)** - Complete loyalty system
-  documentation
-
-- **[LOYALTY_QUICK_REFERENCE.md](./features/LOYALTY_QUICK_REFERENCE.md)** - Quick reference for loyalty features-
-  **[ADMIN_DASHBOARD_REFACTORING_SUMMARY.md](./ADMIN_DASHBOARD_REFACTORING_SUMMARY.md)** - Admin dashboard refactoring
-
-- **[CUSTOMERS_PAGE_REFACTORING_SUMMARY.md](./CUSTOMERS_PAGE_REFACTORING_SUMMARY.md)** - Customers page refactoring
-
-### User Interface- **[INVENTORY_PAGE_REFACTORING_SUMMARY.md](./INVENTORY_PAGE_REFACTORING_SUMMARY.md)** - Inventory page refactoring
-
-- **[POS_PAGE_DOCUMENTATION.md](./features/POS_PAGE_DOCUMENTATION.md)** - POS interface and checkout process-
-  **[REPORTS_PAGE_REFACTORING_SUMMARY.md](./REPORTS_PAGE_REFACTORING_SUMMARY.md)** - Reports page refactoring
-
-- **[PRODUCTS_PAGE_DOCUMENTATION.md](./features/PRODUCTS_PAGE_DOCUMENTATION.md)** - Product management interface-
-  **[SALES_PAGE_REFACTORING_SUMMARY.md](./SALES_PAGE_REFACTORING_SUMMARY.md)** - Sales page refactoring
-
-- **[SETTINGS_COMPREHENSIVE_GUIDE.md](./features/SETTINGS_COMPREHENSIVE_GUIDE.md)** - System settings configuration-
-  **[SUPPLIERS_PAGE_REFACTORING_SUMMARY.md](./SUPPLIERS_PAGE_REFACTORING_SUMMARY.md)** - Suppliers page refactoring
-
-### Components### Maintenance
-
-- **[SHARED_COMPONENTS_GUIDE.md](./features/SHARED_COMPONENTS_GUIDE.md)** - Reusable component library
-
-- **[DOCUMENTATION_CLEANUP.md](./DOCUMENTATION_CLEANUP.md)** - Documentation organization summary
+```bash
+npm run build          # Build frontend
+npm start              # Start production server
+```
 
 ---
 
----
+## 📱 Technology Stack
 
-## 📙 Future Features
+**Frontend:**
 
-## 📂 Documentation Structure
+- React + TypeScript
+- Tailwind CSS
+- Vite
+- React Query
+- Recharts (for analytics)
 
-**Location:** `/docs/future-features/`
+**Backend:**
 
-````
-
-Planned enhancements and features ready for implementation:docs/
-
-├── README.md (this file)
-
-- **[OPTION_1_ENHANCED_PRODUCT_MANAGEMENT.md](./future-features/OPTION_1_ENHANCED_PRODUCT_MANAGEMENT.md)** - Product variants system (Backend complete)│
-
-- **[OPTION_2_ADVANCED_POS_FEATURES.md](./future-features/OPTION_2_ADVANCED_POS_FEATURES.md)** - Advanced POS capabilities├── Project Overview
-
-- **[OPTION_6_RECEIPT_AND_PRINTING.md](./future-features/OPTION_6_RECEIPT_AND_PRINTING.md)** - Receipt & printing system (Backend complete)│   ├── PROJECT_COMPLETE_SUMMARY.md
-
-- **[OPTION_7_RETURNS_AND_REFUNDS.md](./future-features/OPTION_7_RETURNS_AND_REFUNDS.md)** - Returns & refunds system (Backend complete)│   ├── PROJECT_STATUS_REPORT.md
-
-- **[WHATS_NEXT_RECOMMENDATIONS.md](./future-features/WHATS_NEXT_RECOMMENDATIONS.md)** - Development roadmap and recommendations│   └── BACKEND_COMPLETE_SUMMARY.md
-
-│
-
-**These are production-ready features waiting for frontend implementation!**├── API Documentation
-
-│   ├── API_ENDPOINTS_GUIDE.md
-
----│   ├── API_TESTING_GUIDE.md
-
-│   └── INTEGRATION_TESTING_GUIDE.md
-
-## 📕 Recent Updates│
-
-├── Feature Guides
-
-**Location:** `/docs/recent-updates/`│   ├── OPTION_1_ENHANCED_PRODUCT_MANAGEMENT.md
-
-│   ├── OPTION_2_ADVANCED_POS_FEATURES.md
-
-Latest changes, fixes, and improvements:│   ├── OPTION_6_RECEIPT_AND_PRINTING.md
-
-│   └── OPTION_7_RETURNS_AND_REFUNDS.md
-
-- **[BIRTHDAY_AUTOMATION_VERIFIED.md](./recent-updates/BIRTHDAY_AUTOMATION_VERIFIED.md)** - Birthday rewards automation (Verified working ✅)│
-
-- **[QUICK_SALE_SETTINGS_FIX.md](./recent-updates/QUICK_SALE_SETTINGS_FIX.md)** - Quick Sale toggle respects settings├── Page Documentation
-
-- **[SCRIPTS_CLEANUP_COMPLETE.md](./recent-updates/SCRIPTS_CLEANUP_COMPLETE.md)** - Backend scripts organization│   ├── POS_PAGE_DOCUMENTATION.md
-
-│   └── PRODUCTS_PAGE_DOCUMENTATION.md
-
----│
-
-├── Component Documentation
-
-## 🔧 Operational Guides│   ├── SHARED_COMPONENTS_GUIDE.md
-
-│   ├── SHARED_COMPONENTS_MIGRATION_SUMMARY.md
-
-**Location:** `/docs/operations/`│   └── BUTTON_MIGRATION_SUMMARY.md
-
-│
-
-Guides for system operation, testing, and maintenance:├── Implementation Tracking
-
-│   ├── IMPLEMENTATION_STATUS.md
-
-- **[POS_SETTINGS_OPERATIONAL_GUIDE.md](./operations/POS_SETTINGS_OPERATIONAL_GUIDE.md)** - POS settings management│   └── IMPLEMENTATION_STATUS_COMPLETE.md
-
-- **[API_TESTING_GUIDE.md](./operations/API_TESTING_GUIDE.md)** - API testing procedures│
-
-├── Refactoring Summaries
-
----│   ├── ADMIN_DASHBOARD_REFACTORING_SUMMARY.md
-
-│   ├── CUSTOMERS_PAGE_REFACTORING_SUMMARY.md
-
-## 📦 Archive│   ├── INVENTORY_PAGE_REFACTORING_SUMMARY.md
-
-│   ├── REPORTS_PAGE_REFACTORING_SUMMARY.md
-
-**Location:** `/docs/archive/`│   ├── SALES_PAGE_REFACTORING_SUMMARY.md
-
-│   └── SUPPLIERS_PAGE_REFACTORING_SUMMARY.md
-
-Historical development documentation (63 files):│
-
-- Development iterations└── Maintenance
-
-- Bug fixes and troubleshooting    └── DOCUMENTATION_CLEANUP.md
-
-- Refactoring summaries```
-
-- Status reports
+- Node.js + Express
+- Prisma ORM
+- SQLite (dev) / PostgreSQL (prod)
+- JWT Authentication
 
 ---
 
-**See:** [archive/README.md](./archive/README.md) for full index
+## 🆘 Need Help?
 
-## 🔍 Finding What You Need
-
----
-
-### For New Developers
-
-## 🚀 Quick Start Guides
-
-1. Start with [PROJECT_COMPLETE_SUMMARY.md](./PROJECT_COMPLETE_SUMMARY.md)
-
-### For New Developers2. Review [BACKEND_COMPLETE_SUMMARY.md](./BACKEND_COMPLETE_SUMMARY.md)
-
-3. Check [API_ENDPOINTS_GUIDE.md](./API_ENDPOINTS_GUIDE.md)
-
-1. **Understand the System**
-
-   - Read [PROJECT_COMPLETE_SUMMARY.md](./core-docs/PROJECT_COMPLETE_SUMMARY.md)### For API Integration
-
-   - Review [API_ENDPOINTS_GUIDE.md](./core-docs/API_ENDPOINTS_GUIDE.md)
-
-1. [API_ENDPOINTS_GUIDE.md](./API_ENDPOINTS_GUIDE.md) - Complete endpoint reference
-
-2. **Learn Key Features**2. [API_TESTING_GUIDE.md](./API_TESTING_GUIDE.md) - Testing examples
-
-   - [Loyalty Program Guide](./features/LOYALTY_PROGRAM_COMPLETE_GUIDE.md)3. [INTEGRATION_TESTING_GUIDE.md](./INTEGRATION_TESTING_GUIDE.md) - Integration patterns
-
-   - [POS Interface](./features/POS_PAGE_DOCUMENTATION.md)
-
-### For Frontend Development
-
-3. **Development Roadmap**
-
-   - [What's Next Recommendations](./future-features/WHATS_NEXT_RECOMMENDATIONS.md)1. [SHARED_COMPONENTS_GUIDE.md](./SHARED_COMPONENTS_GUIDE.md) - Available components
-
-2. [POS_PAGE_DOCUMENTATION.md](./POS_PAGE_DOCUMENTATION.md) - POS interface
-
-### For Feature Development3. [PRODUCTS_PAGE_DOCUMENTATION.md](./PRODUCTS_PAGE_DOCUMENTATION.md) - Product management
-
-
-
-1. **Check Future Features** - See what's ready to implement### For Feature Implementation
-
-2. **Review Feature Guides** - Understand existing features
-
-3. **Check Recent Updates** - Stay current with latest changes- Check the OPTION\_\*.md files for specific features
-
-- Review corresponding refactoring summaries for implementation details
-
-### For Operations/Support- Refer to IMPLEMENTATION_STATUS.md for current progress
-
-
-
-1. **POS Settings** - [Operational Guide](./operations/POS_SETTINGS_OPERATIONAL_GUIDE.md)---
-
-2. **API Testing** - [Testing Guide](./operations/API_TESTING_GUIDE.md)
-
-3. **Troubleshooting** - Check [archive](./archive/) for historical fixes## 📝 Documentation Guidelines
-
-
-
----### Updating Documentation
-
-
-
-## 📊 System StatusWhen updating documentation files:
-
-
-
-### ✅ Production Ready Features1. Keep the table of contents updated
-
-2. Add timestamps for major changes
-
-- ✅ **POS Interface** - Complete checkout system3. Include code examples where applicable
-
-- ✅ **Inventory Management** - Real-time stock tracking4. Link to related documentation
-
-- ✅ **Customer Management** - Profiles and history
-
-- ✅ **Loyalty Program** - 4-tier system with automatic upgrades### Creating New Documentation
-
-- ✅ **Multi-Currency** - BDT, USD, EUR support
-
-- ✅ **Birthday Automation** - Automated birthday rewardsWhen creating new documentation:
-
-- ✅ **Settings System** - Configurable features
-
-- ✅ **User Management** - Role-based access control1. Place it in the `docs/` folder
-
-2. Update this README with a link to the new file
-
-### 🚧 Backend Ready (Needs Frontend)3. Follow the existing documentation format
-
-4. Include relevant examples and screenshots
-
-- 🔧 **Product Variants** - Multiple sizes/variations
-
-- 🔧 **Receipt System** - PDF, HTML, thermal printing### Documentation Standards
-
-- 🔧 **Returns & Refunds** - Partial returns, store credit
-
-- Use clear, descriptive headings
-
-### 📋 Planned Features- Include code examples with proper syntax highlighting
-
-- Add visual aids (diagrams, screenshots) when helpful
-
-See [WHATS_NEXT_RECOMMENDATIONS.md](./future-features/WHATS_NEXT_RECOMMENDATIONS.md) for detailed roadmap.- Keep content up-to-date with code changes
-
-- Use consistent formatting across all files
+1. **Check this guide** for common tasks
+2. **Inspect browser console** (F12) for errors
+3. **Check backend logs** for API errors
+4. **Reset database** if data is corrupted
+5. **Create GitHub issue** for bugs
 
 ---
 
----
+## 📋 Keyboard Shortcuts (POS)
 
-## 🔍 Finding Documentation
-
-## 🔗 Related Resources
-
-### By Category
-
-### Main Project
-
-| Category | Location | Files |
-
-|----------|----------|-------|- [Main README](../README.md) - Project overview and setup instructions
-
-| **Core Docs** | `/docs/core-docs/` | 3 |- [Backend Documentation](../backend/) - Backend source code
-
-| **Features** | `/docs/features/` | 6 |- [Frontend Documentation](../frontend/) - Frontend source code
-
-| **Future Features** | `/docs/future-features/` | 5 |
-
-| **Recent Updates** | `/docs/recent-updates/` | 3 |### External Resources
-
-| **Operations** | `/docs/operations/` | 2 |
-
-| **Archive** | `/docs/archive/` | 63 |- API Testing: Postman, Thunder Client, or similar tools
-
-- Database: Prisma documentation for schema management
-
-### By Topic- Frontend: React, TypeScript, and TailwindCSS documentation
-
-
-
-**Loyalty Program:**---
-
-- Guide: [features/LOYALTY_PROGRAM_COMPLETE_GUIDE.md](./features/LOYALTY_PROGRAM_COMPLETE_GUIDE.md)
-
-- Quick Ref: [features/LOYALTY_QUICK_REFERENCE.md](./features/LOYALTY_QUICK_REFERENCE.md)## 📞 Support
-
-
-
-**POS System:**For questions or clarifications about the documentation:
-
-- Interface: [features/POS_PAGE_DOCUMENTATION.md](./features/POS_PAGE_DOCUMENTATION.md)
-
-- Settings: [operations/POS_SETTINGS_OPERATIONAL_GUIDE.md](./operations/POS_SETTINGS_OPERATIONAL_GUIDE.md)1. Check the relevant documentation file first
-
-2. Review the PROJECT_COMPLETE_SUMMARY.md for overview
-
-**Products:**3. Contact the development team
-
-- Current: [features/PRODUCTS_PAGE_DOCUMENTATION.md](./features/PRODUCTS_PAGE_DOCUMENTATION.md)
-
-- Future: [future-features/OPTION_1_ENHANCED_PRODUCT_MANAGEMENT.md](./future-features/OPTION_1_ENHANCED_PRODUCT_MANAGEMENT.md)---
-
-
-
-**API:****Last Updated:** October 4, 2025 **Documentation Version:** 1.0 **Project:** POS System
-
-- Reference: [core-docs/API_ENDPOINTS_GUIDE.md](./core-docs/API_ENDPOINTS_GUIDE.md)
-
-- Testing: [operations/API_TESTING_GUIDE.md](./operations/API_TESTING_GUIDE.md)---
-
-
-
----> 💡 **Tip:** Use your IDE's file search (Ctrl+P or Cmd+P) to quickly find specific documentation files!
-
-
-## 📝 Documentation Standards
-
-### Creating New Documentation
-
-**Active Documentation** (main folders):
-- Feature guides for new functionality
-- API updates
-- Operational procedures
-- User guides
-
-**Archive** (when complete):
-- Development iterations
-- Bug fix documentation
-- Refactoring summaries
-- Status reports
-
-### Keeping Docs Updated
-
-- ✅ Update feature docs when functionality changes
-- ✅ Keep API reference in sync with backend
-- ✅ Archive completed development docs
-- ✅ Update roadmap when priorities change
+- `F1` - Focus product search
+- `F2` - Customer lookup
+- `F3` - Apply discount
+- `F4` - Process payment
+- `ESC` - Clear cart
 
 ---
 
-## 🎯 Next Steps
+**🎉 That's it! You're ready to use the POS System.**
 
-### Recommended Reading Order
-
-1. **[Core Docs]** Start with PROJECT_COMPLETE_SUMMARY.md
-2. **[Features]** Read guides for features you'll work with
-3. **[Future Features]** Check WHATS_NEXT_RECOMMENDATIONS.md
-4. **[Recent Updates]** Stay current with latest changes
-
-### For Specific Tasks
-
-**Implementing a Feature:**
-→ Check `/future-features/` for specifications
-→ Review `/features/` for similar implementations
-→ Update docs after completion
-
-**Troubleshooting:**
-→ Check `/recent-updates/` for recent fixes
-→ Search `/archive/` for historical issues
-→ Review `/operations/` for testing procedures
-
-**System Configuration:**
-→ See `/operations/` guides
-→ Check `/features/SETTINGS_COMPREHENSIVE_GUIDE.md`
-
----
-
-## 📞 Need Help?
-
-- **Can't find documentation?** Check the archive
-- **Outdated information?** Recent updates may have changes
-- **Feature requests?** See the roadmap in future-features
-
----
-
-## 📈 Documentation Stats
-
-- **Total Active Docs:** 21 files
-- **Total Archived:** 63 files
-- **Last Cleanup:** October 5, 2025
-- **Organization:** Folder-based structure
-
----
-
-**Your POS System documentation is complete, organized, and production-ready! 🎉**
-
-*For questions about documentation structure, see [DOCUMENTATION_CLEANUP_SUMMARY.md](./DOCUMENTATION_CLEANUP_SUMMARY.md)*
-````
+For more details, check the code or create a GitHub issue.
