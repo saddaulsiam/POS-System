@@ -10,6 +10,8 @@ interface POSSettings {
   enableCustomerSearch: boolean;
   enableBarcodeScanner: boolean;
   enableLoyaltyPoints: boolean;
+  loyaltyPointsPerUnit: number;
+  pointsRedemptionRate: number;
   // Store Information
   storeName: string;
   storeAddress: string;
@@ -73,6 +75,13 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   const [loading, setLoading] = useState(true);
 
   const loadSettings = async () => {
+    // Don't load settings if no auth token exists
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const data = await posSettingsAPI.get();
       setSettings(data);
@@ -87,6 +96,8 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         enableCustomerSearch: true,
         enableBarcodeScanner: true,
         enableLoyaltyPoints: true,
+        loyaltyPointsPerUnit: 10,
+        pointsRedemptionRate: 100,
         storeName: "POS System",
         storeAddress: "123 Main St, City, Country",
         storePhone: "(123) 456-7890",
@@ -120,7 +131,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
 
   useEffect(() => {
     loadSettings();
-  }, []);
+  }, []); // Only run once on mount
 
   const refreshSettings = async () => {
     await loadSettings();

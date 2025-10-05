@@ -41,39 +41,39 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
 
   if (!isOpen) return null;
 
-  // Define redemption options (example: 100 points = $1)
-  const pointsToMoneyRate = 100; // 100 points = $1
+  // Get redemption rate from settings (default: 100 points = 1 currency unit)
+  const pointsToMoneyRate = settings?.pointsRedemptionRate || 100;
 
   const predefinedOptions: RedemptionOption[] = [
     {
       type: "DISCOUNT",
-      label: "$5 Discount",
-      description: "Get $5 off your purchase",
-      pointsRequired: 500,
+      label: `${formatCurrency(5, settings)} Discount`,
+      description: `Get ${formatCurrency(5, settings)} off your purchase`,
+      pointsRequired: Math.round(5 * pointsToMoneyRate),
       value: 5,
       icon: "💵",
     },
     {
       type: "DISCOUNT",
-      label: "$10 Discount",
-      description: "Get $10 off your purchase",
-      pointsRequired: 1000,
+      label: `${formatCurrency(10, settings)} Discount`,
+      description: `Get ${formatCurrency(10, settings)} off your purchase`,
+      pointsRequired: Math.round(10 * pointsToMoneyRate),
       value: 10,
       icon: "💰",
     },
     {
       type: "DISCOUNT",
-      label: "$20 Discount",
-      description: "Get $20 off your purchase",
-      pointsRequired: 2000,
+      label: `${formatCurrency(20, settings)} Discount`,
+      description: `Get ${formatCurrency(20, settings)} off your purchase`,
+      pointsRequired: Math.round(20 * pointsToMoneyRate),
       value: 20,
       icon: "🎁",
     },
     {
       type: "STORE_CREDIT",
-      label: "$50 Store Credit",
+      label: `${formatCurrency(50, settings)} Store Credit`,
       description: "Convert to store credit for future use",
-      pointsRequired: 5000,
+      pointsRequired: Math.round(50 * pointsToMoneyRate),
       value: 50,
       icon: "🏪",
     },
@@ -217,7 +217,7 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
             <h4 className="text-md font-semibold text-gray-800 mb-3">Custom Redemption</h4>
             <div className="bg-gray-50 rounded-lg p-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Enter points to redeem (100 points = $1)
+                Enter points to redeem ({pointsToMoneyRate} points = {formatCurrency(1, settings)})
               </label>
               <input
                 type="number"
