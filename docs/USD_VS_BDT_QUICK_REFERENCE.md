@@ -28,7 +28,7 @@ Position: Before amount
 Decimals: 2
 Thousand Separator: ,
 Decimal Separator: .
-Locale: bn-BD
+Locale: en-US (English numerals)
 
 Examples:
 ৳10.00
@@ -36,6 +36,8 @@ Examples:
 ৳1,234.56
 ৳10,000.00
 ৳1,000,000.00
+
+Note: Uses English numerals (1,2,3) instead of Bangla numerals (১,২,৩)
 ```
 
 ---
@@ -201,7 +203,7 @@ Examples: ¥1,235 (no decimals)
   decimals: 2,
   thousandSeparator: ",",
   decimalSeparator: ".",
-  locale: "bn-BD"
+  locale: "en-US"  // Uses English numerals (1,2,3) not Bangla (১,২,৩)
 }
 ```
 

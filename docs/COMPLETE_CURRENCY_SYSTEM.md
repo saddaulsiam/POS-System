@@ -30,14 +30,16 @@
 
 ## 📊 Supported Currencies
 
-| Code    | Name             | Symbol | Format Example | Decimals | Locale |
-| ------- | ---------------- | ------ | -------------- | -------- | ------ |
-| **USD** | US Dollar        | $      | $1,234.56      | 2        | en-US  |
-| **BDT** | Bangladeshi Taka | ৳      | ৳1,234.56      | 2        | bn-BD  |
-| **EUR** | Euro             | €      | €1,234.56      | 2        | de-DE  |
-| **GBP** | British Pound    | £      | £1,234.56      | 2        | en-GB  |
-| **INR** | Indian Rupee     | ₹      | ₹1,234.56      | 2        | en-IN  |
-| **JPY** | Japanese Yen     | ¥      | ¥1,234         | 0        | ja-JP  |
+| Code    | Name             | Symbol | Format Example | Decimals | Locale  |
+| ------- | ---------------- | ------ | -------------- | -------- | ------- |
+| **USD** | US Dollar        | $      | $1,234.56      | 2        | en-US   |
+| **BDT** | Bangladeshi Taka | ৳      | ৳1,234.56      | 2        | en-US\* |
+| **EUR** | Euro             | €      | €1,234.56      | 2        | de-DE   |
+| **GBP** | British Pound    | £      | £1,234.56      | 2        | en-GB   |
+| **INR** | Indian Rupee     | ₹      | ₹1,234.56      | 2        | en-IN   |
+| **JPY** | Japanese Yen     | ¥      | ¥1,234         | 0        | ja-JP   |
+
+\*BDT uses en-US locale for English numerals (1,2,3) instead of Bangla numerals (১,২,৩)
 
 ---
 
@@ -56,7 +58,7 @@ export interface CurrencyConfig {
   decimals: number;          // 2 for most, 0 for JPY
   thousandSeparator: string; // ","
   decimalSeparator: string;  // "."
-  locale?: string;           // "en-US", "bn-BD" for Intl.NumberFormat
+  locale?: string;           // "en-US" for Intl.NumberFormat (BDT uses en-US for English numerals)
 }
 
 export const CURRENCIES: Record<string, CurrencyConfig> = {

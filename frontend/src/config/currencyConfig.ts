@@ -36,7 +36,7 @@ export const CURRENCIES: Record<string, CurrencyConfig> = {
     decimals: 2,
     thousandSeparator: ",",
     decimalSeparator: ".",
-    locale: "bn-BD",
+    locale: "en-BD",
   },
   EUR: {
     code: "EUR",
