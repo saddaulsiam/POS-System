@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useSettings } from "../../context/SettingsContext";
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
+  const { settings } = useSettings();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -15,7 +17,7 @@ const Navbar: React.FC = () => {
             <span className="bg-blue-600 text-white rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-lg sm:text-xl">
               🛒
             </span>
-            <span className="hidden sm:inline">POS System</span>
+            <span className="hidden sm:inline">{settings?.storeName || "POS System"}</span>
             <span className="sm:hidden">POS</span>
           </span>
         </div>

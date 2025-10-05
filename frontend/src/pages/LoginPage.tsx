@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useSettings } from "../context/SettingsContext";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import { Button, Input } from "../components/common";
 
@@ -8,6 +9,7 @@ const LoginPage: React.FC = () => {
   const [pinCode, setPinCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const { settings } = useSettings();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +69,9 @@ const LoginPage: React.FC = () => {
               />
             </svg>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Fresh Mart POS</h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            {settings?.storeName || "POS System"}
+          </h2>
           <p className="mt-2 text-center text-sm text-gray-600">Sign in to your account</p>
         </div>
 
