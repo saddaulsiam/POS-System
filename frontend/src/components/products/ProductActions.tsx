@@ -29,7 +29,12 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
     <div className="flex gap-2">
       {/* Export Dropdown */}
       <div className="relative">
-        <Button variant="success" onClick={() => setShowExportMenu(!showExportMenu)} title="Export products">
+        <Button
+          variant="success"
+          onClick={() => setShowExportMenu(!showExportMenu)}
+          title="Export products"
+          className="flex items-center"
+        >
           📥 Export
           <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -53,7 +58,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg"
             >
-              � Export as Excel
+              📊 Export as Excel
             </button>
           </div>
         )}
@@ -61,7 +66,12 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
 
       {/* Import Dropdown */}
       <div className="relative">
-        <Button variant="warning" onClick={() => setShowImportMenu(!showImportMenu)} title="Import products">
+        <Button
+          variant="warning"
+          onClick={() => setShowImportMenu(!showImportMenu)}
+          title="Import products"
+          className="flex items-center"
+        >
           📤 Import
           <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -85,7 +95,7 @@ export const ProductActions: React.FC<ProductActionsProps> = ({
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg"
             >
-              � Import from Excel
+              📊 Import from Excel
             </button>
           </div>
         )}
