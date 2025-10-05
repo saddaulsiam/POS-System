@@ -486,12 +486,18 @@ const POSPage: React.FC = () => {
       // Auto-email receipt if enabled and customer has email
       if (settings?.emailReceiptAuto && customer?.email) {
         try {
-          await receiptsAPI.send({
+          console.log("Sending email receipt", {
+            saleId: sale.id,
+            customerEmail: customer.email,
+            customerName: customer.name,
+          });
+          const emailResult = await receiptsAPI.send({
             saleId: sale.id,
             customerEmail: customer.email,
             customerName: customer.name,
             includePDF: true,
           });
+          console.log("Email send result", emailResult);
           toast.success(`Receipt emailed to ${customer.email}`, {
             duration: 3000,
             icon: "📧",
@@ -518,6 +524,8 @@ const POSPage: React.FC = () => {
             setTimeout(() => {
               printWindow.print();
             }, 500); // Small delay to ensure content is rendered
+          } else {
+            console.warn("[DEBUG] Print window blocked or failed to open");
           }
 
           toast.success("Receipt ready to print", {
@@ -525,15 +533,17 @@ const POSPage: React.FC = () => {
             icon: "🖨️",
           });
         } catch (printError) {
-          console.error("Error printing receipt:", printError);
+          console.error("[DEBUG] Error printing receipt:", printError);
           toast.error("Failed to open receipt for printing");
         }
       }
 
-      // Auto-print receipt if enabled
+      // Auto-print thermal receipt if enabled
       if (settings?.autoPrintThermal) {
         try {
+          console.log("[DEBUG] Printing thermal receipt", { saleId: sale.id });
           const thermalContent = await receiptsAPI.getThermal(sale.id);
+          console.log("[DEBUG] Thermal receipt content", thermalContent);
           const printWindow = window.open("", "_blank", "width=400,height=600");
           if (printWindow) {
             printWindow.document.write(`<pre style='font-size:16px; font-family:monospace;'>${thermalContent}</pre>`);
@@ -541,9 +551,12 @@ const POSPage: React.FC = () => {
             setTimeout(() => {
               printWindow.print();
             }, 300);
+          } else {
+            console.warn("[DEBUG] Print window blocked or failed to open");
           }
           toast.success("Thermal receipt ready to print", { icon: "🧾" });
         } catch (err) {
+          console.error("[DEBUG] Error printing thermal receipt:", err);
           toast.error("Failed to print thermal receipt");
         }
       }
@@ -630,24 +643,7 @@ const POSPage: React.FC = () => {
 
       toast.success(`Sale completed! Receipt ID: ${sale.receiptId}`);
 
-      // Auto-email receipt if enabled and customer has email
-      if (settings?.emailReceiptAuto && customer?.email) {
-        try {
-          await receiptsAPI.send({
-            saleId: sale.id,
-            customerEmail: customer.email,
-            customerName: customer.name,
-            includePDF: true,
-          });
-          toast.success(`Receipt emailed to ${customer.email}`, {
-            duration: 3000,
-            icon: "📧",
-          });
-        } catch (emailError) {
-          console.error("Error sending receipt email:", emailError);
-          toast.error("Sale completed but failed to send receipt email");
-        }
-      }
+      // (Email receipt sending removed by request)
 
       // Auto-print receipt if enabled
       if (settings?.printReceiptAuto) {

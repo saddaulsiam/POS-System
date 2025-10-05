@@ -33,14 +33,11 @@ interface POSSettings {
   receiptFooterText: string | null;
   returnPolicy: string | null;
   printReceiptAuto: boolean;
-  emailReceiptAuto: boolean;
   autoPrintThermal: boolean;
 
   // Alerts & Notifications
   enableLowStockAlerts: boolean;
   lowStockThreshold: number;
-  enableEmailNotifications: boolean;
-  adminAlertEmail: string | null;
 
   // System Settings
   autoLogoutMinutes: number;
@@ -554,7 +551,7 @@ const SettingsPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900">🧾 Receipt Settings</h2>
-              <p className="text-sm text-gray-600 mt-1">Configure receipt printing and email options</p>
+              <p className="text-sm text-gray-600 mt-1">Configure receipt printing options</p>
             </div>
 
             <div className="p-6 space-y-6">
@@ -580,25 +577,7 @@ const SettingsPage: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Auto-Email Receipt</h4>
-                    <p className="text-sm text-gray-500">Email receipt to customer</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle("emailReceiptAuto", !settings.emailReceiptAuto)}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.emailReceiptAuto ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.emailReceiptAuto ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
+                {/* Auto-Email Receipt option removed */}
 
                 <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                   <div>
@@ -862,25 +841,7 @@ const SettingsPage: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Email Notifications</h4>
-                    <p className="text-sm text-gray-500">Send email alerts to admin</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle("enableEmailNotifications", !settings.enableEmailNotifications)}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.enableEmailNotifications ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.enableEmailNotifications ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
+                {/* Email Notifications option removed */}
               </div>
 
               {/* Low Stock Threshold */}
@@ -901,24 +862,7 @@ const SettingsPage: React.FC = () => {
                 <p className="text-sm text-gray-500 mt-1">Alert when product stock falls below this number</p>
               </div>
 
-              {/* Admin Email */}
-              {settings.enableEmailNotifications && (
-                <div>
-                  <label htmlFor="adminAlertEmail" className="block text-sm font-medium text-gray-700 mb-2">
-                    Admin Alert Email
-                  </label>
-                  <input
-                    type="email"
-                    id="adminAlertEmail"
-                    defaultValue={settings.adminAlertEmail || ""}
-                    onBlur={(e) => handleTextFieldChange("adminAlertEmail", e)}
-                    disabled={saving}
-                    className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                    placeholder="admin@example.com"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">Email address for receiving alerts and notifications</p>
-                </div>
-              )}
+              {/* Admin Email option removed */}
             </div>
           </div>
         )}

@@ -934,7 +934,7 @@ export const receiptsAPI = {
   },
 
   send: async (data: { saleId: number; customerEmail: string; customerName?: string; includePDF?: boolean }) => {
-    const response = await api.post("/receipts/send", data);
+    const response = await api.post("/receipts/send-email", data);
     return response.data;
   },
 
