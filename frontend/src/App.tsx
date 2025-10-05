@@ -22,6 +22,7 @@ import SalesPage from "./pages/SalesPage";
 import SuppliersPage from "./pages/SuppliersPage";
 import LoyaltyAdminPage from "./pages/LoyaltyAdminPage";
 import SettingsPage from "./pages/SettingsPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
 
 const adminPaths = [
   "/admin",
@@ -31,6 +32,7 @@ const adminPaths = [
   "/customers",
   "/sales",
   "/reports",
+  "/analytics",
   "/inventory",
   "/employees",
   "/profile",
@@ -86,6 +88,7 @@ const App: React.FC = () => {
                 <Route path="/customers" element={<CustomersPage />} />
                 <Route path="/sales" element={<SalesPage />} />
                 <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/inventory" element={<InventoryPage />} />
                 <Route path="/audit-logs" element={<AuditLogsPage />} />
                 <Route path="/loyalty-admin" element={<LoyaltyAdminPage />} />

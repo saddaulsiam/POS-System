@@ -219,6 +219,68 @@ const RedeemPointsDialog: React.FC<RedeemPointsDialogProps> = ({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Enter points to redeem ({pointsToMoneyRate} points = {formatCurrency(1, settings)})
               </label>
+
+              {/* Quick Amount Buttons */}
+              <div className="mb-4">
+                <p className="text-xs text-gray-600 mb-2">Quick amounts:</p>
+                <div className="grid grid-cols-5 gap-2">
+                  {[50, 100, 200, 500].map((amount) => {
+                    const pointsNeeded = Math.round(amount * pointsToMoneyRate);
+                    const canAfford = availablePoints >= pointsNeeded;
+                    const exceedsCart = amount > cartTotal && cartTotal > 0;
+                    const isDisabled = !canAfford || exceedsCart || redeeming;
+
+                    return (
+                      <button
+                        key={amount}
+                        onClick={() => {
+                          setCustomPoints(pointsNeeded.toString());
+                          setSelectedOption(null);
+                        }}
+                        disabled={isDisabled}
+                        className={`px-3 py-2 rounded-lg border-2 text-sm font-semibold transition-all ${
+                          customPointsValue === pointsNeeded
+                            ? "border-blue-500 bg-blue-500 text-white"
+                            : isDisabled
+                            ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50"
+                        }`}
+                        title={
+                          !canAfford
+                            ? `Need ${pointsNeeded - availablePoints} more points`
+                            : exceedsCart
+                            ? "Exceeds cart total"
+                            : `${pointsNeeded} points`
+                        }
+                      >
+                        {formatCurrency(amount, settings)}
+                      </button>
+                    );
+                  })}
+                  {/* Max Button */}
+                  <button
+                    onClick={() => {
+                      const maxDiscount = Math.min(
+                        calculateCustomDiscount(availablePoints),
+                        cartTotal || calculateCustomDiscount(availablePoints)
+                      );
+                      const maxPoints = Math.round(maxDiscount * pointsToMoneyRate);
+                      setCustomPoints(maxPoints.toString());
+                      setSelectedOption(null);
+                    }}
+                    disabled={availablePoints === 0 || redeeming}
+                    className={`px-3 py-2 rounded-lg border-2 text-sm font-bold transition-all ${
+                      availablePoints === 0 || redeeming
+                        ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
+                        : "border-green-500 bg-white text-green-700 hover:bg-green-500 hover:text-white"
+                    }`}
+                    title="Use maximum available points"
+                  >
+                    Max
+                  </button>
+                </div>
+              </div>
+
               <input
                 type="number"
                 min="100"

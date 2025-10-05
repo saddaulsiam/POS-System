@@ -769,6 +769,38 @@ export const loyaltyAPI = {
 
 // OPTION 5: Advanced Reports & Analytics API
 export const analyticsAPI = {
+  // New dedicated analytics endpoints
+  getOverview: async (params?: { startDate?: string; endDate?: string; period?: string }) => {
+    const response = await api.get("/analytics/overview", { params });
+    return response.data;
+  },
+
+  getSalesTrend: async (params?: { period?: string; groupBy?: string }) => {
+    const response = await api.get("/analytics/sales-trend", { params });
+    return response.data;
+  },
+
+  getTopProducts: async (params?: { startDate?: string; endDate?: string; limit?: number }) => {
+    const response = await api.get("/analytics/top-products", { params });
+    return response.data;
+  },
+
+  getCategoryBreakdown: async (params?: { startDate?: string; endDate?: string }) => {
+    const response = await api.get("/analytics/category-breakdown", { params });
+    return response.data;
+  },
+
+  getCustomerStats: async (params?: { startDate?: string; endDate?: string }) => {
+    const response = await api.get("/analytics/customer-stats", { params });
+    return response.data;
+  },
+
+  getPaymentMethods: async (params?: { startDate?: string; endDate?: string }) => {
+    const response = await api.get("/analytics/payment-methods", { params });
+    return response.data;
+  },
+
+  // Legacy report endpoints (kept for backward compatibility)
   getProfitMargin: async (params?: { startDate?: string; endDate?: string; categoryId?: number }) => {
     const response = await api.get("/reports/profit-margin", { params });
     return response.data;

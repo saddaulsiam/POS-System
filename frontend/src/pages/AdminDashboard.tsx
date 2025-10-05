@@ -79,7 +79,7 @@ const AdminDashboard: React.FC = () => {
   const loadDashboardData = async () => {
     setIsLoading(true);
     try {
-      const { reportsAPI, customersAPI } = await import("../services/api");
+      const { reportsAPI, customersAPI, analyticsAPI } = await import("../services/api");
 
       // Helper to format date as YYYY-MM-DD
       const formatDate = (date: Date) => {
@@ -107,6 +107,7 @@ const AdminDashboard: React.FC = () => {
         customers,
         weekCustomers,
         todaySalesRange,
+        categoryBreakdown,
       ] = await Promise.all([
         reportsAPI.getSalesRange(formatDate(today), formatDate(today)),
         reportsAPI.getDailySales(formatDate(yesterday)),
@@ -117,6 +118,7 @@ const AdminDashboard: React.FC = () => {
         customersAPI.getAll({ page: 1, limit: 1 }),
         customersAPI.getAll({ page: 1, limit: 100 }),
         reportsAPI.getSalesRange(formatDate(today), formatDate(today)),
+        analyticsAPI.getCategoryBreakdown({ startDate: formatDate(weekAgo), endDate: formatDate(today) }),
       ]);
 
       // Defensive checks for required fields
@@ -186,7 +188,11 @@ const AdminDashboard: React.FC = () => {
             : 0,
         topSellingProducts,
         recentTransactions,
-        salesByCategory: [],
+        salesByCategory: (categoryBreakdown.categories || []).map((cat: any) => ({
+          category: cat.name,
+          sales: cat.revenue,
+          percentage: cat.percentage,
+        })),
         hourlySales: [],
       });
     } catch (error: any) {
@@ -198,8 +204,8 @@ const AdminDashboard: React.FC = () => {
   };
 
   const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-100">
+      <h3 className="text-lg font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">{title}</h3>
       {children}
     </div>
   );
@@ -211,6 +217,7 @@ const AdminDashboard: React.FC = () => {
       icon: "📦",
       color: "blue",
       description: "Add new inventory items",
+      gradient: "from-blue-500 to-blue-600",
     },
     {
       name: "Process Sale",
@@ -218,6 +225,7 @@ const AdminDashboard: React.FC = () => {
       icon: "💰",
       color: "green",
       description: "Go to POS terminal",
+      gradient: "from-green-500 to-emerald-600",
     },
     {
       name: "View Reports",
@@ -225,6 +233,7 @@ const AdminDashboard: React.FC = () => {
       icon: "📊",
       color: "purple",
       description: "Detailed analytics",
+      gradient: "from-purple-500 to-purple-600",
     },
     {
       name: "Manage Staff",
@@ -232,6 +241,7 @@ const AdminDashboard: React.FC = () => {
       icon: "👥",
       color: "indigo",
       description: "Employee management",
+      gradient: "from-indigo-500 to-indigo-600",
     },
     {
       name: "Customer List",
@@ -239,6 +249,7 @@ const AdminDashboard: React.FC = () => {
       icon: "👤",
       color: "pink",
       description: "Customer database",
+      gradient: "from-pink-500 to-rose-600",
     },
     {
       name: "Inventory",
@@ -246,6 +257,7 @@ const AdminDashboard: React.FC = () => {
       icon: "📋",
       color: "yellow",
       description: "Stock management",
+      gradient: "from-yellow-500 to-orange-600",
     },
     {
       name: "Settings",
@@ -253,6 +265,15 @@ const AdminDashboard: React.FC = () => {
       icon: "⚙️",
       color: "gray",
       description: "System configuration",
+      gradient: "from-gray-500 to-gray-600",
+    },
+    {
+      name: "Analytics",
+      href: "/analytics",
+      icon: "📈",
+      color: "teal",
+      description: "Advanced insights",
+      gradient: "from-teal-500 to-cyan-600",
     },
   ];
 
@@ -269,17 +290,65 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+                Dashboard
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Welcome back, <span className="font-semibold text-gray-900">{user?.name || "Admin"}</span>! Here's
+                what's happening with your store today.
+              </p>
+            </div>
+            <div className="hidden md:flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Today's Date</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {new Date().toLocaleDateString("en-US", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {isLoading ? (
-          <div className="flex justify-center items-center min-h-96">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="flex flex-col justify-center items-center min-h-96">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mb-4"></div>
+            <p className="text-gray-600 text-lg">Loading dashboard data...</p>
           </div>
         ) : (
           <div className="space-y-8">
             {/* Key Metrics */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">📊 Key Metrics</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <span className="text-3xl">📊</span>
+                  <span>Key Metrics</span>
+                </h2>
+                <button
+                  onClick={loadDashboardData}
+                  className="px-4 py-2 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 text-gray-700 font-medium flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  Refresh
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <DashboardStatCard
                   title="Today's Sales"
@@ -302,7 +371,10 @@ const AdminDashboard: React.FC = () => {
 
             {/* Sales Overview */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">📈 Sales Overview</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="text-3xl">📈</span>
+                <span>Sales Overview</span>
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <DashboardStatCard
                   title="Yesterday"
@@ -336,7 +408,10 @@ const AdminDashboard: React.FC = () => {
 
             {/* Performance Metrics */}
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">⚡ Performance Metrics</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="text-3xl">⚡</span>
+                <span>Performance Metrics</span>
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <DashboardStatCard
                   title="Total Customers"
@@ -362,34 +437,68 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             {/* Charts and Analytics */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <ChartCard title="Top Selling Products">
-                <SimpleBarChart
-                  data={stats.topSellingProducts.map((p) => ({
-                    label: p.name,
-                    value: p.totalSold,
-                  }))}
-                />
-              </ChartCard>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="text-3xl">📊</span>
+                <span>Analytics & Insights</span>
+              </h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <ChartCard title="Top Selling Products">
+                  <SimpleBarChart
+                    data={stats.topSellingProducts.map((p) => ({
+                      label: p.name,
+                      value: p.totalSold,
+                    }))}
+                  />
+                </ChartCard>
 
-              <ChartCard title="Sales by Category">
-                <SimpleBarChart
-                  data={stats.salesByCategory.map((c) => ({
-                    label: c.category,
-                    value: c.percentage,
-                  }))}
-                />
-              </ChartCard>
+                <ChartCard title="Sales by Category">
+                  <SimpleBarChart
+                    data={stats.salesByCategory.map((c) => ({
+                      label: c.category,
+                      value: c.percentage,
+                    }))}
+                  />
+                </ChartCard>
+              </div>
             </div>
 
             {/* Recent Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <RecentTransactionsList transactions={stats.recentTransactions} />
-              <QuickActionsGrid actions={quickActions} />
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="text-3xl">⚡</span>
+                <span>Recent Activity</span>
+              </h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <RecentTransactionsList transactions={stats.recentTransactions} />
+                <QuickActionsGrid actions={quickActions} />
+              </div>
             </div>
 
             {/* Alerts and Notifications */}
             <AlertsSection lowStockCount={stats.lowStockCount} outOfStockCount={stats.outOfStockCount} />
+
+            {/* Dashboard Footer - Quick Summary */}
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-8 text-white">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                <div>
+                  <p className="text-blue-100 text-sm mb-1">Total Revenue (Month)</p>
+                  <p className="text-3xl font-bold">{formatCurrency(stats.monthSales, settings)}</p>
+                </div>
+                <div>
+                  <p className="text-blue-100 text-sm mb-1">Transactions (Week)</p>
+                  <p className="text-3xl font-bold">{stats.weekTransactions}</p>
+                </div>
+                <div>
+                  <p className="text-blue-100 text-sm mb-1">Active Inventory</p>
+                  <p className="text-3xl font-bold">{stats.activeProducts}</p>
+                </div>
+                <div>
+                  <p className="text-blue-100 text-sm mb-1">Total Customers</p>
+                  <p className="text-3xl font-bold">{stats.totalCustomers}</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
