@@ -133,13 +133,31 @@ export const POSBarcodeScanner: React.FC<POSBarcodeScannerProps> = ({
                 <div
                   key={product.id}
                   onClick={() => handleSelectSuggestion(product)}
-                  className={`px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-blue-50 transition-colors ${
+                  className={`px-3 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 hover:bg-blue-50 transition-colors ${
                     index === selectedIndex ? "bg-blue-50" : ""
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{product.name}</p>
+                  <div className="flex items-center gap-3">
+                    {/* Product Image */}
+                    <div className="w-14 h-14 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+                      {product.image ? (
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src =
+                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f3f4f6'/%3E%3Ctext x='50' y='50' font-size='40' text-anchor='middle' dy='.3em' fill='%239ca3af'%3E📦%3C/text%3E%3C/svg%3E";
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-2xl text-gray-400">📦</div>
+                      )}
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{product.name}</p>
                       <div className="flex items-center space-x-3 mt-1">
                         <span className="text-xs text-gray-500">SKU: {product.sku}</span>
                         {product.barcode && <span className="text-xs text-gray-500">Barcode: {product.barcode}</span>}
@@ -152,8 +170,10 @@ export const POSBarcodeScanner: React.FC<POSBarcodeScannerProps> = ({
                         </span>
                       </div>
                     </div>
-                    <div className="text-right ml-4">
-                      <p className="text-lg font-bold text-green-600">
+
+                    {/* Price */}
+                    <div className="text-right ml-2 flex-shrink-0">
+                      <p className="text-base font-bold text-green-600">
                         {formatCurrency(product.sellingPrice, settings)}
                       </p>
                     </div>

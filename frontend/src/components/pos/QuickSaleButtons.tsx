@@ -35,7 +35,7 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
   const handleQuickItemClick = (item: QuickSaleItem) => {
     if (item.product) {
       onProductSelect(item.product);
-      toast.success(`Added ${item.displayName} to cart`);
+      // Toast message is shown by parent component (POSPage)
     }
   };
 
@@ -141,24 +141,47 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {quickItems.map((item) => (
           <button
             key={item.id}
             onClick={() => handleQuickItemClick(item)}
-            className="relative group overflow-hidden rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95"
+            className="relative group overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 h-24"
             style={{
               backgroundColor: item.color,
-              minHeight: "80px",
             }}
           >
-            <div className="p-4 h-full flex flex-col items-center justify-center text-center">
-              <span className="text-white font-semibold text-sm leading-tight drop-shadow-md">{item.displayName}</span>
+            <div className="h-full flex items-stretch">
+              {/* Product Image - Full Height on Left */}
               {item.product && (
-                <span className="text-white text-xs mt-1 opacity-90 drop-shadow-sm">
-                  ${item.product.sellingPrice.toFixed(2)}
-                </span>
+                <div className="w-24 h-full flex-shrink-0 bg-white bg-opacity-20">
+                  {item.product.image ? (
+                    <img
+                      src={item.product.image}
+                      alt={item.displayName}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-2xl text-white opacity-50">
+                      📦
+                    </div>
+                  )}
+                </div>
               )}
+
+              <div className="flex-1 px-4 py-3 flex flex-col justify-center text-left">
+                <span className="text-white font-semibold text-sm leading-tight drop-shadow-md block mb-1">
+                  {item.displayName}
+                </span>
+                {item.product && (
+                  <span className="text-white text-xs opacity-90 drop-shadow-sm block font-medium">
+                    ${item.product.sellingPrice.toFixed(2)}
+                  </span>
+                )}
+              </div>
             </div>
             <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity"></div>
           </button>
