@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(response.user));
 
       console.log("💾 AuthContext: Saved to localStorage");
-      toast.success(`Welcome back, ${response.user.name}!`);
+      toast.success(`Welcome back, ${response.user.name}!`, { duration: 2000 });
       return true;
     } catch (error: any) {
       console.error("❌ AuthContext: Login failed:", {
@@ -127,7 +127,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    toast.success("Logged out successfully");
+    toast.dismiss();
   };
 
   const isAuthenticated = !!user && !!token;

@@ -105,7 +105,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
           </div>
         </div>
       }
-      size="md"
+      size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Required Field Section */}
