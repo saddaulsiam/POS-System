@@ -514,15 +514,36 @@ const POSPage: React.FC = () => {
     try {
       const total = calculateTotal(cart);
       const finalTotal = total - loyaltyDiscount;
-      const cashAmount = paymentMethod === "CASH" ? parseFloat(cashReceived) : finalTotal;
 
-      if (paymentMethod === "CASH" && cashAmount < finalTotal) {
-        toast.error("Insufficient cash amount");
-        setIsProcessingPayment(false);
-        return;
+      // Validate cash payment
+      if (paymentMethod === "CASH") {
+        if (!cashReceived || cashReceived.trim() === "") {
+          toast.error("Please enter cash received amount");
+          setIsProcessingPayment(false);
+          return;
+        }
+
+        const cashAmount = parseFloat(cashReceived);
+        if (isNaN(cashAmount) || cashAmount < 0) {
+          toast.error("Please enter a valid cash amount");
+          setIsProcessingPayment(false);
+          return;
+        }
+
+        if (cashAmount < finalTotal) {
+          toast.error(
+            `Insufficient cash. Need ${formatCurrency(finalTotal, settings)}, received ${formatCurrency(
+              cashAmount,
+              settings
+            )}`
+          );
+          setIsProcessingPayment(false);
+          return;
+        }
       }
 
-      const saleData = {
+      // Build sale data - only include cashReceived for CASH payments
+      const saleData: any = {
         customerId: customer?.id,
         items: cart.map((item) => ({
           productId: item.product.id,
@@ -532,8 +553,12 @@ const POSPage: React.FC = () => {
           discount: item.discount || 0,
         })),
         paymentMethod,
-        cashReceived: paymentMethod === "CASH" ? cashAmount : undefined,
       };
+
+      // Only include cashReceived for CASH payments
+      if (paymentMethod === "CASH") {
+        saleData.cashReceived = parseFloat(cashReceived);
+      }
 
       const sale = await salesAPI.create(saleData);
 
@@ -550,9 +575,25 @@ const POSPage: React.FC = () => {
 
       // Reload products to update stock quantities
       loadProducts(selectedCategory || undefined);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error processing payment:", error);
-      toast.error("Failed to process payment");
+
+      // Show meaningful error message
+      let errorMessage = "Failed to process payment";
+
+      if (error.response?.data?.errors && error.response.data.errors.length > 0) {
+        // Backend validation errors
+        const firstError = error.response.data.errors[0];
+        errorMessage = firstError.msg || errorMessage;
+      } else if (error.response?.data?.error) {
+        // Generic backend error
+        errorMessage = error.response.data.error;
+      } else if (error.message) {
+        // Network or other errors
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsProcessingPayment(false);
     }
