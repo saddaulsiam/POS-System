@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useSettings } from "../../context/SettingsContext";
+import NotificationBell from "./NotificationBell";
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -24,6 +25,7 @@ const Navbar: React.FC = () => {
 
         {/* User Info & Actions */}
         <div className="flex items-center gap-3">
+          <NotificationBell />
           {/* User Role Badge */}
           <span className="hidden sm:inline-flex px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">
             {user?.role}
