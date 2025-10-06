@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { BackButton } from "../components/common";
-import { Card, CardBody, CardFooter, CardHeader } from "../components/common/Card";
-import { getCurrencyConfig, getCurrencyOptions } from "../config/currencyConfig";
+import AlertsTab from "../components/settings/AlertsTab";
+import FeaturesTab from "../components/settings/FeaturesTab";
+import FinanceTab from "../components/settings/FinanceTab";
+import ProfileTab from "../components/settings/ProfileTab";
+import ReceiptTab from "../components/settings/ReceiptTab";
+import StoreTab from "../components/settings/StoreTab";
+import SystemTab from "../components/settings/SystemTab";
 import { useAuth } from "../context/AuthContext";
 import { changePin, posSettingsAPI, updateProfile } from "../services/api";
+
 interface POSSettings {
   id: number;
-
   // Feature Toggles
   enableQuickSale: boolean;
   enableSplitPayment: boolean;
@@ -219,6 +224,25 @@ const SettingsPage: React.FC = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  // Handler adapters for tab components
+  const handleToggleString = (field: string, value: boolean) => {
+    handleToggle(field as keyof POSSettings, value);
+  };
+  const handleTextFieldChangeString = (field: string, e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    handleTextFieldChange(field as keyof POSSettings, e);
+  };
+  const handleNumberFieldChangeString = (
+    field: string,
+    e: React.FocusEvent<HTMLInputElement>,
+    min?: number,
+    max?: number
+  ) => {
+    handleNumberFieldChange(field as keyof POSSettings, e, min, max);
+  };
+  const handleSelectChangeString = (field: string, value: string) => {
+    handleSelectChange(field as keyof POSSettings, value);
   };
 
   if (loading) {
@@ -459,1063 +483,146 @@ const SettingsPage: React.FC = () => {
 
         {/* Tab Content */}
         {activeTab === "profile" && (
-          <div className="mb-8">
-            <Card className="mb-8">
-              <CardHeader>
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-blue-200 flex items-center justify-center text-2xl font-bold text-blue-700">
-                    {user?.name?.[0]?.toUpperCase() || "U"}
-                  </div>
-                  <div>
-                    <div className="text-lg font-bold text-gray-800">{user?.name || "User"}</div>
-                    <div className="text-gray-500 text-sm">@{user?.username}</div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <form onSubmit={handleProfileSave} className="space-y-4">
-                  <div>
-                    <label className="block mb-1 font-medium">Name</label>
-                    <input
-                      className="input input-bordered w-full"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-1 font-medium">Username</label>
-                    <input
-                      className="input input-bordered w-full"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <CardFooter align="left">
-                    <button className="btn btn-primary" type="submit" disabled={savingProfile}>
-                      {savingProfile ? "Saving..." : "Save Changes"}
-                    </button>
-                    {profileMsg && <span className="ml-3 text-green-600 text-sm">{profileMsg}</span>}
-                  </CardFooter>
-                </form>
-              </CardBody>
-            </Card>
-            <Card>
-              <CardHeader>Change PIN</CardHeader>
-              <CardBody>
-                <form onSubmit={handlePinChange} className="space-y-4">
-                  <div>
-                    <label className="block mb-1 font-medium">Current PIN</label>
-                    <input
-                      className="input input-bordered w-full"
-                      type="password"
-                      value={currentPin}
-                      onChange={(e) => setCurrentPin(e.target.value)}
-                      minLength={4}
-                      maxLength={6}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-1 font-medium">New PIN</label>
-                    <input
-                      className="input input-bordered w-full"
-                      type="password"
-                      value={newPin}
-                      onChange={(e) => setNewPin(e.target.value)}
-                      minLength={4}
-                      maxLength={6}
-                      required
-                    />
-                    <span className="text-xs text-gray-400">PIN must be 4-6 digits</span>
-                  </div>
-                  <CardFooter align="left">
-                    <button className="btn btn-secondary" type="submit" disabled={pinSaving}>
-                      {pinSaving ? "Changing..." : "Change PIN"}
-                    </button>
-                    {pinMsg && <span className="ml-3 text-green-600 text-sm">{pinMsg}</span>}
-                  </CardFooter>
-                </form>
-              </CardBody>
-            </Card>
-          </div>
+          <ProfileTab
+            user={user}
+            name={name}
+            setName={setName}
+            username={username}
+            setUsername={setUsername}
+            savingProfile={savingProfile}
+            profileMsg={profileMsg}
+            handleProfileSave={handleProfileSave}
+            currentPin={currentPin}
+            setCurrentPin={setCurrentPin}
+            newPin={newPin}
+            setNewPin={setNewPin}
+            pinMsg={pinMsg}
+            pinSaving={pinSaving}
+            handlePinChange={handlePinChange}
+          />
         )}
         {activeTab === "features" && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">🎯 POS Feature Controls</h2>
-              <p className="text-sm text-gray-600 mt-1">Enable or disable core point of sale features</p>
-            </div>
-
-            <div className="divide-y divide-gray-200">
-              {featureToggles.map((feature) => (
-                <div
-                  key={feature.key}
-                  className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-start space-x-4 flex-1">
-                    <div className="text-3xl">{feature.icon}</div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-medium text-gray-900">{feature.title}</h3>
-                        <button
-                          onClick={() => {
-                            setSelectedFeature(feature.key);
-                            setShowInfoModal(true);
-                          }}
-                          className="text-blue-600 hover:text-blue-800 transition-colors"
-                          title="View detailed information"
-                        >
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                              fillRule="evenodd"
-                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleToggle(feature.key, !settings[feature.key])}
-                    disabled={saving}
-                    className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-                      settings[feature.key] ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                    role="switch"
-                    aria-checked={!!settings[feature.key]}
-                  >
-                    <span
-                      className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                        settings[feature.key] ? "translate-x-6" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {/* Info Box */}
-            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 mx-6 mb-6">
-              <div className="flex items-start">
-                <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <div>
-                  <h4 className="text-sm font-medium text-blue-900">Quick Tip</h4>
-                  <p className="text-sm text-blue-700 mt-1">
-                    Changes take effect immediately. Click the <strong>ℹ️ info icon</strong> next to each feature for
-                    detailed explanations.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <FeaturesTab
+            featureToggles={featureToggles}
+            settings={settings}
+            saving={saving}
+            handleToggle={handleToggleString}
+            setSelectedFeature={setSelectedFeature}
+            setShowInfoModal={setShowInfoModal}
+          />
         )}
-
         {activeTab === "store" && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">🏪 Store Information</h2>
-              <p className="text-sm text-gray-600 mt-1">Business details displayed on receipts and reports</p>
-            </div>
-
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="storeName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Store Name
-                </label>
-                <input
-                  type="text"
-                  id="storeName"
-                  defaultValue={settings.storeName}
-                  onBlur={(e) => handleTextFieldChange("storeName", e)}
-                  disabled={saving}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="storePhone" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="text"
-                  id="storePhone"
-                  defaultValue={settings.storePhone}
-                  onBlur={(e) => handleTextFieldChange("storePhone", e)}
-                  disabled={saving}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="storeEmail" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="storeEmail"
-                  defaultValue={settings.storeEmail}
-                  onBlur={(e) => handleTextFieldChange("storeEmail", e)}
-                  disabled={saving}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="taxId" className="block text-sm font-medium text-gray-700 mb-2">
-                  Tax ID (Optional)
-                </label>
-                <input
-                  type="text"
-                  id="taxId"
-                  defaultValue={settings.taxId || ""}
-                  onBlur={(e) => handleTextFieldChange("taxId", e)}
-                  disabled={saving}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label htmlFor="storeAddress" className="block text-sm font-medium text-gray-700 mb-2">
-                  Store Address
-                </label>
-                <textarea
-                  id="storeAddress"
-                  rows={2}
-                  defaultValue={settings.storeAddress}
-                  onBlur={(e) => handleTextFieldChange("storeAddress", e)}
-                  disabled={saving}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-              </div>
-            </div>
-          </div>
+          <StoreTab settings={settings} saving={saving} handleTextFieldChange={handleTextFieldChangeString} />
         )}
-
         {activeTab === "receipt" && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">🧾 Receipt Settings</h2>
-              <p className="text-sm text-gray-600 mt-1">Configure receipt printing options</p>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Receipt Toggles */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Auto-Print Receipt</h4>
-                    <p className="text-sm text-gray-500">Automatically print after sale</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle("printReceiptAuto", !settings.printReceiptAuto)}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.printReceiptAuto ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.printReceiptAuto ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Auto-Email Receipt option removed */}
-
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Auto-Print Thermal Receipt</h4>
-                    <p className="text-sm text-gray-500">Automatically print thermal receipt after sale</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle("autoPrintThermal", !settings.autoPrintThermal)}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.autoPrintThermal ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.autoPrintThermal ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                <p className="text-sm text-yellow-800">
-                  <strong>Which option should I enable?</strong>
-                  <br />
-                  <ul className="list-disc list-inside mt-1 mb-1">
-                    <li>
-                      <strong>Auto-Print Receipt</strong>: Enable if you use a regular (A4/Letter) printer for full-page
-                      receipts.
-                    </li>
-                    <li>
-                      <strong>Auto-Print Thermal Receipt</strong>: Enable if you use a thermal receipt printer
-                      (80mm/58mm) for narrow, text-based receipts.
-                    </li>
-                    <li>
-                      <strong>Both</strong>: Enable both only if you want both receipts to print automatically after
-                      each sale.
-                    </li>
-                  </ul>
-                  Most users only need to enable the one that matches their printer.
-                </p>
-              </div>
-
-              {/* Receipt Footer */}
-              <div>
-                <label htmlFor="receiptFooter" className="block text-sm font-medium text-gray-700 mb-2">
-                  Receipt Footer Text
-                </label>
-                <textarea
-                  id="receiptFooter"
-                  rows={3}
-                  defaultValue={settings.receiptFooterText || ""}
-                  onBlur={(e) => handleTextFieldChange("receiptFooterText", e)}
-                  disabled={saving}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  placeholder="Thank you for shopping with us!"
-                />
-                <p className="text-sm text-gray-500 mt-1">Displayed at the bottom of printed receipts</p>
-              </div>
-
-              {/* Return Policy */}
-              <div>
-                <label htmlFor="returnPolicy" className="block text-sm font-medium text-gray-700 mb-2">
-                  Return Policy Text (Optional)
-                </label>
-                <textarea
-                  id="returnPolicy"
-                  rows={3}
-                  defaultValue={settings.returnPolicy || ""}
-                  onBlur={(e) => handleTextFieldChange("returnPolicy", e)}
-                  disabled={saving}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  placeholder="Returns accepted within 30 days with receipt"
-                />
-                <p className="text-sm text-gray-500 mt-1">Return policy displayed on receipts</p>
-              </div>
-            </div>
-          </div>
+          <ReceiptTab
+            settings={settings}
+            saving={saving}
+            handleToggle={handleToggleString}
+            handleTextFieldChange={handleTextFieldChangeString}
+          />
         )}
-
         {activeTab === "finance" && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">💰 Tax & Currency</h2>
-              <p className="text-sm text-gray-600 mt-1">Configure pricing and tax settings</p>
-            </div>
-
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="taxRate" className="block text-sm font-medium text-gray-700 mb-2">
-                  Default Tax Rate (%)
-                </label>
-                <input
-                  type="number"
-                  id="taxRate"
-                  min="0"
-                  max="100"
-                  step="0.01"
-                  defaultValue={settings.taxRate}
-                  onBlur={(e) => handleNumberFieldChange("taxRate", e, 0, 100)}
-                  disabled={saving}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  placeholder="0.00"
-                />
-                <p className="text-sm text-gray-500 mt-1">Applied to all products unless overridden</p>
-              </div>
-
-              <div>
-                <label htmlFor="currencyCode" className="block text-sm font-medium text-gray-700 mb-2">
-                  Currency
-                </label>
-                <select
-                  id="currencyCode"
-                  value={settings.currencyCode || "USD"}
-                  onChange={(e) => {
-                    const currencyCode = e.target.value;
-                    const config = getCurrencyConfig(currencyCode);
-
-                    // Update currency code and sync symbol/position
-                    handleSelectChange("currencyCode", currencyCode);
-                    handleSelectChange("currencySymbol", config.symbol);
-                    handleSelectChange("currencyPosition", config.symbolPosition);
-
-                    toast.success(`Currency changed to ${config.name}`);
-                  }}
-                  disabled={saving}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                >
-                  {getCurrencyOptions().map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-sm text-gray-500 mt-1">
-                  Preview: {getCurrencyConfig(settings.currencyCode).symbol}1,234.56
-                  {getCurrencyConfig(settings.currencyCode).symbolPosition === "after" &&
-                    getCurrencyConfig(settings.currencyCode).symbol}
-                </p>
-              </div>
-
-              <div>
-                <label htmlFor="loyaltyPointsPerUnit" className="block text-sm font-medium text-gray-700 mb-2">
-                  Loyalty Points Rate
-                </label>
-                <input
-                  type="number"
-                  id="loyaltyPointsPerUnit"
-                  min="0.01"
-                  step="0.01"
-                  defaultValue={settings.loyaltyPointsPerUnit || 10}
-                  onBlur={(e) => handleNumberFieldChange("loyaltyPointsPerUnit", e, 0.01, 10000)}
-                  disabled={saving || !settings.enableLoyaltyPoints}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  placeholder="10.00"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  1 point per {settings.loyaltyPointsPerUnit || 10} {getCurrencyConfig(settings.currencyCode).symbol}{" "}
-                  spent
-                  {!settings.enableLoyaltyPoints && " (Enable Loyalty Points first)"}
-                </p>
-              </div>
-
-              <div>
-                <label htmlFor="pointsRedemptionRate" className="block text-sm font-medium text-gray-700 mb-2">
-                  Points Redemption Rate
-                </label>
-                <input
-                  type="number"
-                  id="pointsRedemptionRate"
-                  min="1"
-                  step="1"
-                  defaultValue={settings.pointsRedemptionRate || 100}
-                  onBlur={(e) => handleNumberFieldChange("pointsRedemptionRate", e, 1, 10000)}
-                  disabled={saving || !settings.enableLoyaltyPoints}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  placeholder="100"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  {settings.pointsRedemptionRate || 100} points = {getCurrencyConfig(settings.currencyCode).symbol}1
-                  discount
-                  {!settings.enableLoyaltyPoints && " (Enable Loyalty Points first)"}
-                </p>
-              </div>
-
-              <div className="col-span-2">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div className="ml-3 flex-1">
-                      <h3 className="text-sm font-medium text-blue-800">Currency & Loyalty System</h3>
-                      <div className="mt-2 text-sm text-blue-700">
-                        <p>Select your preferred currency from the dropdown. Each currency includes:</p>
-                        <ul className="list-disc list-inside mt-1 space-y-1">
-                          <li>
-                            <strong>USD</strong> - US Dollar ($) with standard formatting
-                          </li>
-                          <li>
-                            <strong>BDT</strong> - Bangladeshi Taka (৳) with English numerals
-                          </li>
-                          <li>
-                            <strong>EUR, GBP, INR, JPY</strong> - Additional currencies available
-                          </li>
-                        </ul>
-                        <p className="mt-2">
-                          The currency will be applied across all prices, reports, and receipts in the system.
-                        </p>
-                        <p className="mt-2 font-medium">
-                          <strong>Earning Points:</strong> Customers earn 1 point per{" "}
-                          {settings.loyaltyPointsPerUnit || 10} {getCurrencyConfig(settings.currencyCode).symbol} spent.
-                        </p>
-                        <p className="mt-1 font-medium">
-                          <strong>Redeeming Points:</strong> {settings.pointsRedemptionRate || 100} points ={" "}
-                          {getCurrencyConfig(settings.currencyCode).symbol}1 discount.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <FinanceTab
+            settings={settings}
+            saving={saving}
+            handleNumberFieldChange={handleNumberFieldChangeString}
+            handleSelectChange={handleSelectChangeString}
+          />
         )}
-
         {activeTab === "alerts" && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">🔔 Alerts & Notifications</h2>
-              <p className="text-sm text-gray-600 mt-1">Manage inventory alerts and notifications</p>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Alert Toggles */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Low Stock Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Low Stock Alerts</h4>
-                    <p className="text-sm text-gray-500">Notify when inventory is low</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle("enableLowStockAlerts", !settings.enableLowStockAlerts)}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.enableLowStockAlerts ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.enableLowStockAlerts ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* High Stock Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">High Stock Alerts</h4>
-                    <p className="text-sm text-gray-500">Notify when inventory is too high</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle("enableHighStockAlerts", !(settings.enableHighStockAlerts ?? false))}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.enableHighStockAlerts ?? false ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.enableHighStockAlerts ?? false ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Product Expiry Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Product Expiry Alerts</h4>
-                    <p className="text-sm text-gray-500">Notify when products are near expiry</p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      handleToggle("enableProductExpiryAlerts", !(settings.enableProductExpiryAlerts ?? false))
-                    }
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.enableProductExpiryAlerts ?? false ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.enableProductExpiryAlerts ?? false ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Daily Sales Target Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Daily Sales Target Alert</h4>
-                    <p className="text-sm text-gray-500">Notify when daily sales target is reached</p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      handleToggle("dailySalesTargetAlertEnabled", !(settings.dailySalesTargetAlertEnabled ?? false))
-                    }
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.dailySalesTargetAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.dailySalesTargetAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Price Change Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Price Change Alert</h4>
-                    <p className="text-sm text-gray-500">Notify when a product price is changed</p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      handleToggle("priceChangeAlertEnabled", !(settings.priceChangeAlertEnabled ?? false))
-                    }
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.priceChangeAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.priceChangeAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Inactive Product Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Inactive Product Alert</h4>
-                    <p className="text-sm text-gray-500">Notify if a product has not sold for X days</p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      handleToggle("inactiveProductAlertEnabled", !(settings.inactiveProductAlertEnabled ?? false))
-                    }
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.inactiveProductAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.inactiveProductAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Low Balance Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Low Balance Alert</h4>
-                    <p className="text-sm text-gray-500">Notify when cash drawer balance falls below threshold</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle("lowBalanceAlertEnabled", !(settings.lowBalanceAlertEnabled ?? false))}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.lowBalanceAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.lowBalanceAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Frequent Refunds Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Frequent Refunds Alert</h4>
-                    <p className="text-sm text-gray-500">Notify if refunds exceed threshold in a day</p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      handleToggle("frequentRefundsAlertEnabled", !(settings.frequentRefundsAlertEnabled ?? false))
-                    }
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.frequentRefundsAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.frequentRefundsAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Supplier Delivery Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Supplier Delivery Alert</h4>
-                    <p className="text-sm text-gray-500">Notify if supplier delivery is overdue</p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      handleToggle("supplierDeliveryAlertEnabled", !(settings.supplierDeliveryAlertEnabled ?? false))
-                    }
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.supplierDeliveryAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.supplierDeliveryAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Loyalty Points Expiry Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Loyalty Points Expiry Alert</h4>
-                    <p className="text-sm text-gray-500">Notify customers before their loyalty points expire</p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      handleToggle(
-                        "loyaltyPointsExpiryAlertEnabled",
-                        !(settings.loyaltyPointsExpiryAlertEnabled ?? false)
-                      )
-                    }
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.loyaltyPointsExpiryAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.loyaltyPointsExpiryAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* System Error/Failure Alert */}
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">System Error/Failure Alert</h4>
-                    <p className="text-sm text-gray-500">Notify admins when a critical system error occurs</p>
-                  </div>
-                  <button
-                    onClick={() =>
-                      handleToggle("systemErrorAlertEnabled", !(settings.systemErrorAlertEnabled ?? false))
-                    }
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.systemErrorAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.systemErrorAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* Low Stock Threshold */}
-              <div>
-                <label htmlFor="lowStockThreshold" className="block text-sm font-medium text-gray-700 mb-2">
-                  Low Stock Threshold
-                </label>
-                <input
-                  type="number"
-                  id="lowStockThreshold"
-                  min="1"
-                  max="1000"
-                  defaultValue={settings.lowStockThreshold}
-                  onBlur={(e) => handleNumberFieldChange("lowStockThreshold", e, 1, 1000)}
-                  disabled={saving}
-                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-                <p className="text-sm text-gray-500 mt-1">Alert when product stock falls below this number</p>
-              </div>
-
-              {/* High Stock Threshold */}
-              <div>
-                <label htmlFor="highStockThreshold" className="block text-sm font-medium text-gray-700 mb-2">
-                  High Stock Threshold
-                </label>
-                <input
-                  type="number"
-                  id="highStockThreshold"
-                  min="10"
-                  max="10000"
-                  defaultValue={settings.highStockThreshold || 1000}
-                  onBlur={(e) => handleNumberFieldChange("highStockThreshold", e, 10, 10000)}
-                  disabled={saving}
-                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-                <p className="text-sm text-gray-500 mt-1">Alert when product stock exceeds this number</p>
-              </div>
-
-              {/* Product Expiry Days */}
-              <div>
-                <label htmlFor="productExpiryDays" className="block text-sm font-medium text-gray-700 mb-2">
-                  Days Before Expiry to Alert
-                </label>
-                <input
-                  type="number"
-                  id="productExpiryDays"
-                  min="1"
-                  max="365"
-                  defaultValue={settings.productExpiryDays || 7}
-                  onBlur={(e) => handleNumberFieldChange("productExpiryDays", e, 1, 365)}
-                  disabled={saving || !(settings.enableProductExpiryAlerts ?? false)}
-                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-                <p className="text-sm text-gray-500 mt-1">Alert when a product is within this many days of expiry</p>
-              </div>
-
-              {/* Daily Sales Target Amount */}
-              <div>
-                <label htmlFor="dailySalesTargetAmount" className="block text-sm font-medium text-gray-700 mb-2">
-                  Daily Sales Target Amount
-                </label>
-                <input
-                  type="number"
-                  id="dailySalesTargetAmount"
-                  min="1"
-                  step="1"
-                  defaultValue={settings.dailySalesTargetAmount || 1000}
-                  onBlur={(e) => handleNumberFieldChange("dailySalesTargetAmount", e, 1)}
-                  disabled={saving || !(settings.dailySalesTargetAlertEnabled ?? false)}
-                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-                <p className="text-sm text-gray-500 mt-1">Set the daily sales target amount for alert notification</p>
-              </div>
-
-              {/* Expected Delivery Days for Supplier Delivery Alert */}
-              <div>
-                <label htmlFor="expectedDeliveryDays" className="block text-sm font-medium text-gray-700 mb-2">
-                  Expected Delivery Days
-                </label>
-                <input
-                  type="number"
-                  id="expectedDeliveryDays"
-                  min="1"
-                  max="60"
-                  defaultValue={settings.expectedDeliveryDays || 7}
-                  onBlur={(e) => handleNumberFieldChange("expectedDeliveryDays", e, 1, 60)}
-                  disabled={saving || !(settings.supplierDeliveryAlertEnabled ?? false)}
-                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-                <p className="text-sm text-gray-500 mt-1">Alert if supplier delivery is overdue by this many days</p>
-              </div>
-
-              {/* Inactive Product Days for Inactive Product Alert */}
-              <div>
-                <label htmlFor="inactiveProductDays" className="block text-sm font-medium text-gray-700 mb-2">
-                  Inactive Product Days
-                </label>
-                <input
-                  type="number"
-                  id="inactiveProductDays"
-                  min="1"
-                  max="365"
-                  defaultValue={settings.inactiveProductDays || 30}
-                  onBlur={(e) => handleNumberFieldChange("inactiveProductDays", e, 1, 365)}
-                  disabled={saving || !(settings.inactiveProductAlertEnabled ?? false)}
-                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-                <p className="text-sm text-gray-500 mt-1">Alert if a product has not sold for this many days</p>
-              </div>
-
-              {/* Low Balance Threshold for Low Balance Alert */}
-              <div>
-                <label htmlFor="lowBalanceThreshold" className="block text-sm font-medium text-gray-700 mb-2">
-                  Low Balance Threshold
-                </label>
-                <input
-                  type="number"
-                  id="lowBalanceThreshold"
-                  min="0"
-                  step="0.01"
-                  defaultValue={settings.lowBalanceThreshold || 100}
-                  onBlur={(e) => handleNumberFieldChange("lowBalanceThreshold", e, 0)}
-                  disabled={saving || !(settings.lowBalanceAlertEnabled ?? false)}
-                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-                <p className="text-sm text-gray-500 mt-1">Alert when cash drawer balance falls below this amount</p>
-              </div>
-
-              {/* Frequent Refunds Threshold for Frequent Refunds Alert */}
-              <div>
-                <label htmlFor="frequentRefundsThreshold" className="block text-sm font-medium text-gray-700 mb-2">
-                  Frequent Refunds Threshold
-                </label>
-                <input
-                  type="number"
-                  id="frequentRefundsThreshold"
-                  min="1"
-                  step="1"
-                  defaultValue={settings.frequentRefundsThreshold || 3}
-                  onBlur={(e) => handleNumberFieldChange("frequentRefundsThreshold", e, 1)}
-                  disabled={saving || !(settings.frequentRefundsAlertEnabled ?? false)}
-                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-                <p className="text-sm text-gray-500 mt-1">Alert if refunds exceed this number in a day</p>
-              </div>
-
-              {/* Loyalty Points Expiry Days for Loyalty Points Expiry Alert */}
-              <div>
-                <label htmlFor="loyaltyPointsExpiryDays" className="block text-sm font-medium text-gray-700 mb-2">
-                  Days Before Points Expiry
-                </label>
-                <input
-                  type="number"
-                  id="loyaltyPointsExpiryDays"
-                  min="1"
-                  step="1"
-                  defaultValue={settings.loyaltyPointsExpiryDays || 30}
-                  onBlur={(e) => handleNumberFieldChange("loyaltyPointsExpiryDays", e, 1)}
-                  disabled={saving || !(settings.loyaltyPointsExpiryAlertEnabled ?? false)}
-                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                />
-                <p className="text-sm text-gray-500 mt-1">Alert customers this many days before their points expire</p>
-              </div>
-            </div>
-          </div>
+          <AlertsTab
+            settings={settings}
+            saving={saving}
+            handleSwitchChange={handleToggleString}
+            handleNumberFieldChange={handleNumberFieldChangeString}
+            handleSelectChange={handleSelectChangeString}
+            alertTypes={[
+              {
+                key: "lowStock",
+                label: "Low Stock",
+                description: "Notify when inventory is low",
+                min: 1,
+                max: 1000,
+                unit: "qty",
+              },
+              {
+                key: "highStock",
+                label: "High Stock",
+                description: "Notify when inventory is too high",
+                min: 10,
+                max: 10000,
+                unit: "qty",
+              },
+              {
+                key: "productExpiry",
+                label: "Product Expiry",
+                description: "Notify when products are near expiry",
+                min: 1,
+                max: 365,
+                unit: "days",
+              },
+              {
+                key: "dailySalesTarget",
+                label: "Daily Sales Target",
+                description: "Notify when daily sales target is reached",
+                min: 1,
+                unit: "amount",
+              },
+              { key: "priceChange", label: "Price Change", description: "Notify when a product price is changed" },
+              {
+                key: "inactiveProduct",
+                label: "Inactive Product",
+                description: "Notify if a product has not sold for X days",
+                min: 1,
+                max: 365,
+                unit: "days",
+              },
+              {
+                key: "lowBalance",
+                label: "Low Balance",
+                description: "Notify when cash drawer balance falls below threshold",
+                min: 0,
+                unit: "amount",
+              },
+              {
+                key: "frequentRefunds",
+                label: "Frequent Refunds",
+                description: "Notify if refunds exceed threshold in a day",
+                min: 1,
+                unit: "count",
+              },
+              {
+                key: "supplierDelivery",
+                label: "Supplier Delivery",
+                description: "Notify if supplier delivery is overdue",
+                min: 1,
+                max: 60,
+                unit: "days",
+              },
+              {
+                key: "loyaltyPointsExpiry",
+                label: "Loyalty Points Expiry",
+                description: "Notify customers before their loyalty points expire",
+                min: 1,
+                unit: "days",
+              },
+              {
+                key: "systemErrorAlert",
+                label: "System Error/Failure",
+                description: "Notify admins when a critical system error occurs",
+              },
+            ]}
+          />
         )}
-
         {activeTab === "system" && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">⚙️ System Settings</h2>
-              <p className="text-sm text-gray-600 mt-1">Security and system preferences</p>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* System Toggles */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Require Password on Void</h4>
-                    <p className="text-sm text-gray-500">Admin approval for void transactions</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle("requirePasswordOnVoid", !settings.requirePasswordOnVoid)}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.requirePasswordOnVoid ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.requirePasswordOnVoid ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Enable Audit Log</h4>
-                    <p className="text-sm text-gray-500">Track all system actions</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle("enableAuditLog", !settings.enableAuditLog)}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.enableAuditLog ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.enableAuditLog ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Show Product Images</h4>
-                    <p className="text-sm text-gray-500">Display images in POS</p>
-                  </div>
-                  <button
-                    onClick={() => handleToggle("showProductImages", !settings.showProductImages)}
-                    disabled={saving}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                      settings.showProductImages ? "bg-blue-600" : "bg-gray-200"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                        settings.showProductImages ? "translate-x-5" : "translate-x-0"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* Numeric Settings */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="autoLogoutMinutes" className="block text-sm font-medium text-gray-700 mb-2">
-                    Auto Logout (Minutes)
-                  </label>
-                  <input
-                    type="number"
-                    id="autoLogoutMinutes"
-                    min="5"
-                    max="240"
-                    defaultValue={settings.autoLogoutMinutes}
-                    onBlur={(e) => handleNumberFieldChange("autoLogoutMinutes", e, 5, 240)}
-                    disabled={saving}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">Auto-logout after inactivity</p>
-                </div>
-
-                <div>
-                  <label htmlFor="productsPerPage" className="block text-sm font-medium text-gray-700 mb-2">
-                    Products Per Page
-                  </label>
-                  <input
-                    type="number"
-                    id="productsPerPage"
-                    min="10"
-                    max="100"
-                    defaultValue={settings.productsPerPage}
-                    onBlur={(e) => handleNumberFieldChange("productsPerPage", e, 10, 100)}
-                    disabled={saving}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">Number of products per page</p>
-                </div>
-
-                <div>
-                  <label htmlFor="defaultView" className="block text-sm font-medium text-gray-700 mb-2">
-                    Default Product View
-                  </label>
-                  <select
-                    id="defaultView"
-                    value={settings.defaultView}
-                    onChange={(e) => handleSelectChange("defaultView", e.target.value)}
-                    disabled={saving}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  >
-                    <option value="grid">Grid View</option>
-                    <option value="list">List View</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
+          <SystemTab
+            settings={settings}
+            saving={saving}
+            handleSwitchChange={handleToggleString}
+            handleNumberFieldChange={handleNumberFieldChangeString}
+            handleSelectChange={handleSelectChangeString}
+          />
         )}
 
         {/* Info Modal */}
