@@ -149,14 +149,17 @@ const FeaturesTab: React.FC<FeaturesTabProps> = ({
           <h2 className="text-xl font-semibold text-gray-900">🎯 POS Feature Controls</h2>
           <p className="text-sm text-gray-600 mt-1">Enable or disable core point of sale features</p>
         </div>
-        <div className="divide-y divide-gray-200">
+        <div className="space-y-4 p-6">
           {featureToggles.map((feature) => (
-            <div key={feature.key} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
-              <div className="flex items-start space-x-4 flex-1">
-                <div className="text-3xl">{feature.icon}</div>
-                <div className="flex-1">
+            <div
+              key={feature.key}
+              className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <span className="text-2xl">{feature.icon}</span>
+                <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-medium text-gray-900">{feature.title}</h3>
+                    <span className="font-medium text-gray-900">{feature.title}</span>
                     <button
                       onClick={() => {
                         setSelectedFeature(feature.key);
@@ -180,15 +183,15 @@ const FeaturesTab: React.FC<FeaturesTabProps> = ({
               <button
                 onClick={() => handleToggle(feature.key, !settings[feature.key])}
                 disabled={saving}
-                className={`relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
                   settings[feature.key] ? "bg-blue-600" : "bg-gray-200"
                 }`}
                 role="switch"
                 aria-checked={!!settings[feature.key]}
               >
                 <span
-                  className={`pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    settings[feature.key] ? "translate-x-6" : "translate-x-0"
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                    settings[feature.key] ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
               </button>

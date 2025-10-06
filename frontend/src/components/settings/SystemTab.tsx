@@ -21,37 +21,34 @@ const SystemTab: React.FC<SystemTabProps> = ({
         <h2 className="text-xl font-semibold text-gray-900">⚙️ System</h2>
         <p className="text-sm text-gray-600 mt-1">System preferences and advanced options</p>
       </div>
-      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label htmlFor="autoPrintThermal" className="block text-sm font-medium text-gray-700 mb-2">
-            Auto Print Thermal Receipts
-          </label>
-          <input
-            type="checkbox"
-            id="autoPrintThermal"
-            checked={!!settings.autoPrintThermal}
-            onChange={(e) => handleSwitchChange("autoPrintThermal", e.target.checked)}
+      <div className="space-y-4 p-6">
+        {/* System Error Alerts Toggle */}
+        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors">
+          <div>
+            <span className="font-medium text-gray-900">System Error Alerts</span>
+            <p className="text-sm text-gray-600 mt-1">Receive alerts for system errors or failures</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleSwitchChange("systemErrorAlertEnabled", !settings.systemErrorAlertEnabled)}
             disabled={saving}
-            className="form-checkbox h-5 w-5 text-blue-600"
-          />
-          <p className="text-sm text-gray-500 mt-1">Automatically print receipts after each sale</p>
-        </div>
-        <div>
-          <label htmlFor="systemErrorAlertEnabled" className="block text-sm font-medium text-gray-700 mb-2">
-            System Error Alerts
-          </label>
-          <input
-            type="checkbox"
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+              settings.systemErrorAlertEnabled ? "bg-blue-600" : "bg-gray-200"
+            }`}
+            role="switch"
+            aria-checked={!!settings.systemErrorAlertEnabled}
             id="systemErrorAlertEnabled"
-            checked={!!settings.systemErrorAlertEnabled}
-            onChange={(e) => handleSwitchChange("systemErrorAlertEnabled", e.target.checked)}
-            disabled={saving}
-            className="form-checkbox h-5 w-5 text-blue-600"
-          />
-          <p className="text-sm text-gray-500 mt-1">Receive alerts for system errors or failures</p>
+          >
+            <span
+              className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                settings.systemErrorAlertEnabled ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </button>
         </div>
-        <div>
-          <label htmlFor="dailySalesTarget" className="block text-sm font-medium text-gray-700 mb-2">
+        {/* Daily Sales Target Input */}
+        <div className="p-4 border border-gray-200 rounded-lg bg-white">
+          <label htmlFor="dailySalesTarget" className="block text-sm font-medium text-gray-900 mb-1">
             Daily Sales Target
           </label>
           <input
@@ -67,8 +64,9 @@ const SystemTab: React.FC<SystemTabProps> = ({
           />
           <p className="text-sm text-gray-500 mt-1">Set a daily sales target for your store</p>
         </div>
-        <div>
-          <label htmlFor="highStockAlertThreshold" className="block text-sm font-medium text-gray-700 mb-2">
+        {/* High Stock Alert Threshold Input */}
+        <div className="p-4 border border-gray-200 rounded-lg bg-white">
+          <label htmlFor="highStockAlertThreshold" className="block text-sm font-medium text-gray-900 mb-1">
             High Stock Alert Threshold
           </label>
           <input

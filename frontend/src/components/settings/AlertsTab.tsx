@@ -98,23 +98,35 @@ const AlertsTab: React.FC<AlertsTabProps> = ({
         <h2 className="text-xl font-semibold text-gray-900">🔔 Alerts & Notifications</h2>
         <p className="text-sm text-gray-600 mt-1">Configure system alerts and notification preferences</p>
       </div>
-      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-4 p-6">
         {alertTypes.map((alert) => (
-          <div key={alert.key} className="flex flex-col space-y-2">
+          <div
+            key={alert.key}
+            className="p-4 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+          >
             <div className="flex items-center justify-between">
-              <label htmlFor={alert.key} className="text-sm font-medium text-gray-700">
-                {alert.label}
-              </label>
-              <input
-                type="checkbox"
-                id={alert.key}
-                checked={!!settings[`${alert.key}Enabled`]}
-                onChange={(e) => handleSwitchChange(`${alert.key}Enabled`, e.target.checked)}
+              <div>
+                <span className="font-medium text-gray-900">{alert.label}</span>
+                <p className="text-sm text-gray-600 mt-1">{alert.description}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleSwitchChange(`${alert.key}Enabled`, !settings[`${alert.key}Enabled`])}
                 disabled={saving}
-                className="form-checkbox h-5 w-5 text-blue-600"
-              />
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                  settings[`${alert.key}Enabled`] ? "bg-blue-600" : "bg-gray-200"
+                }`}
+                role="switch"
+                aria-checked={!!settings[`${alert.key}Enabled`]}
+                id={alert.key}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                    settings[`${alert.key}Enabled`] ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
             </div>
-            <p className="text-xs text-gray-500 mb-1">{alert.description}</p>
             {typeof settings[`${alert.key}Threshold`] !== "undefined" && (
               <input
                 type="number"
@@ -125,7 +137,7 @@ const AlertsTab: React.FC<AlertsTabProps> = ({
                 defaultValue={settings[`${alert.key}Threshold`]}
                 onBlur={(e) => handleNumberFieldChange(`${alert.key}Threshold`, e, alert.min, alert.max)}
                 disabled={saving || !settings[`${alert.key}Enabled`]}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                 placeholder={alert.unit ? `Enter value (${alert.unit})` : "Enter value"}
               />
             )}
