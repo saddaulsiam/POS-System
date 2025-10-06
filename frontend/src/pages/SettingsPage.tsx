@@ -5,7 +5,6 @@ import { Card, CardBody, CardFooter, CardHeader } from "../components/common/Car
 import { getCurrencyConfig, getCurrencyOptions } from "../config/currencyConfig";
 import { useAuth } from "../context/AuthContext";
 import { changePin, posSettingsAPI, updateProfile } from "../services/api";
-
 interface POSSettings {
   id: number;
 
@@ -58,6 +57,7 @@ interface POSSettings {
   frequentRefundsThreshold?: number;
   loyaltyPointsExpiryAlertEnabled?: boolean;
   loyaltyPointsExpiryDays?: number;
+  systemErrorAlertEnabled?: boolean;
 
   // System Settings
   autoLogoutMinutes: number;
@@ -1197,6 +1197,29 @@ const SettingsPage: React.FC = () => {
                     <span
                       className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
                         settings.loyaltyPointsExpiryAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* System Error/Failure Alert */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">System Error/Failure Alert</h4>
+                    <p className="text-sm text-gray-500">Notify admins when a critical system error occurs</p>
+                  </div>
+                  <button
+                    onClick={() =>
+                      handleToggle("systemErrorAlertEnabled", !(settings.systemErrorAlertEnabled ?? false))
+                    }
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.systemErrorAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.systemErrorAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
                       }`}
                     />
                   </button>
