@@ -1,3 +1,7 @@
+// Daily Sales Target Alert (frontend state, add to POSSettings interface if not present)
+// Add to interface if not present:
+// dailySalesTargetAlertEnabled?: boolean;
+// dailySalesTargetAmount?: number;
 import { useAuth } from "../context/AuthContext";
 import { updateProfile, changePin } from "../services/api";
 import { Card, CardHeader, CardBody, CardFooter } from "../components/common/Card";
@@ -9,6 +13,7 @@ import { getCurrencyOptions, getCurrencyConfig } from "../config/currencyConfig"
 
 interface POSSettings {
   id: number;
+
   // Feature Toggles
   enableQuickSale: boolean;
   enableSplitPayment: boolean;
@@ -41,6 +46,19 @@ interface POSSettings {
   // Alerts & Notifications
   enableLowStockAlerts: boolean;
   lowStockThreshold: number;
+  enableHighStockAlerts?: boolean;
+  highStockThreshold?: number;
+  enableProductExpiryAlerts?: boolean;
+  productExpiryDays?: number;
+  dailySalesTargetAlertEnabled?: boolean;
+  dailySalesTargetAmount?: number;
+  priceChangeAlertEnabled?: boolean;
+  supplierDeliveryAlertEnabled?: boolean;
+  expectedDeliveryDays?: number;
+  inactiveProductAlertEnabled?: boolean;
+  inactiveProductDays?: number;
+  lowBalanceAlertEnabled?: boolean;
+  lowBalanceThreshold?: number;
 
   // System Settings
   autoLogoutMinutes: number;
@@ -598,6 +616,46 @@ const SettingsPage: React.FC = () => {
                     detailed explanations.
                   </p>
                 </div>
+                {/* Product Expiry Alert */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Product Expiry Alerts</h4>
+                    <p className="text-sm text-gray-500">Notify when products are near expiry</p>
+                  </div>
+                  <button
+                    onClick={() =>
+                      handleToggle("enableProductExpiryAlerts", !(settings.enableProductExpiryAlerts ?? false))
+                    }
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.enableProductExpiryAlerts ?? false ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.enableProductExpiryAlerts ?? false ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Product Expiry Days */}
+                <div>
+                  <label htmlFor="productExpiryDays" className="block text-sm font-medium text-gray-700 mb-2">
+                    Days Before Expiry to Alert
+                  </label>
+                  <input
+                    type="number"
+                    id="productExpiryDays"
+                    min="1"
+                    max="365"
+                    defaultValue={settings.productExpiryDays || 7}
+                    onBlur={(e) => handleNumberFieldChange("productExpiryDays", e, 1, 365)}
+                    disabled={saving || !(settings.enableProductExpiryAlerts ?? false)}
+                    className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">Alert when a product is within this many days of expiry</p>
+                </div>
               </div>
             </div>
           </div>
@@ -958,6 +1016,7 @@ const SettingsPage: React.FC = () => {
             <div className="p-6 space-y-6">
               {/* Alert Toggles */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Low Stock Alert */}
                 <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                   <div>
                     <h4 className="font-medium text-gray-900">Low Stock Alerts</h4>
@@ -978,7 +1037,164 @@ const SettingsPage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Email Notifications option removed */}
+                {/* High Stock Alert */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">High Stock Alerts</h4>
+                    <p className="text-sm text-gray-500">Notify when inventory is too high</p>
+                  </div>
+                  <button
+                    onClick={() => handleToggle("enableHighStockAlerts", !(settings.enableHighStockAlerts ?? false))}
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.enableHighStockAlerts ?? false ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.enableHighStockAlerts ?? false ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Product Expiry Alert */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Product Expiry Alerts</h4>
+                    <p className="text-sm text-gray-500">Notify when products are near expiry</p>
+                  </div>
+                  <button
+                    onClick={() =>
+                      handleToggle("enableProductExpiryAlerts", !(settings.enableProductExpiryAlerts ?? false))
+                    }
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.enableProductExpiryAlerts ?? false ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.enableProductExpiryAlerts ?? false ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Daily Sales Target Alert */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Daily Sales Target Alert</h4>
+                    <p className="text-sm text-gray-500">Notify when daily sales target is reached</p>
+                  </div>
+                  <button
+                    onClick={() =>
+                      handleToggle("dailySalesTargetAlertEnabled", !(settings.dailySalesTargetAlertEnabled ?? false))
+                    }
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.dailySalesTargetAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.dailySalesTargetAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Price Change Alert */}
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Price Change Alert</h4>
+                    <p className="text-sm text-gray-500">Notify when a product price is changed</p>
+                  </div>
+                  <button
+                    onClick={() =>
+                      handleToggle("priceChangeAlertEnabled", !(settings.priceChangeAlertEnabled ?? false))
+                    }
+                    disabled={saving}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                      settings.priceChangeAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                        settings.priceChangeAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                  {/* Inactive Product Alert */}
+                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div>
+                      <h4 className="font-medium text-gray-900">Inactive Product Alert</h4>
+                      <p className="text-sm text-gray-500">Notify if a product has not sold for X days</p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        handleToggle("inactiveProductAlertEnabled", !(settings.inactiveProductAlertEnabled ?? false))
+                      }
+                      disabled={saving}
+                      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                        settings.inactiveProductAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                          settings.inactiveProductAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                    {/* Low Balance Alert */}
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-gray-900">Low Balance Alert</h4>
+                        <p className="text-sm text-gray-500">Notify when cash drawer balance falls below threshold</p>
+                      </div>
+                      <button
+                        onClick={() =>
+                          handleToggle("lowBalanceAlertEnabled", !(settings.lowBalanceAlertEnabled ?? false))
+                        }
+                        disabled={saving}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                          settings.lowBalanceAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                            settings.lowBalanceAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                  {/* Supplier Delivery Alert */}
+                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div>
+                      <h4 className="font-medium text-gray-900">Supplier Delivery Alert</h4>
+                      <p className="text-sm text-gray-500">Notify if supplier delivery is overdue</p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        handleToggle("supplierDeliveryAlertEnabled", !(settings.supplierDeliveryAlertEnabled ?? false))
+                      }
+                      disabled={saving}
+                      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                        settings.supplierDeliveryAlertEnabled ?? false ? "bg-blue-600" : "bg-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
+                          settings.supplierDeliveryAlertEnabled ?? false ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </button>
+                  </div>
               </div>
 
               {/* Low Stock Threshold */}
@@ -999,7 +1215,113 @@ const SettingsPage: React.FC = () => {
                 <p className="text-sm text-gray-500 mt-1">Alert when product stock falls below this number</p>
               </div>
 
-              {/* Admin Email option removed */}
+              {/* High Stock Threshold */}
+              <div>
+                <label htmlFor="highStockThreshold" className="block text-sm font-medium text-gray-700 mb-2">
+                  High Stock Threshold
+                </label>
+                <input
+                  type="number"
+                  id="highStockThreshold"
+                  min="10"
+                  max="10000"
+                  defaultValue={settings.highStockThreshold || 1000}
+                  onBlur={(e) => handleNumberFieldChange("highStockThreshold", e, 10, 10000)}
+                  disabled={saving}
+                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+                <p className="text-sm text-gray-500 mt-1">Alert when product stock exceeds this number</p>
+              </div>
+
+              {/* Product Expiry Days */}
+              <div>
+                <label htmlFor="productExpiryDays" className="block text-sm font-medium text-gray-700 mb-2">
+                  Days Before Expiry to Alert
+                </label>
+                <input
+                  type="number"
+                  id="productExpiryDays"
+                  min="1"
+                  max="365"
+                  defaultValue={settings.productExpiryDays || 7}
+                  onBlur={(e) => handleNumberFieldChange("productExpiryDays", e, 1, 365)}
+                  disabled={saving || !(settings.enableProductExpiryAlerts ?? false)}
+                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+                <p className="text-sm text-gray-500 mt-1">Alert when a product is within this many days of expiry</p>
+              </div>
+
+              {/* Daily Sales Target Amount */}
+              <div>
+                <label htmlFor="dailySalesTargetAmount" className="block text-sm font-medium text-gray-700 mb-2">
+                  Daily Sales Target Amount
+                </label>
+                <input
+                  type="number"
+                  id="dailySalesTargetAmount"
+                  min="1"
+                  step="1"
+                  defaultValue={settings.dailySalesTargetAmount || 1000}
+                  onBlur={(e) => handleNumberFieldChange("dailySalesTargetAmount", e, 1)}
+                  disabled={saving || !(settings.dailySalesTargetAlertEnabled ?? false)}
+                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+                <p className="text-sm text-gray-500 mt-1">Set the daily sales target amount for alert notification</p>
+              </div>
+
+              {/* Expected Delivery Days for Supplier Delivery Alert */}
+              <div>
+                <label htmlFor="expectedDeliveryDays" className="block text-sm font-medium text-gray-700 mb-2">
+                  Expected Delivery Days
+                </label>
+                <input
+                  type="number"
+                  id="expectedDeliveryDays"
+                  min="1"
+                  max="60"
+                  defaultValue={settings.expectedDeliveryDays || 7}
+                  onBlur={(e) => handleNumberFieldChange("expectedDeliveryDays", e, 1, 60)}
+                  disabled={saving || !(settings.supplierDeliveryAlertEnabled ?? false)}
+                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+                <p className="text-sm text-gray-500 mt-1">Alert if supplier delivery is overdue by this many days</p>
+              </div>
+
+              {/* Inactive Product Days for Inactive Product Alert */}
+              <div>
+                <label htmlFor="inactiveProductDays" className="block text-sm font-medium text-gray-700 mb-2">
+                  Inactive Product Days
+                </label>
+                <input
+                  type="number"
+                  id="inactiveProductDays"
+                  min="1"
+                  max="365"
+                  defaultValue={settings.inactiveProductDays || 30}
+                  onBlur={(e) => handleNumberFieldChange("inactiveProductDays", e, 1, 365)}
+                  disabled={saving || !(settings.inactiveProductAlertEnabled ?? false)}
+                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+                <p className="text-sm text-gray-500 mt-1">Alert if a product has not sold for this many days</p>
+              </div>
+
+              {/* Low Balance Threshold for Low Balance Alert */}
+              <div>
+                <label htmlFor="lowBalanceThreshold" className="block text-sm font-medium text-gray-700 mb-2">
+                  Low Balance Threshold
+                </label>
+                <input
+                  type="number"
+                  id="lowBalanceThreshold"
+                  min="0"
+                  step="0.01"
+                  defaultValue={settings.lowBalanceThreshold || 100}
+                  onBlur={(e) => handleNumberFieldChange("lowBalanceThreshold", e, 0)}
+                  disabled={saving || !(settings.lowBalanceAlertEnabled ?? false)}
+                  className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                />
+                <p className="text-sm text-gray-500 mt-1">Alert when cash drawer balance falls below this amount</p>
+              </div>
             </div>
           </div>
         )}

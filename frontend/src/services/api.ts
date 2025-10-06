@@ -1015,16 +1015,8 @@ export const posSettingsAPI = {
     return response.data;
   },
 
-  update: async (settings: {
-    enableQuickSale?: boolean;
-    enableSplitPayment?: boolean;
-    enableParkSale?: boolean;
-    enableCustomerSearch?: boolean;
-    enableBarcodeScanner?: boolean;
-    enableLoyaltyPoints?: boolean;
-    taxRate?: number;
-    receiptFooterText?: string;
-  }) => {
+  update: async (settings: any) => {
+    // Accept any fields for flexibility (including all alert toggles/thresholds)
     const response = await api.put("/pos-settings", settings);
     return response.data;
   },
