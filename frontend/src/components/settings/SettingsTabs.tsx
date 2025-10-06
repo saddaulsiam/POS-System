@@ -6,12 +6,11 @@ interface SettingsTabsProps {
 }
 
 const tabList = [
-  { key: "profile", label: "🙍 Profile" },
   { key: "features", label: "🎯 POS Features" },
   { key: "receipt", label: "🧾 Receipts" },
   { key: "finance", label: "💰 Tax & Currency" },
   { key: "alerts", label: "🔔 Alerts" },
-  { key: "system", label: "⚙️ System" },
+  { key: "general", label: "⚙️ General Settings" },
 ];
 
 const SettingsTabs: React.FC<SettingsTabsProps> = ({ activeTab, setActiveTab }) => (

@@ -4,10 +4,9 @@ import { BackButton } from "../components/common";
 import AlertsTab from "../components/settings/AlertsTab";
 import FeaturesTab from "../components/settings/FeaturesTab";
 import FinanceTab from "../components/settings/FinanceTab";
-import ProfileTab from "../components/settings/ProfileTab";
 import ReceiptTab from "../components/settings/ReceiptTab";
-import SystemTab from "../components/settings/SystemTab";
 import SettingsTabs from "../components/settings/SettingsTabs";
+import GeneralSettingsTab from "../components/settings/GeneralSettingsTab";
 import { useAuth } from "../context/AuthContext";
 import { changePin, posSettingsAPI, updateProfile } from "../services/api";
 import type { POSSettings } from "../types/POSSettings";
@@ -18,7 +17,7 @@ const SettingsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("profile");
+  const [activeTab, setActiveTab] = useState<string>("features");
   // Profile management state
   const { user, setUser } = useAuth();
   const [name, setName] = useState(user?.name || "");
@@ -224,25 +223,6 @@ const SettingsPage: React.FC = () => {
         <SettingsTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {/* Tab Content */}
-        {activeTab === "profile" && (
-          <ProfileTab
-            user={user}
-            name={name}
-            setName={setName}
-            username={username}
-            setUsername={setUsername}
-            savingProfile={savingProfile}
-            profileMsg={profileMsg}
-            handleProfileSave={handleProfileSave}
-            currentPin={currentPin}
-            setCurrentPin={setCurrentPin}
-            newPin={newPin}
-            setNewPin={setNewPin}
-            pinMsg={pinMsg}
-            pinSaving={pinSaving}
-            handlePinChange={handlePinChange}
-          />
-        )}
         {activeTab === "features" && (
           <FeaturesTab
             settings={settings}
@@ -280,8 +260,26 @@ const SettingsPage: React.FC = () => {
             handleSelectChange={handleSelectChangeString}
           />
         )}
-        {activeTab === "system" && (
-          <SystemTab settings={settings} saving={saving} handleTextFieldChange={handleTextFieldChangeString} />
+        {activeTab === "general" && (
+          <GeneralSettingsTab
+            name={name}
+            setName={setName}
+            username={username}
+            setUsername={setUsername}
+            savingProfile={savingProfile}
+            profileMsg={profileMsg}
+            handleProfileSave={handleProfileSave}
+            currentPin={currentPin}
+            setCurrentPin={setCurrentPin}
+            newPin={newPin}
+            setNewPin={setNewPin}
+            pinMsg={pinMsg}
+            pinSaving={pinSaving}
+            handlePinChange={handlePinChange}
+            settings={settings}
+            saving={saving}
+            handleTextFieldChangeString={handleTextFieldChangeString}
+          />
         )}
       </div>
     </div>
