@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Input } from "../components/common/Input";
 import { useAuth } from "../context/AuthContext";
 import { useSettings } from "../context/SettingsContext";
 import { inventoryAPI, suppliersAPI, productsAPI } from "../services/api";
@@ -643,22 +644,22 @@ const PurchaseOrdersPage: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Order Date <span className="text-red-500">*</span>
                   </label>
-                  <input
+                  <Input
                     type="date"
                     value={formData.orderDate}
                     onChange={(e) => setFormData({ ...formData, orderDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    fullWidth
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Expected Date</label>
-                  <input
+                  <Input
                     type="date"
                     value={formData.expectedDate}
                     onChange={(e) => setFormData({ ...formData, expectedDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    fullWidth
                   />
                 </div>
               </div>
@@ -704,24 +705,24 @@ const PurchaseOrdersPage: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
-                    <input
+                    <Input
                       type="number"
-                      min="1"
+                      min={1}
                       value={currentItem.quantity}
                       onChange={(e) => setCurrentItem({ ...currentItem, quantity: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      fullWidth
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Unit Price</label>
-                    <input
+                    <Input
                       type="number"
-                      step="0.01"
-                      min="0"
+                      step={0.01}
+                      min={0}
                       value={currentItem.unitPrice}
                       onChange={(e) => setCurrentItem({ ...currentItem, unitPrice: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      fullWidth
                     />
                   </div>
                 </div>

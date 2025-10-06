@@ -1,4 +1,4 @@
-import React from "react";
+import { Input } from "../common/Input";
 
 interface FinanceTabProps {
   settings: any;
@@ -31,16 +31,16 @@ const FinanceTab: React.FC<FinanceTabProps> = ({ settings, saving, handleNumberF
           <label htmlFor="taxRate" className="block text-sm font-medium text-gray-700 mb-2">
             Default Tax Rate (%)
           </label>
-          <input
+          <Input
             type="number"
             id="taxRate"
-            min="0"
-            max="100"
-            step="0.01"
+            min={0}
+            max={100}
+            step={0.01}
             defaultValue={settings.taxRate}
             onBlur={(e) => handleNumberFieldChange("taxRate", e, 0, 100)}
             disabled={saving}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            fullWidth
             placeholder="0.00"
           />
           <p className="text-sm text-gray-500 mt-1">Applied to all products unless overridden</p>
@@ -79,15 +79,15 @@ const FinanceTab: React.FC<FinanceTabProps> = ({ settings, saving, handleNumberF
           <label htmlFor="loyaltyPointsPerUnit" className="block text-sm font-medium text-gray-700 mb-2">
             Loyalty Points Rate
           </label>
-          <input
+          <Input
             type="number"
             id="loyaltyPointsPerUnit"
-            min="0.01"
-            step="0.01"
+            min={0.01}
+            step={0.01}
             defaultValue={settings.loyaltyPointsPerUnit || 10}
             onBlur={(e) => handleNumberFieldChange("loyaltyPointsPerUnit", e, 0.01, 10000)}
             disabled={saving || !settings.enableLoyaltyPoints}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            fullWidth
             placeholder="10.00"
           />
           <p className="text-sm text-gray-500 mt-1">
@@ -99,15 +99,15 @@ const FinanceTab: React.FC<FinanceTabProps> = ({ settings, saving, handleNumberF
           <label htmlFor="pointsRedemptionRate" className="block text-sm font-medium text-gray-700 mb-2">
             Points Redemption Rate
           </label>
-          <input
+          <Input
             type="number"
             id="pointsRedemptionRate"
-            min="1"
-            step="1"
+            min={1}
+            step={1}
             defaultValue={settings.pointsRedemptionRate || 100}
             onBlur={(e) => handleNumberFieldChange("pointsRedemptionRate", e, 1, 10000)}
             disabled={saving || !settings.enableLoyaltyPoints}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            fullWidth
             placeholder="100"
           />
           <p className="text-sm text-gray-500 mt-1">

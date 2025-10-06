@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Input } from "../components/common/Input";
 import { productsAPI, categoriesAPI, suppliersAPI } from "../services/api";
 import { Category, Supplier } from "../types";
 import toast from "react-hot-toast";
@@ -146,12 +147,12 @@ const NewProductPage: React.FC = () => {
             <label className="block text-sm font-medium mb-1">
               Name <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               name="name"
               value={form.name}
               onChange={handleFormChange}
               required
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+              fullWidth
               placeholder="e.g. Coca Cola 500ml"
             />
           </div>
@@ -159,12 +160,12 @@ const NewProductPage: React.FC = () => {
             <label className="block text-sm font-medium mb-1">
               SKU <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               name="sku"
               value={form.sku}
               onChange={handleFormChange}
               required
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+              fullWidth
               placeholder="e.g. CC500ML"
             />
           </div>
@@ -207,15 +208,15 @@ const NewProductPage: React.FC = () => {
             <label className="block text-sm font-medium mb-1">
               Purchase Price <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               name="purchasePrice"
               type="number"
-              min="0"
-              step="0.01"
+              min={0}
+              step={0.01}
               value={form.purchasePrice}
               onChange={handleFormChange}
               required
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+              fullWidth
               placeholder="e.g. 10.00"
             />
             <span className="text-xs text-gray-400">The cost you pay to acquire this product.</span>
@@ -224,15 +225,15 @@ const NewProductPage: React.FC = () => {
             <label className="block text-sm font-medium mb-1">
               Selling Price <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               name="sellingPrice"
               type="number"
-              min="0"
-              step="0.01"
+              min={0}
+              step={0.01}
               value={form.sellingPrice}
               onChange={handleFormChange}
               required
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+              fullWidth
               placeholder="e.g. 15.00"
             />
             <span className="text-xs text-gray-400">The price at which you sell this product.</span>
@@ -241,44 +242,44 @@ const NewProductPage: React.FC = () => {
             <label className="block text-sm font-medium mb-1">
               Stock Quantity <span className="text-red-500">*</span>
             </label>
-            <input
+            <Input
               name="stockQuantity"
               type="number"
-              min="0"
-              step="1"
+              min={0}
+              step={1}
               value={form.stockQuantity}
               onChange={handleFormChange}
               required
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+              fullWidth
               placeholder="e.g. 100"
             />
             <span className="text-xs text-gray-400">Initial stock available for this product.</span>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Low Stock Threshold</label>
-            <input
+            <Input
               name="lowStockThreshold"
               type="number"
-              min="0"
-              step="1"
+              min={0}
+              step={1}
               value={form.lowStockThreshold}
               onChange={handleFormChange}
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+              fullWidth
               placeholder="e.g. 10"
             />
             <span className="text-xs text-gray-400">Get notified when stock falls below this number.</span>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Tax Rate (%)</label>
-            <input
+            <Input
               name="taxRate"
               type="number"
-              min="0"
-              max="100"
-              step="0.01"
+              min={0}
+              max={100}
+              step={0.01}
               value={form.taxRate}
               onChange={handleFormChange}
-              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+              fullWidth
               placeholder="e.g. 5"
             />
             <span className="text-xs text-gray-400">Leave 0 if not applicable.</span>

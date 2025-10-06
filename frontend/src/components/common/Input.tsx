@@ -19,12 +19,13 @@ export const Input: React.FC<InputProps> = ({
 }) => {
   const inputId = id || `input-${label?.toLowerCase().replace(/\s+/g, "-")}`;
   const widthStyle = fullWidth ? "w-full" : "";
+  const hasError = Boolean(error);
 
   const inputClassName = `
-    px-3 py-2 border rounded-md shadow-sm 
+    px-3 py-2 border rounded-md transition-all
     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
     disabled:bg-gray-100 disabled:cursor-not-allowed
-    ${error ? "border-red-500 focus:ring-red-500 focus:border-red-500" : "border-gray-300"}
+    ${hasError ? "border-red-500 focus:ring-red-500 focus:border-red-500" : "border-gray-300"}
     ${widthStyle}
     ${className}
   `
@@ -34,14 +35,32 @@ export const Input: React.FC<InputProps> = ({
   return (
     <div className={widthStyle}>
       {label && (
-        <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor={inputId}
+          className={`block text-sm font-medium mb-1 ${hasError ? "text-red-700" : "text-gray-700"}`}
+        >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      <input id={inputId} className={inputClassName} required={required} {...props} />
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-      {helperText && !error && <p className="mt-1 text-sm text-gray-500">{helperText}</p>}
+      <input
+        id={inputId}
+        className={inputClassName}
+        required={required}
+        aria-invalid={hasError}
+        aria-describedby={hasError ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
+        {...props}
+      />
+      {hasError && (
+        <p id={`${inputId}-error`} className="mt-1 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+      {helperText && !hasError && (
+        <p id={`${inputId}-helper`} className="mt-1 text-sm text-gray-500">
+          {helperText}
+        </p>
+      )}
     </div>
   );
 };
@@ -66,12 +85,13 @@ export const TextArea: React.FC<TextAreaProps> = ({
 }) => {
   const textAreaId = id || `textarea-${label?.toLowerCase().replace(/\s+/g, "-")}`;
   const widthStyle = fullWidth ? "w-full" : "";
+  const hasError = Boolean(error);
 
   const textAreaClassName = `
-    px-3 py-2 border rounded-md shadow-sm 
+    px-3 py-2 border rounded-md transition-all
     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
     disabled:bg-gray-100 disabled:cursor-not-allowed
-    ${error ? "border-red-500 focus:ring-red-500 focus:border-red-500" : "border-gray-300"}
+    ${hasError ? "border-red-500 focus:ring-red-500 focus:border-red-500" : "border-gray-300"}
     ${widthStyle}
     ${className}
   `
@@ -81,14 +101,33 @@ export const TextArea: React.FC<TextAreaProps> = ({
   return (
     <div className={widthStyle}>
       {label && (
-        <label htmlFor={textAreaId} className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor={textAreaId}
+          className={`block text-sm font-medium mb-1 ${hasError ? "text-red-700" : "text-gray-700"}`}
+        >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      <textarea id={textAreaId} className={textAreaClassName} rows={rows} required={required} {...props} />
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-      {helperText && !error && <p className="mt-1 text-sm text-gray-500">{helperText}</p>}
+      <textarea
+        id={textAreaId}
+        className={textAreaClassName}
+        rows={rows}
+        required={required}
+        aria-invalid={hasError}
+        aria-describedby={hasError ? `${textAreaId}-error` : helperText ? `${textAreaId}-helper` : undefined}
+        {...props}
+      />
+      {hasError && (
+        <p id={`${textAreaId}-error`} className="mt-1 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+      {helperText && !hasError && (
+        <p id={`${textAreaId}-helper`} className="mt-1 text-sm text-gray-500">
+          {helperText}
+        </p>
+      )}
     </div>
   );
 };
@@ -114,12 +153,13 @@ export const Select: React.FC<SelectProps> = ({
 }) => {
   const selectId = id || `select-${label?.toLowerCase().replace(/\s+/g, "-")}`;
   const widthStyle = fullWidth ? "w-full" : "";
+  const hasError = Boolean(error);
 
   const selectClassName = `
-    px-3 py-2 border rounded-md shadow-sm 
+    px-3 py-2 border rounded-md transition-all
     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
     disabled:bg-gray-100 disabled:cursor-not-allowed
-    ${error ? "border-red-500 focus:ring-red-500 focus:border-red-500" : "border-gray-300"}
+    ${hasError ? "border-red-500 focus:ring-red-500 focus:border-red-500" : "border-gray-300"}
     ${widthStyle}
     ${className}
   `
@@ -129,20 +169,38 @@ export const Select: React.FC<SelectProps> = ({
   return (
     <div className={widthStyle}>
       {label && (
-        <label htmlFor={selectId} className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor={selectId}
+          className={`block text-sm font-medium mb-1 ${hasError ? "text-red-700" : "text-gray-700"}`}
+        >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      <select id={selectId} className={selectClassName} required={required} {...props}>
+      <select
+        id={selectId}
+        className={selectClassName}
+        required={required}
+        aria-invalid={hasError}
+        aria-describedby={hasError ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined}
+        {...props}
+      >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
         ))}
       </select>
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-      {helperText && !error && <p className="mt-1 text-sm text-gray-500">{helperText}</p>}
+      {hasError && (
+        <p id={`${selectId}-error`} className="mt-1 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+      {helperText && !hasError && (
+        <p id={`${selectId}-helper`} className="mt-1 text-sm text-gray-500">
+          {helperText}
+        </p>
+      )}
     </div>
   );
 };

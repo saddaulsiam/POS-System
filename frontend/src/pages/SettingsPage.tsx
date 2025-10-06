@@ -6,7 +6,8 @@ import FeaturesTab from "../components/settings/FeaturesTab";
 import FinanceTab from "../components/settings/FinanceTab";
 import ReceiptTab from "../components/settings/ReceiptTab";
 import SettingsTabs from "../components/settings/SettingsTabs";
-import GeneralSettingsTab from "../components/settings/GeneralSettingsTab";
+import SystemSettingsTab from "../components/settings/SystemTab";
+import ProfileTab from "../components/settings/ProfileTab";
 import { useAuth } from "../context/AuthContext";
 import { changePin, posSettingsAPI, updateProfile } from "../services/api";
 import type { POSSettings } from "../types/POSSettings";
@@ -260,8 +261,9 @@ const SettingsPage: React.FC = () => {
             handleSelectChange={handleSelectChangeString}
           />
         )}
-        {activeTab === "general" && (
-          <GeneralSettingsTab
+        {activeTab === "profile" && (
+          <ProfileTab
+            user={user}
             name={name}
             setName={setName}
             username={username}
@@ -276,6 +278,10 @@ const SettingsPage: React.FC = () => {
             pinMsg={pinMsg}
             pinSaving={pinSaving}
             handlePinChange={handlePinChange}
+          />
+        )}
+        {activeTab === "system" && (
+          <SystemSettingsTab
             settings={settings}
             saving={saving}
             handleTextFieldChangeString={handleTextFieldChangeString}

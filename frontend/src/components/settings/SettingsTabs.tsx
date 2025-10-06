@@ -10,7 +10,8 @@ const tabList = [
   { key: "receipt", label: "🧾 Receipts" },
   { key: "finance", label: "💰 Tax & Currency" },
   { key: "alerts", label: "🔔 Alerts" },
-  { key: "general", label: "⚙️ General Settings" },
+  { key: "profile", label: "🙍 Profile" },
+  { key: "system", label: "⚙️ System" },
 ];
 
 const SettingsTabs: React.FC<SettingsTabsProps> = ({ activeTab, setActiveTab }) => (

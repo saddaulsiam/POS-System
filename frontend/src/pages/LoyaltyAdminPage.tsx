@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Input } from "../components/common/Input";
 import { Gift, Trophy, Star, Plus, Edit2, Trash2, TrendingUp, Users, Award, Target } from "lucide-react";
 import { loyaltyAPI } from "../services/api";
 import toast from "react-hot-toast";
@@ -563,51 +564,51 @@ const TierEditModal: React.FC<{
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Points</label>
-            <input
+            <Input
               type="number"
               value={formData.minimumPoints}
               onChange={(e) => setFormData({ ...formData, minimumPoints: parseInt(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              min="0"
+              min={0}
               required
+              fullWidth
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Points Multiplier</label>
-            <input
+            <Input
               type="number"
-              step="0.1"
+              step={0.1}
               value={formData.pointsMultiplier}
               onChange={(e) => setFormData({ ...formData, pointsMultiplier: parseFloat(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              min="1.0"
+              min={1.0}
               required
+              fullWidth
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Discount Percentage</label>
-            <input
+            <Input
               type="number"
               value={formData.discountPercentage}
               onChange={(e) => setFormData({ ...formData, discountPercentage: parseFloat(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              min="0"
-              max="100"
+              min={0}
+              max={100}
               required
+              fullWidth
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Birthday Bonus (Points)</label>
-            <input
+            <Input
               type="number"
               value={formData.birthdayBonus}
               onChange={(e) => setFormData({ ...formData, birthdayBonus: parseInt(e.target.value) })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              min="0"
+              min={0}
               required
+              fullWidth
             />
           </div>
 
@@ -680,12 +681,12 @@ const OfferModal: React.FC<{
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Offer Title *</label>
-            <input
+            <Input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required
+              fullWidth
             />
           </div>
 
@@ -717,13 +718,13 @@ const OfferModal: React.FC<{
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Discount Value</label>
-              <input
+              <Input
                 type="number"
-                step="0.01"
+                step={0.01}
                 value={formData.discountValue}
                 onChange={(e) => setFormData({ ...formData, discountValue: parseFloat(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                min="0"
+                min={0}
+                fullWidth
               />
             </div>
           </div>
@@ -731,13 +732,13 @@ const OfferModal: React.FC<{
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Purchase</label>
-              <input
+              <Input
                 type="number"
-                step="0.01"
+                step={0.01}
                 value={formData.minimumPurchase}
                 onChange={(e) => setFormData({ ...formData, minimumPurchase: parseFloat(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                min="0"
+                min={0}
+                fullWidth
               />
             </div>
 
@@ -759,23 +760,23 @@ const OfferModal: React.FC<{
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
-              <input
+              <Input
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
+                fullWidth
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">End Date *</label>
-              <input
+              <Input
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
+                fullWidth
               />
             </div>
           </div>

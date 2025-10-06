@@ -1,4 +1,4 @@
-import React from "react";
+import { Input } from "../common/Input";
 
 interface AlertsTabProps {
   settings: any;
@@ -137,16 +137,17 @@ const AlertsTab: React.FC<AlertsTabProps> = ({
               </button>
             </div>
             {alert.thresholdKey && typeof settings[alert.thresholdKey] !== "undefined" && (
-              <input
+              <Input
                 type="number"
                 id={alert.thresholdKey}
                 min={alert.min || 0}
                 max={alert.max}
-                step="1"
+                step={1}
                 defaultValue={settings[alert.thresholdKey]}
                 onBlur={(e) => handleNumberFieldChange(alert.thresholdKey, e, alert.min, alert.max)}
                 disabled={saving || !settings[alert.key]}
-                className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                fullWidth
+                className="mt-2"
                 placeholder={alert.unit ? `Enter value (${alert.unit})` : "Enter value"}
               />
             )}
