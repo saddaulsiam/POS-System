@@ -1,5 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 import { updateProfile, changePin } from "../services/api";
+import { Card, CardHeader, CardBody, CardFooter } from "../components/common/Card";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { posSettingsAPI } from "../services/api";
@@ -441,63 +442,86 @@ const SettingsPage: React.FC = () => {
 
         {/* Tab Content */}
         {activeTab === "profile" && (
-          <div className="bg-white rounded-lg shadow p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">My Profile</h2>
-            <form onSubmit={handleProfileSave} className="mb-8">
-              <div className="mb-4">
-                <label className="block mb-1 font-medium">Name</label>
-                <input
-                  className="input input-bordered w-full"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block mb-1 font-medium">Username</label>
-                <input
-                  className="input input-bordered w-full"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-              <button className="btn btn-primary" type="submit" disabled={savingProfile}>
-                {savingProfile ? "Saving..." : "Save Changes"}
-              </button>
-              {profileMsg && <div className="mt-2 text-sm text-green-600">{profileMsg}</div>}
-            </form>
-            <h3 className="text-lg font-semibold mb-4">Change PIN</h3>
-            <form onSubmit={handlePinChange}>
-              <div className="mb-4">
-                <label className="block mb-1 font-medium">Current PIN</label>
-                <input
-                  className="input input-bordered w-full"
-                  type="password"
-                  value={currentPin}
-                  onChange={(e) => setCurrentPin(e.target.value)}
-                  minLength={4}
-                  maxLength={6}
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block mb-1 font-medium">New PIN</label>
-                <input
-                  className="input input-bordered w-full"
-                  type="password"
-                  value={newPin}
-                  onChange={(e) => setNewPin(e.target.value)}
-                  minLength={4}
-                  maxLength={6}
-                  required
-                />
-              </div>
-              <button className="btn btn-secondary" type="submit" disabled={pinSaving}>
-                {pinSaving ? "Changing..." : "Change PIN"}
-              </button>
-              {pinMsg && <div className="mt-2 text-sm text-green-600">{pinMsg}</div>}
-            </form>
+          <div className="mb-8">
+            <Card className="mb-8">
+              <CardHeader>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-blue-200 flex items-center justify-center text-2xl font-bold text-blue-700">
+                    {user?.name?.[0]?.toUpperCase() || "U"}
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold text-gray-800">{user?.name || "User"}</div>
+                    <div className="text-gray-500 text-sm">@{user?.username}</div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <form onSubmit={handleProfileSave} className="space-y-4">
+                  <div>
+                    <label className="block mb-1 font-medium">Name</label>
+                    <input
+                      className="input input-bordered w-full"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block mb-1 font-medium">Username</label>
+                    <input
+                      className="input input-bordered w-full"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <CardFooter align="left">
+                    <button className="btn btn-primary" type="submit" disabled={savingProfile}>
+                      {savingProfile ? "Saving..." : "Save Changes"}
+                    </button>
+                    {profileMsg && <span className="ml-3 text-green-600 text-sm">{profileMsg}</span>}
+                  </CardFooter>
+                </form>
+              </CardBody>
+            </Card>
+            <Card>
+              <CardHeader>Change PIN</CardHeader>
+              <CardBody>
+                <form onSubmit={handlePinChange} className="space-y-4">
+                  <div>
+                    <label className="block mb-1 font-medium">Current PIN</label>
+                    <input
+                      className="input input-bordered w-full"
+                      type="password"
+                      value={currentPin}
+                      onChange={(e) => setCurrentPin(e.target.value)}
+                      minLength={4}
+                      maxLength={6}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block mb-1 font-medium">New PIN</label>
+                    <input
+                      className="input input-bordered w-full"
+                      type="password"
+                      value={newPin}
+                      onChange={(e) => setNewPin(e.target.value)}
+                      minLength={4}
+                      maxLength={6}
+                      required
+                    />
+                    <span className="text-xs text-gray-400">PIN must be 4-6 digits</span>
+                  </div>
+                  <CardFooter align="left">
+                    <button className="btn btn-secondary" type="submit" disabled={pinSaving}>
+                      {pinSaving ? "Changing..." : "Change PIN"}
+                    </button>
+                    {pinMsg && <span className="ml-3 text-green-600 text-sm">{pinMsg}</span>}
+                  </CardFooter>
+                </form>
+              </CardBody>
+            </Card>
           </div>
         )}
         {activeTab === "features" && (
