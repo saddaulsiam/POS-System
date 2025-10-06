@@ -16,7 +16,6 @@ import NewProductPage from "./pages/NewProductPage";
 import POSPage from "./pages/POSPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import ProductsPage from "./pages/ProductsPage";
-import ProfilePage from "./pages/ProfilePage";
 import ReportsPage from "./pages/ReportsPage";
 import SalesPage from "./pages/SalesPage";
 import SuppliersPage from "./pages/SuppliersPage";
@@ -75,9 +74,6 @@ const App: React.FC = () => {
             {/* POS Interface - Main cashier interface */}
             <Route path="/" element={<POSPage />} />
             <Route path="/pos" element={<POSPage />} />
-
-            {/* Profile route for all authenticated users */}
-            <Route path="/profile" element={<ProfilePage />} />
 
             {/* Admin/Manager Routes */}
             {(user?.role === "ADMIN" || user?.role === "MANAGER") && (

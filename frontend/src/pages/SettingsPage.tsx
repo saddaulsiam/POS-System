@@ -1,3 +1,5 @@
+import { useAuth } from "../context/AuthContext";
+import { updateProfile, changePin } from "../services/api";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { posSettingsAPI } from "../services/api";
@@ -61,7 +63,48 @@ const SettingsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("features");
+  const [activeTab, setActiveTab] = useState<string>("profile");
+  // Profile management state
+  const { user, setUser } = useAuth();
+  const [name, setName] = useState(user?.name || "");
+  const [username, setUsername] = useState(user?.username || "");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileMsg, setProfileMsg] = useState("");
+  const [currentPin, setCurrentPin] = useState("");
+  const [newPin, setNewPin] = useState("");
+  const [pinMsg, setPinMsg] = useState("");
+  const [pinSaving, setPinSaving] = useState(false);
+
+  const handleProfileSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    setProfileMsg("");
+    try {
+      const updated = await updateProfile({ name, username });
+      setUser && setUser(updated);
+      setProfileMsg("Profile updated successfully.");
+    } catch (err: any) {
+      setProfileMsg(err?.response?.data?.error || "Failed to update profile");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handlePinChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPinSaving(true);
+    setPinMsg("");
+    try {
+      await changePin({ currentPin, newPin });
+      setPinMsg("PIN changed successfully.");
+      setCurrentPin("");
+      setNewPin("");
+    } catch (err: any) {
+      setPinMsg(err?.response?.data?.error || "Failed to change PIN");
+    } finally {
+      setPinSaving(false);
+    }
+  };
 
   useEffect(() => {
     loadSettings();
@@ -323,6 +366,16 @@ const SettingsPage: React.FC = () => {
           <div className="border-b border-gray-200">
             <nav className="flex -mb-px overflow-x-auto" aria-label="Tabs">
               <button
+                onClick={() => setActiveTab("profile")}
+                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === "profile"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                🙍 Profile
+              </button>
+              <button
                 onClick={() => setActiveTab("features")}
                 className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === "features"
@@ -387,6 +440,66 @@ const SettingsPage: React.FC = () => {
         </div>
 
         {/* Tab Content */}
+        {activeTab === "profile" && (
+          <div className="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 className="text-xl font-semibold mb-4">My Profile</h2>
+            <form onSubmit={handleProfileSave} className="mb-8">
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">Name</label>
+                <input
+                  className="input input-bordered w-full"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">Username</label>
+                <input
+                  className="input input-bordered w-full"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+              </div>
+              <button className="btn btn-primary" type="submit" disabled={savingProfile}>
+                {savingProfile ? "Saving..." : "Save Changes"}
+              </button>
+              {profileMsg && <div className="mt-2 text-sm text-green-600">{profileMsg}</div>}
+            </form>
+            <h3 className="text-lg font-semibold mb-4">Change PIN</h3>
+            <form onSubmit={handlePinChange}>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">Current PIN</label>
+                <input
+                  className="input input-bordered w-full"
+                  type="password"
+                  value={currentPin}
+                  onChange={(e) => setCurrentPin(e.target.value)}
+                  minLength={4}
+                  maxLength={6}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 font-medium">New PIN</label>
+                <input
+                  className="input input-bordered w-full"
+                  type="password"
+                  value={newPin}
+                  onChange={(e) => setNewPin(e.target.value)}
+                  minLength={4}
+                  maxLength={6}
+                  required
+                />
+              </div>
+              <button className="btn btn-secondary" type="submit" disabled={pinSaving}>
+                {pinSaving ? "Changing..." : "Change PIN"}
+              </button>
+              {pinMsg && <div className="mt-2 text-sm text-green-600">{pinMsg}</div>}
+            </form>
+          </div>
+        )}
         {activeTab === "features" && (
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b border-gray-200">
