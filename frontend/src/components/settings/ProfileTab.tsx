@@ -90,11 +90,12 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                 label="Current PIN"
                 type="password"
                 id="currentPin"
+                placeholder="Enter current PIN"
                 value={currentPin}
                 onChange={(e) => setCurrentPin(e.target.value)}
                 disabled={pinSaving}
                 fullWidth
-                error={currentPin === "" && pinMsg ? "Current PIN is required" : undefined}
+                error={currentPin === "" && !pinSaving && pinMsg ? "Current PIN is required" : undefined}
               />
             </div>
             <div>
@@ -102,11 +103,12 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                 label="New PIN"
                 type="password"
                 id="newPin"
+                placeholder="Enter 4 digits pin"
                 value={newPin}
                 onChange={(e) => setNewPin(e.target.value)}
                 disabled={pinSaving}
                 fullWidth
-                error={newPin === "" && pinMsg ? "New PIN is required" : undefined}
+                error={newPin === "" && !pinSaving && pinMsg ? "New PIN is required" : undefined}
               />
             </div>
           </div>

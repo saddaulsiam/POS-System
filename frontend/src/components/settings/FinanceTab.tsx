@@ -1,4 +1,4 @@
-import { Input } from "../common/Input";
+import { Input, Select } from "../common/Input";
 
 interface FinanceTabProps {
   settings: any;
@@ -49,7 +49,7 @@ const FinanceTab: React.FC<FinanceTabProps> = ({ settings, saving, handleNumberF
           <label htmlFor="currencyCode" className="block text-sm font-medium text-gray-700 mb-2">
             Currency
           </label>
-          <select
+          <Select
             id="currencyCode"
             value={settings.currencyCode || "USD"}
             onChange={(e) => {
@@ -61,14 +61,9 @@ const FinanceTab: React.FC<FinanceTabProps> = ({ settings, saving, handleNumberF
               // toast.success(`Currency changed to ${config.name}`); // Optionally handle toast in parent
             }}
             disabled={saving}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {getCurrencyOptions().map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            fullWidth
+            options={getCurrencyOptions()}
+          />
           <p className="text-sm text-gray-500 mt-1">
             Preview: {getCurrencyConfig(settings.currencyCode).symbol}1,234.56
             {getCurrencyConfig(settings.currencyCode).symbolPosition === "after" &&

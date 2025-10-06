@@ -51,9 +51,10 @@ const SettingsPage: React.FC = () => {
     setPinMsg("");
     try {
       await changePin({ currentPin, newPin });
-      setPinMsg("PIN changed successfully.");
+      setPinMsg(""); // Clear error message
       setCurrentPin("");
       setNewPin("");
+      toast.success("PIN changed successfully.");
     } catch (err: any) {
       setPinMsg(err?.response?.data?.error || "Failed to change PIN");
     } finally {
