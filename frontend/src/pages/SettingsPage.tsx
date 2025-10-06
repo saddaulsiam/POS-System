@@ -8,77 +8,10 @@ import ProfileTab from "../components/settings/ProfileTab";
 import ReceiptTab from "../components/settings/ReceiptTab";
 import StoreTab from "../components/settings/StoreTab";
 import SystemTab from "../components/settings/SystemTab";
+import SettingsTabs from "../components/settings/SettingsTabs";
 import { useAuth } from "../context/AuthContext";
 import { changePin, posSettingsAPI, updateProfile } from "../services/api";
-
-interface POSSettings {
-  id: number;
-  // Feature Toggles
-  enableQuickSale: boolean;
-  enableSplitPayment: boolean;
-  enableParkSale: boolean;
-  enableCustomerSearch: boolean;
-  enableBarcodeScanner: boolean;
-  enableLoyaltyPoints: boolean;
-  loyaltyPointsPerUnit: number;
-  pointsRedemptionRate: number;
-
-  // Store Information
-  storeName: string;
-  storeAddress: string;
-  storePhone: string;
-  storeEmail: string;
-  taxId: string | null;
-
-  // Currency & Tax
-  taxRate: number;
-  currencyCode: string;
-  currencySymbol: string;
-  currencyPosition: string;
-
-  // Receipt Settings
-  receiptFooterText: string | null;
-  returnPolicy: string | null;
-  printReceiptAuto: boolean;
-  autoPrintThermal: boolean;
-
-  // Alerts & Notifications
-  enableLowStockAlerts: boolean;
-  lowStockThreshold: number;
-  enableHighStockAlerts?: boolean;
-  highStockThreshold?: number;
-  enableProductExpiryAlerts?: boolean;
-  productExpiryDays?: number;
-  dailySalesTargetAlertEnabled?: boolean;
-  dailySalesTargetAmount?: number;
-  priceChangeAlertEnabled?: boolean;
-  supplierDeliveryAlertEnabled?: boolean;
-  expectedDeliveryDays?: number;
-  inactiveProductAlertEnabled?: boolean;
-  inactiveProductDays?: number;
-  lowBalanceAlertEnabled?: boolean;
-  lowBalanceThreshold?: number;
-  frequentRefundsAlertEnabled?: boolean;
-  frequentRefundsThreshold?: number;
-  loyaltyPointsExpiryAlertEnabled?: boolean;
-  loyaltyPointsExpiryDays?: number;
-  systemErrorAlertEnabled?: boolean;
-
-  // System Settings
-  autoLogoutMinutes: number;
-  requirePasswordOnVoid: boolean;
-  enableAuditLog: boolean;
-  productsPerPage: number;
-  defaultView: string;
-  showProductImages: boolean;
-
-  updatedAt: string;
-  updatedByEmployee?: {
-    id: number;
-    name: string;
-    username: string;
-  };
-}
+import type { POSSettings } from "../types/POSSettings";
 
 const SettingsPage: React.FC = () => {
   const [settings, setSettings] = useState<POSSettings | null>(null);
@@ -289,82 +222,7 @@ const SettingsPage: React.FC = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-lg shadow mb-6">
-          <div className="border-b border-gray-200">
-            <nav className="flex -mb-px overflow-x-auto" aria-label="Tabs">
-              <button
-                onClick={() => setActiveTab("profile")}
-                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "profile"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                🙍 Profile
-              </button>
-              <button
-                onClick={() => setActiveTab("features")}
-                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "features"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                🎯 POS Features
-              </button>
-              <button
-                onClick={() => setActiveTab("store")}
-                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "store"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                🏪 Store Info
-              </button>
-              <button
-                onClick={() => setActiveTab("receipt")}
-                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "receipt"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                🧾 Receipts
-              </button>
-              <button
-                onClick={() => setActiveTab("finance")}
-                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "finance"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                💰 Tax & Currency
-              </button>
-              <button
-                onClick={() => setActiveTab("alerts")}
-                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "alerts"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                🔔 Alerts
-              </button>
-              <button
-                onClick={() => setActiveTab("system")}
-                className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === "system"
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                ⚙️ System
-              </button>
-            </nav>
-          </div>
-        </div>
+        <SettingsTabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {/* Tab Content */}
         {activeTab === "profile" && (
