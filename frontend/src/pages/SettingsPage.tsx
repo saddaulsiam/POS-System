@@ -6,7 +6,6 @@ import FeaturesTab from "../components/settings/FeaturesTab";
 import FinanceTab from "../components/settings/FinanceTab";
 import ProfileTab from "../components/settings/ProfileTab";
 import ReceiptTab from "../components/settings/ReceiptTab";
-import StoreTab from "../components/settings/StoreTab";
 import SystemTab from "../components/settings/SystemTab";
 import SettingsTabs from "../components/settings/SettingsTabs";
 import { useAuth } from "../context/AuthContext";
@@ -255,9 +254,7 @@ const SettingsPage: React.FC = () => {
             selectedFeature={selectedFeature}
           />
         )}
-        {activeTab === "store" && (
-          <StoreTab settings={settings} saving={saving} handleTextFieldChange={handleTextFieldChangeString} />
-        )}
+        {/* StoreTab removed; store info now in System tab */}
         {activeTab === "receipt" && (
           <ReceiptTab
             settings={settings}
@@ -284,13 +281,7 @@ const SettingsPage: React.FC = () => {
           />
         )}
         {activeTab === "system" && (
-          <SystemTab
-            settings={settings}
-            saving={saving}
-            handleSwitchChange={handleToggleString}
-            handleNumberFieldChange={handleNumberFieldChangeString}
-            handleSelectChange={handleSelectChangeString}
-          />
+          <SystemTab settings={settings} saving={saving} handleTextFieldChange={handleTextFieldChangeString} />
         )}
       </div>
     </div>
