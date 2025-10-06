@@ -10,7 +10,8 @@ interface AlertsTabProps {
 
 const alertTypes = [
   {
-    key: "lowStock",
+    key: "enableLowStockAlerts",
+    thresholdKey: "lowStockThreshold",
     label: "Low Stock",
     description: "Notify when inventory is low",
     min: 1,
@@ -18,7 +19,8 @@ const alertTypes = [
     unit: "qty",
   },
   {
-    key: "highStock",
+    key: "enableHighStockAlerts",
+    thresholdKey: "highStockThreshold",
     label: "High Stock",
     description: "Notify when inventory is too high",
     min: 10,
@@ -26,7 +28,8 @@ const alertTypes = [
     unit: "qty",
   },
   {
-    key: "productExpiry",
+    key: "enableProductExpiryAlerts",
+    thresholdKey: "productExpiryDays",
     label: "Product Expiry",
     description: "Notify when products are near expiry",
     min: 1,
@@ -34,15 +37,17 @@ const alertTypes = [
     unit: "days",
   },
   {
-    key: "dailySalesTarget",
+    key: "dailySalesTargetAlertEnabled",
+    thresholdKey: "dailySalesTargetAmount",
     label: "Daily Sales Target",
     description: "Notify when daily sales target is reached",
     min: 1,
     unit: "amount",
   },
-  { key: "priceChange", label: "Price Change", description: "Notify when a product price is changed" },
+  { key: "priceChangeAlertEnabled", label: "Price Change", description: "Notify when a product price is changed" },
   {
-    key: "inactiveProduct",
+    key: "inactiveProductAlertEnabled",
+    thresholdKey: "inactiveProductDays",
     label: "Inactive Product",
     description: "Notify if a product has not sold for X days",
     min: 1,
@@ -50,21 +55,24 @@ const alertTypes = [
     unit: "days",
   },
   {
-    key: "lowBalance",
+    key: "lowBalanceAlertEnabled",
+    thresholdKey: "lowBalanceThreshold",
     label: "Low Balance",
     description: "Notify when cash drawer balance falls below threshold",
     min: 0,
     unit: "amount",
   },
   {
-    key: "frequentRefunds",
+    key: "frequentRefundsAlertEnabled",
+    thresholdKey: "frequentRefundsThreshold",
     label: "Frequent Refunds",
     description: "Notify if refunds exceed threshold in a day",
     min: 1,
     unit: "count",
   },
   {
-    key: "supplierDelivery",
+    key: "supplierDeliveryAlertEnabled",
+    thresholdKey: "expectedDeliveryDays",
     label: "Supplier Delivery",
     description: "Notify if supplier delivery is overdue",
     min: 1,
@@ -72,14 +80,15 @@ const alertTypes = [
     unit: "days",
   },
   {
-    key: "loyaltyPointsExpiry",
+    key: "loyaltyPointsExpiryAlertEnabled",
+    thresholdKey: "loyaltyPointsExpiryDays",
     label: "Loyalty Points Expiry",
     description: "Notify customers before their loyalty points expire",
     min: 1,
     unit: "days",
   },
   {
-    key: "systemErrorAlert",
+    key: "systemErrorAlertEnabled",
     label: "System Error/Failure",
     description: "Notify admins when a critical system error occurs",
   },
@@ -111,32 +120,32 @@ const AlertsTab: React.FC<AlertsTabProps> = ({
               </div>
               <button
                 type="button"
-                onClick={() => handleSwitchChange(`${alert.key}Enabled`, !settings[`${alert.key}Enabled`])}
+                onClick={() => handleSwitchChange(alert.key, !settings[alert.key])}
                 disabled={saving}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                  settings[`${alert.key}Enabled`] ? "bg-blue-600" : "bg-gray-200"
+                  settings[alert.key] ? "bg-blue-600" : "bg-gray-200"
                 }`}
                 role="switch"
-                aria-checked={!!settings[`${alert.key}Enabled`]}
+                aria-checked={!!settings[alert.key]}
                 id={alert.key}
               >
                 <span
                   className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ${
-                    settings[`${alert.key}Enabled`] ? "translate-x-5" : "translate-x-0"
+                    settings[alert.key] ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
               </button>
             </div>
-            {typeof settings[`${alert.key}Threshold`] !== "undefined" && (
+            {alert.thresholdKey && typeof settings[alert.thresholdKey] !== "undefined" && (
               <input
                 type="number"
-                id={`${alert.key}Threshold`}
+                id={alert.thresholdKey}
                 min={alert.min || 0}
                 max={alert.max}
                 step="1"
-                defaultValue={settings[`${alert.key}Threshold`]}
-                onBlur={(e) => handleNumberFieldChange(`${alert.key}Threshold`, e, alert.min, alert.max)}
-                disabled={saving || !settings[`${alert.key}Enabled`]}
+                defaultValue={settings[alert.thresholdKey]}
+                onBlur={(e) => handleNumberFieldChange(alert.thresholdKey, e, alert.min, alert.max)}
+                disabled={saving || !settings[alert.key]}
                 className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                 placeholder={alert.unit ? `Enter value (${alert.unit})` : "Enter value"}
               />
