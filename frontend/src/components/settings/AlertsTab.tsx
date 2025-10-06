@@ -6,8 +6,84 @@ interface AlertsTabProps {
   handleSwitchChange: (field: string, value: boolean) => void;
   handleNumberFieldChange: (field: string, e: React.FocusEvent<HTMLInputElement>, min?: number, max?: number) => void;
   handleSelectChange: (field: string, value: string) => void;
-  alertTypes: Array<{ key: string; label: string; description: string; min?: number; max?: number; unit?: string }>;
 }
+
+const alertTypes = [
+  {
+    key: "lowStock",
+    label: "Low Stock",
+    description: "Notify when inventory is low",
+    min: 1,
+    max: 1000,
+    unit: "qty",
+  },
+  {
+    key: "highStock",
+    label: "High Stock",
+    description: "Notify when inventory is too high",
+    min: 10,
+    max: 10000,
+    unit: "qty",
+  },
+  {
+    key: "productExpiry",
+    label: "Product Expiry",
+    description: "Notify when products are near expiry",
+    min: 1,
+    max: 365,
+    unit: "days",
+  },
+  {
+    key: "dailySalesTarget",
+    label: "Daily Sales Target",
+    description: "Notify when daily sales target is reached",
+    min: 1,
+    unit: "amount",
+  },
+  { key: "priceChange", label: "Price Change", description: "Notify when a product price is changed" },
+  {
+    key: "inactiveProduct",
+    label: "Inactive Product",
+    description: "Notify if a product has not sold for X days",
+    min: 1,
+    max: 365,
+    unit: "days",
+  },
+  {
+    key: "lowBalance",
+    label: "Low Balance",
+    description: "Notify when cash drawer balance falls below threshold",
+    min: 0,
+    unit: "amount",
+  },
+  {
+    key: "frequentRefunds",
+    label: "Frequent Refunds",
+    description: "Notify if refunds exceed threshold in a day",
+    min: 1,
+    unit: "count",
+  },
+  {
+    key: "supplierDelivery",
+    label: "Supplier Delivery",
+    description: "Notify if supplier delivery is overdue",
+    min: 1,
+    max: 60,
+    unit: "days",
+  },
+  {
+    key: "loyaltyPointsExpiry",
+    label: "Loyalty Points Expiry",
+    description: "Notify customers before their loyalty points expire",
+    min: 1,
+    unit: "days",
+  },
+  {
+    key: "systemErrorAlert",
+    label: "System Error/Failure",
+    description: "Notify admins when a critical system error occurs",
+  },
+];
 
 const AlertsTab: React.FC<AlertsTabProps> = ({
   settings,
@@ -15,7 +91,6 @@ const AlertsTab: React.FC<AlertsTabProps> = ({
   handleSwitchChange,
   handleNumberFieldChange,
   handleSelectChange,
-  alertTypes,
 }) => {
   return (
     <div className="bg-white rounded-lg shadow">

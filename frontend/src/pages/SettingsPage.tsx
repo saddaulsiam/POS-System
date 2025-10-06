@@ -266,121 +266,6 @@ const SettingsPage: React.FC = () => {
     );
   }
 
-  const featureToggles = [
-    {
-      key: "enableQuickSale" as keyof POSSettings,
-      title: "Quick Sale Buttons",
-      description: "Enable quick access buttons for frequently sold products on POS",
-      icon: "⚡",
-      detailedInfo: {
-        whatIs:
-          "Quick Sale feature allows you to create customizable buttons for your most frequently sold products, providing instant access without searching.",
-        howItWorks: [
-          "Admin creates Quick Sale items from the Products page",
-          "These items appear as buttons at the top of the POS interface",
-          "Cashiers can add products to cart with a single click",
-          "Ideal for fast-moving items like coffee, snacks, or common services",
-        ],
-        whenToUse: "Enable when you have high-volume, repeat products that need quick access",
-        whenToDisable: "Disable during training periods or if your inventory changes frequently",
-      },
-    },
-    {
-      key: "enableSplitPayment" as keyof POSSettings,
-      title: "Split Payment",
-      description: "Allow customers to pay using multiple payment methods",
-      icon: "💳",
-      detailedInfo: {
-        whatIs:
-          "Split Payment allows customers to divide a single transaction across multiple payment methods (cash, card, mobile payment, etc.).",
-        howItWorks: [
-          "Customer selects 'Split Payment' option at checkout",
-          "Cashier specifies amount for each payment method",
-          "System validates that total matches transaction amount",
-          "All payment methods are recorded in the sale record",
-        ],
-        whenToUse: "Enable when customers commonly use multiple payment methods",
-        whenToDisable: "Disable if your store policy requires single payment method only",
-      },
-    },
-    {
-      key: "enableParkSale" as keyof POSSettings,
-      title: "Park Sale",
-      description: "Ability to temporarily save and resume transactions",
-      icon: "📦",
-      detailedInfo: {
-        whatIs:
-          "Park Sale allows cashiers to temporarily save incomplete transactions and resume them later, freeing up the POS for other customers.",
-        howItWorks: [
-          "Cashier adds items to cart but customer isn't ready to pay",
-          "Click 'Park Sale' to save transaction with a name/reference",
-          "Transaction is stored temporarily (24 hours by default)",
-          "Resume parked sale anytime from 'Parked Sales' list",
-          "Complete payment when customer returns",
-        ],
-        whenToUse: "Enable for high-traffic stores where customers may need to step aside",
-        whenToDisable: "Disable if all transactions complete immediately or you want to prevent incomplete sales",
-      },
-    },
-    {
-      key: "enableCustomerSearch" as keyof POSSettings,
-      title: "Customer Search",
-      description: "Search and link customers to transactions for loyalty tracking",
-      icon: "👤",
-      detailedInfo: {
-        whatIs:
-          "Customer Search enables linking transactions to customer profiles for loyalty points, purchase history, and personalized service.",
-        howItWorks: [
-          "Cashier enters customer phone number in POS",
-          "System finds matching customer profile",
-          "Transaction is linked to customer account",
-          "Loyalty points are automatically calculated and awarded",
-          "Customer can redeem points for discounts",
-        ],
-        whenToUse: "Enable if you have a loyalty program or want to track customer purchases",
-        whenToDisable: "Disable for anonymous-only sales or privacy-focused businesses",
-      },
-    },
-    {
-      key: "enableBarcodeScanner" as keyof POSSettings,
-      title: "Barcode Scanner",
-      description: "Enable barcode scanning functionality",
-      icon: "📷",
-      detailedInfo: {
-        whatIs:
-          "Barcode Scanner input allows using physical barcode scanners or manual barcode entry to quickly add products to cart.",
-        howItWorks: [
-          "Physical barcode scanner connected via USB acts as keyboard",
-          "Scan product barcode - item automatically added to cart",
-          "Manual entry: type barcode and press Enter",
-          "Autocomplete suggestions appear as you type",
-          "System finds product by barcode and adds to transaction",
-        ],
-        whenToUse: "Enable when using barcode scanners or products have barcode labels",
-        whenToDisable: "Disable if you don't use barcodes or want to prevent accidental scans",
-      },
-    },
-    {
-      key: "enableLoyaltyPoints" as keyof POSSettings,
-      title: "Loyalty Points",
-      description: "Enable customer loyalty points and rewards system",
-      icon: "🎁",
-      detailedInfo: {
-        whatIs:
-          "Loyalty Points system rewards customers with points for purchases, which they can redeem for discounts on future transactions.",
-        howItWorks: [
-          "Customers earn points based on purchase amount (configured in Loyalty Admin)",
-          "Points accumulate in customer profile",
-          "Different tiers (Bronze, Silver, Gold) offer different benefits",
-          "Customers can redeem points for discounts at checkout",
-          "Birthday rewards and special promotions available",
-        ],
-        whenToUse: "Enable to encourage repeat customers and increase customer retention",
-        whenToDisable: "Disable if not using loyalty program or during system maintenance",
-      },
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
@@ -503,12 +388,13 @@ const SettingsPage: React.FC = () => {
         )}
         {activeTab === "features" && (
           <FeaturesTab
-            featureToggles={featureToggles}
             settings={settings}
             saving={saving}
             handleToggle={handleToggleString}
             setSelectedFeature={setSelectedFeature}
             setShowInfoModal={setShowInfoModal}
+            showInfoModal={showInfoModal}
+            selectedFeature={selectedFeature}
           />
         )}
         {activeTab === "store" && (
@@ -537,82 +423,6 @@ const SettingsPage: React.FC = () => {
             handleSwitchChange={handleToggleString}
             handleNumberFieldChange={handleNumberFieldChangeString}
             handleSelectChange={handleSelectChangeString}
-            alertTypes={[
-              {
-                key: "lowStock",
-                label: "Low Stock",
-                description: "Notify when inventory is low",
-                min: 1,
-                max: 1000,
-                unit: "qty",
-              },
-              {
-                key: "highStock",
-                label: "High Stock",
-                description: "Notify when inventory is too high",
-                min: 10,
-                max: 10000,
-                unit: "qty",
-              },
-              {
-                key: "productExpiry",
-                label: "Product Expiry",
-                description: "Notify when products are near expiry",
-                min: 1,
-                max: 365,
-                unit: "days",
-              },
-              {
-                key: "dailySalesTarget",
-                label: "Daily Sales Target",
-                description: "Notify when daily sales target is reached",
-                min: 1,
-                unit: "amount",
-              },
-              { key: "priceChange", label: "Price Change", description: "Notify when a product price is changed" },
-              {
-                key: "inactiveProduct",
-                label: "Inactive Product",
-                description: "Notify if a product has not sold for X days",
-                min: 1,
-                max: 365,
-                unit: "days",
-              },
-              {
-                key: "lowBalance",
-                label: "Low Balance",
-                description: "Notify when cash drawer balance falls below threshold",
-                min: 0,
-                unit: "amount",
-              },
-              {
-                key: "frequentRefunds",
-                label: "Frequent Refunds",
-                description: "Notify if refunds exceed threshold in a day",
-                min: 1,
-                unit: "count",
-              },
-              {
-                key: "supplierDelivery",
-                label: "Supplier Delivery",
-                description: "Notify if supplier delivery is overdue",
-                min: 1,
-                max: 60,
-                unit: "days",
-              },
-              {
-                key: "loyaltyPointsExpiry",
-                label: "Loyalty Points Expiry",
-                description: "Notify customers before their loyalty points expire",
-                min: 1,
-                unit: "days",
-              },
-              {
-                key: "systemErrorAlert",
-                label: "System Error/Failure",
-                description: "Notify admins when a critical system error occurs",
-              },
-            ]}
           />
         )}
         {activeTab === "system" && (
@@ -623,112 +433,6 @@ const SettingsPage: React.FC = () => {
             handleNumberFieldChange={handleNumberFieldChangeString}
             handleSelectChange={handleSelectChangeString}
           />
-        )}
-
-        {/* Info Modal */}
-        {showInfoModal && selectedFeature && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              {(() => {
-                const feature = featureToggles.find((f) => f.key === selectedFeature);
-                if (!feature) return null;
-
-                return (
-                  <>
-                    {/* Modal Header */}
-                    <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-lg">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-4xl">{feature.icon}</span>
-                          <div>
-                            <h2 className="text-2xl font-bold">{feature.title}</h2>
-                            <p className="text-blue-100 text-sm mt-1">{feature.description}</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => {
-                            setShowInfoModal(false);
-                            setSelectedFeature(null);
-                          }}
-                          className="text-white hover:text-gray-200 transition-colors"
-                        >
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Modal Content */}
-                    <div className="p-6 space-y-6">
-                      {/* What is it? */}
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-3">
-                          <span className="text-blue-600">📘</span>
-                          What is it?
-                        </h3>
-                        <p className="text-gray-700 leading-relaxed">{feature.detailedInfo.whatIs}</p>
-                      </div>
-
-                      {/* How it works */}
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-3">
-                          <span className="text-green-600">⚙️</span>
-                          How it works
-                        </h3>
-                        <ol className="space-y-2">
-                          {feature.detailedInfo.howItWorks.map((step, index) => (
-                            <li key={index} className="flex gap-3">
-                              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                                {index + 1}
-                              </span>
-                              <span className="text-gray-700 pt-0.5">{step}</span>
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
-
-                      {/* When to use */}
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <h3 className="text-lg font-semibold text-green-900 flex items-center gap-2 mb-2">
-                          <span>✅</span>
-                          When to Enable
-                        </h3>
-                        <p className="text-green-800">{feature.detailedInfo.whenToUse}</p>
-                      </div>
-
-                      {/* When to disable */}
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                        <h3 className="text-lg font-semibold text-orange-900 flex items-center gap-2 mb-2">
-                          <span>❌</span>
-                          When to Disable
-                        </h3>
-                        <p className="text-orange-800">{feature.detailedInfo.whenToDisable}</p>
-                      </div>
-                    </div>
-
-                    {/* Modal Footer */}
-                    <div className="sticky bottom-0 bg-gray-50 px-6 py-4 rounded-b-lg border-t border-gray-200">
-                      <button
-                        onClick={() => {
-                          setShowInfoModal(false);
-                          setSelectedFeature(null);
-                        }}
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                      >
-                        Got it!
-                      </button>
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-          </div>
         )}
       </div>
     </div>
