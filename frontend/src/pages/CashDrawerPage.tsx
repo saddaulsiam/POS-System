@@ -424,7 +424,7 @@ const CashDrawerPage: React.FC = () => {
                 <>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Employee:</span>
-                    <span className="text-sm font-medium">{currentDrawer.employee.name}</span>
+                    <span className="text-sm font-medium">{currentDrawer.employee?.name}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Duration:</span>
@@ -488,15 +488,17 @@ const CashDrawerPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {drawerHistory.map((drawer) => (
-                      <tr key={drawer.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 text-sm text-gray-900">{drawer.employee.name}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{formatDate(drawer.openedAt)}</td>
+                    {drawerHistory.filter(Boolean).map((drawer) => (
+                      <tr key={drawer?.id ?? Math.random()} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm text-gray-900">{drawer?.employee?.name ?? "-"}</td>
                         <td className="px-4 py-3 text-sm text-gray-600">
-                          {drawer.closedAt ? formatDate(drawer.closedAt) : "-"}
+                          {drawer?.openedAt ? formatDate(drawer.openedAt) : "-"}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {drawer?.closedAt ? formatDate(drawer.closedAt) : "-"}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900 text-right">
-                          {formatCurrency(drawer.openingBalance)}
+                          {drawer?.openingBalance !== undefined ? formatCurrency(drawer.openingBalance) : "-"}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900 text-right">
                           {drawer.closingBalance ? formatCurrency(drawer.closingBalance) : "-"}

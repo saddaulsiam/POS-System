@@ -74,6 +74,7 @@ const ProductsPage: React.FC = () => {
     setIsLoading(true);
     try {
       const productsResponse = await productsAPI.getAll({ page: 1, limit: 50 });
+      console.log(productsResponse);
       setProducts(productsResponse.data || []);
     } catch (error) {
       console.error("Failed to load data:", error);
