@@ -6,24 +6,25 @@ import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import { useAuth } from "./context/AuthContext";
 import AdminDashboard from "./pages/AdminDashboard";
+import AnalyticsPage from "./pages/AnalyticsPage";
 import AuditLogsPage from "./pages/AuditLogsPage";
+import CashDrawerPage from "./pages/CashDrawerPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import CustomersPage from "./pages/CustomersPage";
 import EmployeesPage from "./pages/EmployeesPage";
 import InventoryPage from "./pages/InventoryPage";
 import LoginPage from "./pages/LoginPage";
+import LoyaltyAdminPage from "./pages/LoyaltyAdminPage";
 import NewProductPage from "./pages/NewProductPage";
+import NotificationsPage from "./pages/NotificationsPage";
 import POSPage from "./pages/POSPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import ProductsPage from "./pages/ProductsPage";
+import PurchaseOrdersPage from "./pages/PurchaseOrdersPage";
 import ReportsPage from "./pages/ReportsPage";
 import SalesPage from "./pages/SalesPage";
-import SuppliersPage from "./pages/SuppliersPage";
-import LoyaltyAdminPage from "./pages/LoyaltyAdminPage";
 import SettingsPage from "./pages/SettingsPage";
-import AnalyticsPage from "./pages/AnalyticsPage";
-import CashDrawerPage from "./pages/CashDrawerPage";
-import PurchaseOrdersPage from "./pages/PurchaseOrdersPage";
+import SuppliersPage from "./pages/SuppliersPage";
 
 const adminPaths = [
   "/admin",
@@ -42,6 +43,7 @@ const adminPaths = [
   "/settings",
   "/purchase-orders",
   "/cash-drawer",
+  "/notifications",
 ];
 
 const App: React.FC = () => {
@@ -95,6 +97,7 @@ const App: React.FC = () => {
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/cash-drawer" element={<CashDrawerPage />} />
                 <Route path="/purchase-orders" element={<PurchaseOrdersPage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
               </>
             )}
 

@@ -192,10 +192,10 @@ export const productsAPI = {
     return response.data;
   },
 
-  getLowStock: async (): Promise<Product[]> => {
-    const response = await api.get("/products/alerts/low-stock");
-    return response.data;
-  },
+  // getLowStock: async (): Promise<Product[]> => {
+  //   const response = await api.get("/products/alerts/low-stock");
+  //   return response.data;
+  // },
 
   exportCSV: async (): Promise<Blob> => {
     const response = await api.get("/products/export", {
