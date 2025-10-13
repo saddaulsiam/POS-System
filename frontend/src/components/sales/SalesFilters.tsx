@@ -40,6 +40,8 @@ export const SalesFilters: React.FC<SalesFiltersProps> = ({
             label="Receipt ID"
             type="text"
             value={receiptId}
+            // onChange={(e) => onReceiptIdChange(e.target.value)}
+            // onBlur={(e) => onReceiptIdChange(e.target.value)}
             onChange={(e) => onReceiptIdChange(e.target.value)}
             placeholder="Enter Receipt ID"
             fullWidth
