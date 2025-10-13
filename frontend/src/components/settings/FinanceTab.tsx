@@ -9,8 +9,22 @@ interface FinanceTabProps {
 
 const FinanceTab: React.FC<FinanceTabProps> = ({ settings, saving, handleNumberFieldChange, handleSelectChange }) => {
   const getCurrencyConfig = (code: string) => {
-    // You may want to import this from config/currencyConfig in your real code
-    return { symbol: "$", symbolPosition: "before", name: code };
+    switch (code) {
+      case "USD":
+        return { symbol: "$", symbolPosition: "before", name: "USD - US Dollar" };
+      case "BDT":
+        return { symbol: "৳", symbolPosition: "before", name: "BDT - Bangladeshi Taka" };
+      case "EUR":
+        return { symbol: "€", symbolPosition: "after", name: "EUR - Euro" };
+      case "GBP":
+        return { symbol: "£", symbolPosition: "before", name: "GBP - British Pound" };
+      case "INR":
+        return { symbol: "₹", symbolPosition: "before", name: "INR - Indian Rupee" };
+      case "JPY":
+        return { symbol: "¥", symbolPosition: "before", name: "JPY - Japanese Yen" };
+      default:
+        return { symbol: "$", symbolPosition: "before", name: code };
+    }
   };
   const getCurrencyOptions = () => [
     { value: "USD", label: "USD - US Dollar ($)" },
@@ -58,7 +72,6 @@ const FinanceTab: React.FC<FinanceTabProps> = ({ settings, saving, handleNumberF
               handleSelectChange("currencyCode", currencyCode);
               handleSelectChange("currencySymbol", config.symbol);
               handleSelectChange("currencyPosition", config.symbolPosition);
-              // toast.success(`Currency changed to ${config.name}`); // Optionally handle toast in parent
             }}
             disabled={saving}
             fullWidth

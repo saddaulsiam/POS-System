@@ -643,8 +643,6 @@ const POSPage: React.FC = () => {
 
       toast.success(`Sale completed! Receipt ID: ${sale.receiptId}`);
 
-      // (Email receipt sending removed by request)
-
       // Auto-print receipt if enabled
       if (settings?.printReceiptAuto) {
         try {
@@ -676,7 +674,12 @@ const POSPage: React.FC = () => {
       // Auto-print receipt if enabled
       if (settings?.autoPrintThermal) {
         try {
-          const thermalContent = await receiptsAPI.getThermal(sale.id);
+          let thermalContent = await receiptsAPI.getThermal(sale.id);
+          // Replace hardcoded $ with dynamic currency symbol from settings
+          const currencySymbol = settings?.currencySymbol || "$";
+          // Regex: replace $ before numbers with currencySymbol
+          thermalContent = thermalContent.replace(/\$(\d+[.,]?\d*)/g, `${currencySymbol}$1`);
+          console.log({ thermalContent });
           const printWindow = window.open("", "_blank", "width=400,height=600");
           if (printWindow) {
             printWindow.document.write(`<pre style='font-size:16px; font-family:monospace;'>${thermalContent}</pre>`);
@@ -723,24 +726,6 @@ const POSPage: React.FC = () => {
       toast.error(errorMessage);
     } finally {
       setIsProcessingPayment(false);
-    }
-  };
-
-  // Print Thermal Receipt
-  const handlePrintThermalReceipt = async (saleId: number) => {
-    try {
-      const thermalContent = await receiptsAPI.getThermal(saleId);
-      const printWindow = window.open("", "_blank", "width=400,height=600");
-      if (printWindow) {
-        printWindow.document.write(`<pre style='font-size:16px; font-family:monospace;'>${thermalContent}</pre>`);
-        printWindow.document.close();
-        setTimeout(() => {
-          printWindow.print();
-        }, 300);
-      }
-      toast.success("Thermal receipt ready to print", { icon: "🧾" });
-    } catch (err) {
-      toast.error("Failed to print thermal receipt");
     }
   };
 
@@ -934,18 +919,6 @@ const POSPage: React.FC = () => {
         onClose={() => setShowCreateCustomerModal(false)}
         onSubmit={handleCustomerFormSubmit}
       />
-
-      {/* Print Thermal Receipt Button - conditionally shown after sale completion */}
-      {showPaymentModal && (
-        <div className="fixed bottom-4 right-4 z-50">
-          <button
-            onClick={() => handlePrintThermalReceipt(cart[0]?.product.id)} // Assuming saleId is available
-            className="bg-green-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-700 transition-colors"
-          >
-            Print Thermal Receipt
-          </button>
-        </div>
-      )}
     </div>
   );
 };
