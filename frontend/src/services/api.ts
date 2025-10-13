@@ -1082,11 +1082,11 @@ export const cashDrawerAPI = {
 // Notifications API
 export const notificationsAPI = {
   getAll: async (): Promise<any[]> => {
-    const response = await api.get("/products/notifications");
+    const response = await api.get("/notification");
     return response.data.data || [];
   },
   markAsRead: async (id: number): Promise<void> => {
-    await api.post(`/products/notifications/${id}/read`);
+    await api.post(`/notification/${id}/read`);
   },
 };
 export default api;
