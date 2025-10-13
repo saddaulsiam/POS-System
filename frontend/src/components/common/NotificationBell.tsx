@@ -29,10 +29,10 @@ const NotificationBell: React.FC = () => {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const data = await notificationsAPI.getAll();
+      const { data } = await notificationsAPI.getAll();
       setNotifications(data);
     } catch (err) {
-      // handle error
+      setNotifications([]);
     }
     setLoading(false);
   };
