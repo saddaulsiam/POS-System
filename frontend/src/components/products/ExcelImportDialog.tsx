@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { toast } from "react-hot-toast";
-import { productsAPI } from "../../services/api";
+import { productsAPI } from "../../services";
 import { Button } from "../common";
 
 interface ExcelImportDialogProps {

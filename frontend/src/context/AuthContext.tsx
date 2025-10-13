@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { User, AuthResponse, LoginRequest } from "../types";
-import { authAPI } from "../services/api";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { authAPI } from "../services";
+import { AuthResponse, LoginRequest, User } from "../types";
 
 interface AuthContextType {
   user: User | null;

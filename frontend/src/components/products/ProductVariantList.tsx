@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { ProductVariant, Product } from "../../types";
-import { productVariantsAPI } from "../../services/api";
+import { productVariantsAPI } from "../../services";
 import { Button } from "../common";
 import { ProductVariantModal } from "./ProductVariantModal";
 import { useSettings } from "../../context/SettingsContext";

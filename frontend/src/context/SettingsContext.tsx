@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { posSettingsAPI } from "../services/api";
+import { posSettingsAPI } from "../services";
 
 interface POSSettings {
   id: number;

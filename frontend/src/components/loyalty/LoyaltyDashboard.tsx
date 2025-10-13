@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Trophy, TrendingUp, Gift, Star, Award, Zap } from "lucide-react";
-import { loyaltyAPI } from "../../services/api";
+import { loyaltyAPI } from "../../services";
 import { RefreshButton } from "../common";
 import type { Customer, LoyaltyTier, LoyaltyTierConfig } from "../../types";
 

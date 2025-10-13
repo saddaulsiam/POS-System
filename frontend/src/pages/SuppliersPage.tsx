@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { suppliersAPI } from "../services/api";
+import { suppliersAPI } from "../services";
 import { Supplier, CreateSupplierRequest, UpdateSupplierRequest } from "../types";
 import toast from "react-hot-toast";
 import { SupplierSearch } from "../components/suppliers/SupplierSearch";

@@ -4,12 +4,12 @@ import { BackButton } from "../components/common";
 import AlertsTab from "../components/settings/AlertsTab";
 import FeaturesTab from "../components/settings/FeaturesTab";
 import FinanceTab from "../components/settings/FinanceTab";
+import ProfileTab from "../components/settings/ProfileTab";
 import ReceiptTab from "../components/settings/ReceiptTab";
 import SettingsTabs from "../components/settings/SettingsTabs";
 import SystemSettingsTab from "../components/settings/SystemTab";
-import ProfileTab from "../components/settings/ProfileTab";
 import { useAuth } from "../context/AuthContext";
-import { changePin, posSettingsAPI, updateProfile } from "../services/api";
+import { authAPI, posSettingsAPI } from "../services";
 import type { POSSettings } from "../types/POSSettings";
 
 const SettingsPage: React.FC = () => {
@@ -35,7 +35,7 @@ const SettingsPage: React.FC = () => {
     setSavingProfile(true);
     setProfileMsg("");
     try {
-      const updated = await updateProfile({ name, username });
+      const updated = await authAPI.updateProfile({ name, username });
       setUser && setUser(updated);
       setProfileMsg("Profile updated successfully.");
     } catch (err: any) {
@@ -50,7 +50,7 @@ const SettingsPage: React.FC = () => {
     setPinSaving(true);
     setPinMsg("");
     try {
-      await changePin({ currentPin, newPin });
+      await authAPI.changePin({ currentPin, newPin });
       setPinMsg(""); // Clear error message
       setCurrentPin("");
       setNewPin("");

@@ -2,10 +2,6 @@ import { AuthResponse, LoginRequest } from "../../types";
 import api from "../api";
 
 export const authAPI = {
-  updateProfile: async (data: { name?: string; username?: string }) => {
-    const response = await api.put("/profile/me", data);
-    return response.data;
-  },
   login: async (credentials: LoginRequest): Promise<AuthResponse> => {
     try {
       console.log("🔐 Attempting login with credentials:", {
@@ -38,7 +34,9 @@ export const authAPI = {
     const response = await api.put("/auth/change-pin", data);
     return response.data;
   },
-};
 
-export const updateProfile = authAPI.updateProfile;
-export const changePin = authAPI.changePin;
+  updateProfile: async (data: { name?: string; username?: string }) => {
+    const response = await api.put("/profile/me", data);
+    return response.data;
+  },
+};

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Trophy, Award, Star, Zap, TrendingUp } from "lucide-react";
-import { loyaltyAPI } from "../../services/api";
+import { loyaltyAPI } from "../../services";
 import type { LoyaltyTier, LoyaltyTierConfig } from "../../types";
 
 interface TierBenefitsDisplayProps {

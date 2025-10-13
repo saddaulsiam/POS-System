@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Product } from "../types";
-import { productsAPI } from "../services/api";
+import { productsAPI } from "../services";
 import { BackButton } from "../components/common";
 import { ProductVariantList } from "../components/products";
 import { useSettings } from "../context/SettingsContext";

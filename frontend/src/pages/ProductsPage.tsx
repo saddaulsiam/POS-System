@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { productsAPI, categoriesAPI, suppliersAPI } from "../services/api";
+import { productsAPI, categoriesAPI, suppliersAPI } from "../services";
 import { Product, Category, Supplier } from "../types";
 import { useAuth } from "../context/AuthContext";
 import { useSettings } from "../context/SettingsContext";

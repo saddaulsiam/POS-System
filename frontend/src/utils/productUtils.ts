@@ -1,5 +1,5 @@
 import { Product } from "../types";
-import { productsAPI } from "../services/api";
+import { productsAPI } from "../services";
 
 /**
  * Print barcode labels for a product

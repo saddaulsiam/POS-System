@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "../common";
 import { Product } from "../../types";
-import { productsAPI } from "../../services/api";
+import { productsAPI } from "../../services";
 import { useSettings } from "../../context/SettingsContext";
 import { formatCurrency } from "../../utils/currencyUtils";
 

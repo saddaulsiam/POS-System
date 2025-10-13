@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ArrowUp, ArrowDown, Calendar, Filter, Download } from "lucide-react";
-import { loyaltyAPI } from "../../services/api";
+import { loyaltyAPI } from "../../services";
 import type { PointsTransaction, PointsTransactionType } from "../../types";
 
 interface PointsHistoryTableProps {

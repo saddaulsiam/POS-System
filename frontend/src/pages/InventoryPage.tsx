@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { reportsAPI, inventoryAPI } from "../services/api";
+import { reportsAPI, inventoryAPI } from "../services";
 import { Product, InventoryReport, StockMovement } from "../types";
 import toast from "react-hot-toast";
 import { InventorySearch } from "../components/inventory/InventorySearch";

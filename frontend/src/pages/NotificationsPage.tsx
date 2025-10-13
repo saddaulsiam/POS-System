@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../components/common";
 import LoadingSpinner from "../components/common/LoadingSpinner";
-import { notificationsAPI } from "../services/api";
+import { notificationsAPI } from "../services";
 
 const NotificationsPage: React.FC = () => {
   const [notifications, setNotifications] = useState<any[]>([]);

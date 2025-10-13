@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { ParkedSale } from "../../types";
-import { parkedSalesAPI } from "../../services/api";
+import { parkedSalesAPI } from "../../services";
 import { Button } from "../common";
 import { useSettings } from "../../context/SettingsContext";
 import { formatCurrency } from "../../utils/currencyUtils";

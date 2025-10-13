@@ -9,7 +9,7 @@ import {
   ArrowDownRight,
   RefreshCw,
 } from "lucide-react";
-import { analyticsAPI } from "../services/api";
+import { analyticsAPI } from "../services";
 import toast from "react-hot-toast";
 import { useSettings } from "../context/SettingsContext";
 import { formatCurrency } from "../utils/currencyUtils";

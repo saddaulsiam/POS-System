@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { categoriesAPI } from "../services/api";
+import { categoriesAPI } from "../services";
 import { Category } from "../types";
 import toast from "react-hot-toast";
 import { Button, Input, Modal } from "../components/common";

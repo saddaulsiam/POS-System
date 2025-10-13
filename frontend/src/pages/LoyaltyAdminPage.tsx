@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "../components/common/Input";
 import { Gift, Trophy, Star, Plus, Edit2, Trash2, TrendingUp, Users, Award, Target } from "lucide-react";
-import { loyaltyAPI } from "../services/api";
+import { loyaltyAPI } from "../services";
 import toast from "react-hot-toast";
 
 interface TierConfig {

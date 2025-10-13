@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Input } from "../components/common/Input";
 import { useAuth } from "../context/AuthContext";
 import { useSettings } from "../context/SettingsContext";
-import { inventoryAPI, suppliersAPI, productsAPI } from "../services/api";
+import { inventoryAPI, suppliersAPI, productsAPI } from "../services";
 import toast from "react-hot-toast";
 import ReceiveItemsModal from "../components/inventory/ReceiveItemsModal";
 import EditPOModal from "../components/inventory/EditPOModal";

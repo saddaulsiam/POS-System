@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { notificationsAPI } from "../../services/api";
+import { notificationsAPI } from "../../services";
 
 const NotificationBell: React.FC = () => {
   const [notifications, setNotifications] = useState<any[]>([]);

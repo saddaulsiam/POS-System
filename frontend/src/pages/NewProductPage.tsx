@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "../components/common/Input";
-import { productsAPI, categoriesAPI, suppliersAPI } from "../services/api";
+import { productsAPI, categoriesAPI, suppliersAPI } from "../services";
 import { Category, Supplier } from "../types";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";

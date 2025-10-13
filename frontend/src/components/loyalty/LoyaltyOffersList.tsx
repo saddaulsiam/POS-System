@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Tag, Calendar, TrendingUp, X } from "lucide-react";
-import { loyaltyAPI } from "../../services/api";
+import { loyaltyAPI } from "../../services";
 import type { LoyaltyOffer, LoyaltyTier } from "../../types";
 import { useSettings } from "../../context/SettingsContext";
 import { formatCurrency } from "../../utils/currencyUtils";

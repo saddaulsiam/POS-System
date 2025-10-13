@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../components/common/LoadingSpinner";
-import { employeesAPI } from "../services/api";
+import { employeesAPI } from "../services";
 import { Employee } from "../types";
 import { Button, Badge } from "../components/common";
 

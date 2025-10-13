@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { Product } from "../../types";
-import { quickSaleItemsAPI } from "../../services/api";
+import { quickSaleItemsAPI } from "../../services";
 import { Button } from "../common";
 
 interface QuickSaleItem {

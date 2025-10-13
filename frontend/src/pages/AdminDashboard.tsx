@@ -79,7 +79,7 @@ const AdminDashboard: React.FC = () => {
   const loadDashboardData = async () => {
     setIsLoading(true);
     try {
-      const { reportsAPI, customersAPI, analyticsAPI } = await import("../services/api");
+      const { reportsAPI, customersAPI, analyticsAPI } = await import("../services");
 
       // Helper to format date as YYYY-MM-DD
       const formatDate = (date: Date) => {

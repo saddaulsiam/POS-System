@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { Product, ProductVariant } from "../../types";
-import { productVariantsAPI } from "../../services/api";
+import { productVariantsAPI } from "../../services";
 import { useSettings } from "../../context/SettingsContext";
 import { formatCurrency } from "../../utils/currencyUtils";
 import { Modal } from "../common";
@@ -32,7 +32,7 @@ export const VariantSelectorModal: React.FC<VariantSelectorModalProps> = ({
   const loadVariants = async () => {
     try {
       setLoading(true);
-      const data = await productVariantsAPI.getByProduct(product.id);
+      const data = await productVariantsAPI.getById(product.id);
       // Only show active variants with stock
       const activeVariants = data.filter((v: ProductVariant) => v.isActive && (v.stockQuantity || 0) > 0);
       setVariants(activeVariants);

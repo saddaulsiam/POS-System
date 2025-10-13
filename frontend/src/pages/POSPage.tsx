@@ -9,7 +9,7 @@ import {
   parkedSalesAPI,
   productVariantsAPI,
   receiptsAPI,
-} from "../services/api";
+} from "../services";
 import { Product, Customer, Category, CartItem, ParkedSale, CreateCustomerRequest, ProductVariant } from "../types";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";

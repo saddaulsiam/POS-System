@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { reportsAPI } from "../services/api";
+import { reportsAPI } from "../services";
 import { DailySalesReport, EmployeePerformanceReport, ProductPerformanceReport, InventoryReport } from "../types";
 import { formatDate } from "../utils/reportUtils";
 import { RefreshButton } from "../components/common";

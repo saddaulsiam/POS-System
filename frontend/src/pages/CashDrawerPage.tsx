@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import api from "../services/api";
+import { cashDrawerAPI } from "../services";
 import { RefreshButton } from "../components/common/RefreshButton";
 
 interface CashDrawer {
@@ -68,11 +68,11 @@ const CashDrawerPage: React.FC = () => {
 
   const fetchCurrentDrawer = async () => {
     try {
-      const response = await api.get("/cash-drawer/current");
-      setCurrentDrawer(response.data.drawer);
+      const response = await cashDrawerAPI.getCurrent();
+      setCurrentDrawer(response.drawer);
 
-      if (response.data.drawer) {
-        fetchReconciliation(response.data.drawer.id);
+      if (response.drawer) {
+        fetchReconciliation(response.drawer.id);
       }
     } catch (err: any) {
       console.error("Error fetching current drawer:", err);
@@ -81,8 +81,8 @@ const CashDrawerPage: React.FC = () => {
 
   const fetchReconciliation = async (drawerId: number) => {
     try {
-      const response = await api.get(`/cash-drawer/${drawerId}/reconciliation`);
-      setReconciliation(response.data);
+      const response = await cashDrawerAPI.getReconciliation(drawerId);
+      setReconciliation(response);
     } catch (err: any) {
       console.error("Error fetching reconciliation:", err);
     }
@@ -92,9 +92,9 @@ const CashDrawerPage: React.FC = () => {
     try {
       setLoading(true);
       // Always fetch from page 1 when refreshing
-      const response = await api.get(`/cash-drawer?page=1&limit=10`);
-      setDrawerHistory(response.data.cashDrawers);
-      setTotalPages(response.data.pagination.pages);
+      const response = await cashDrawerAPI.getAll({ page: 1, limit: 10 });
+      setDrawerHistory(response.cashDrawers);
+      setTotalPages(response.pagination.pages);
       setPage(1);
     } catch (err: any) {
       setError("Failed to fetch drawer history");
@@ -115,9 +115,7 @@ const CashDrawerPage: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await api.post("/cash-drawer/open", {
-        openingBalance: parseFloat(openingBalance),
-      });
+      const response = await cashDrawerAPI.open({ openingBalance: parseFloat(openingBalance) });
 
       setCurrentDrawer(response.data);
       setSuccess("Cash drawer opened successfully");
@@ -148,7 +146,7 @@ const CashDrawerPage: React.FC = () => {
 
     try {
       setLoading(true);
-      await api.post(`/cash-drawer/close/${currentDrawer.id}`, {
+      await cashDrawerAPI.close(currentDrawer.id, {
         closingBalance: parseFloat(closingBalance),
         actualCash: actualCash ? parseFloat(actualCash) : parseFloat(closingBalance),
         notes: closeNotes,

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { QuickSaleItem, Product } from "../../types";
-import { quickSaleItemsAPI } from "../../services/api";
+import { quickSaleItemsAPI } from "../../services";
 import { Button } from "../common";
 
 interface QuickSaleButtonsProps {

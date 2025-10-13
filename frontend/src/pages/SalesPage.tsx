@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { salesAPI, customersAPI, employeesAPI } from "../services/api";
+import { salesAPI, customersAPI, employeesAPI } from "../services";
 import { Sale, Customer, Employee } from "../types";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
