@@ -1,5 +1,4 @@
 import React from "react";
-import { Toaster } from "react-hot-toast";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import LoadingSpinner from "./components/common/LoadingSpinner";
 import Navbar from "./components/common/Navbar";
@@ -106,17 +105,6 @@ const App: React.FC = () => {
           </Routes>
         </main>
       </div>
-
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: "#363636",
-            color: "#fff",
-          },
-        }}
-      />
     </>
   );
 };
