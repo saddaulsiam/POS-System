@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { QuickSaleItem, Product } from "../../types";
+import { useNavigate } from "react-router-dom";
+import { useSettings } from "../../context/SettingsContext";
 import { quickSaleItemsAPI } from "../../services";
+import { Product, QuickSaleItem } from "../../types";
+import { formatCurrency } from "../../utils/currencyUtils";
 import { Button } from "../common";
 
 interface QuickSaleButtonsProps {
@@ -14,6 +16,7 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
   const [loading, setLoading] = useState(true);
   const [showManageModal, setShowManageModal] = useState(false);
   const navigate = useNavigate();
+  const { settings } = useSettings();
 
   useEffect(() => {
     loadQuickItems();
@@ -33,10 +36,15 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
   };
 
   const handleQuickItemClick = (item: QuickSaleItem) => {
-    if (item.product) {
-      onProductSelect(item.product);
-      // Toast message is shown by parent component (POSPage)
+    if (!item.product) return;
+
+    const stock = item.product.stockQuantity ?? 0;
+    if (stock <= 0) {
+      toast.error("Product is out of stock");
+      return;
     }
+
+    onProductSelect(item.product);
   };
 
   const handleConfigureClick = () => {
@@ -146,19 +154,24 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
           <button
             key={item.id}
             onClick={() => handleQuickItemClick(item)}
-            className="relative group overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 active:scale-95 h-24"
+            disabled={item.product ? (item.product.stockQuantity ?? 0) <= 0 : false}
+            className={`relative group overflow-hidden rounded-xl shadow-md transition-all duration-200 transform h-24 ${
+              item.product && (item.product.stockQuantity ?? 0) <= 0
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:shadow-lg hover:scale-105 active:scale-95"
+            }`}
             style={{
               backgroundColor: item.color,
             }}
           >
-            <div className="h-full flex items-stretch">
+            <div className="h-full flex items-stretch relative z-10">
               {/* Product Image - Full Height on Left */}
               {item.product && (
                 <div className="w-24 h-full flex-shrink-0 bg-white bg-opacity-20">
                   {item.product.image ? (
                     <img
                       src={item.product.image}
-                      alt={item.displayName}
+                      alt={item.product.name || item.displayName}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
@@ -174,16 +187,32 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
 
               <div className="flex-1 px-4 py-3 flex flex-col justify-center text-left">
                 <span className="text-white font-semibold text-sm leading-tight drop-shadow-md block mb-1">
-                  {item.displayName}
+                  {item.product?.name || item.displayName}
                 </span>
+                <div className="flex items-center gap-2">
+                  {item.product && (
+                    <span className="text-white text-xs opacity-90 drop-shadow-sm block font-medium">
+                      {formatCurrency(item.product.sellingPrice, settings)}
+                    </span>
+                  )}
+                  {item.product?.sku && (
+                    <span className="text-white text-xs opacity-80 block">· SKU: {item.product.sku}</span>
+                  )}
+                </div>
+
                 {item.product && (
-                  <span className="text-white text-xs opacity-90 drop-shadow-sm block font-medium">
-                    ${item.product.sellingPrice.toFixed(2)}
+                  <span className="text-white text-xs opacity-80 block mt-1">
+                    Stock: {item.product.stockQuantity ?? 0}
                   </span>
                 )}
               </div>
             </div>
-            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity"></div>
+            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity z-0 pointer-events- none"></div>
+            {item.product && (item.product.stockQuantity ?? 0) <= 0 && (
+              <div className="absolute top-2 right-2 z-20 pointer-events-none">
+                <span className="bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded">Out of stock</span>
+              </div>
+            )}
           </button>
         ))}
       </div>
