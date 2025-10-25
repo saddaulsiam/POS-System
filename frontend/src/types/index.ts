@@ -114,6 +114,7 @@ export interface Sale {
   subtotal: number;
   taxAmount: number;
   discountAmount: number;
+  loyaltyDiscount?: number;
   finalAmount: number;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;

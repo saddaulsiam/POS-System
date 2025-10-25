@@ -39,6 +39,24 @@ export const POSCart: React.FC<POSCartProps> = ({
 }) => {
   const { settings } = useSettings();
 
+  // Optionally, distribute loyalty discount per item (proportional)
+  let perItemDiscounts: Record<string, number> = {};
+  if (loyaltyDiscount > 0 && cart.length > 0) {
+    const totalSubtotal = cart.reduce((sum, item) => sum + item.subtotal, 0);
+    let distributed = 0;
+    cart.forEach((item, idx) => {
+      const itemKey = item.variant ? `${item.product.id}-${item.variant.id}` : `${item.product.id}`;
+      // Last item gets the remainder to avoid floating point issues
+      if (idx === cart.length - 1) {
+        perItemDiscounts[itemKey] = loyaltyDiscount - distributed;
+      } else {
+        const share = Math.round((item.subtotal / totalSubtotal) * loyaltyDiscount * 100) / 100;
+        perItemDiscounts[itemKey] = share;
+        distributed += share;
+      }
+    });
+  }
+
   return (
     <>
       {/* Cart Items */}
@@ -70,6 +88,7 @@ export const POSCart: React.FC<POSCartProps> = ({
                 const itemKey = item.variant ? `${item.product.id}-${item.variant.id}` : `${item.product.id}`;
                 const displayName = item.variant ? `${item.product.name} - ${item.variant.name}` : item.product.name;
                 const stockQuantity = item.variant ? item.variant.stockQuantity || 0 : item.product.stockQuantity;
+                const itemDiscount = perItemDiscounts[itemKey] || 0;
 
                 return (
                   <div key={itemKey} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -78,6 +97,11 @@ export const POSCart: React.FC<POSCartProps> = ({
                       {item.variant && <p className="text-xs text-blue-600">SKU: {item.variant.sku}</p>}
                       <p className="text-sm text-gray-500">{formatCurrency(item.price, settings)} each</p>
                       <p className="text-xs text-gray-500">Stock: {stockQuantity}</p>
+                      {itemDiscount > 0 && (
+                        <p className="text-xs text-green-600 mt-1">
+                          🎁 Loyalty Discount: -{formatCurrency(itemDiscount, settings)}
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center space-x-2">
                       <input

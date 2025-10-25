@@ -1,7 +1,7 @@
 import React from "react";
-import { Input } from "../common";
 import { useSettings } from "../../context/SettingsContext";
 import { formatCurrency } from "../../utils/currencyUtils";
+import { Input } from "../common";
 
 interface POSPaymentModalProps {
   isOpen: boolean;
@@ -16,6 +16,7 @@ interface POSPaymentModalProps {
   onPaymentMethodChange: (method: "CASH" | "CARD") => void;
   onCashReceivedChange: (value: string) => void;
   onConfirm: () => void;
+  loyaltyDiscount?: number;
 }
 
 export const POSPaymentModal: React.FC<POSPaymentModalProps> = ({
@@ -31,6 +32,7 @@ export const POSPaymentModal: React.FC<POSPaymentModalProps> = ({
   onPaymentMethodChange,
   onCashReceivedChange,
   onConfirm,
+  loyaltyDiscount, // <-- Add this line
 }) => {
   const { settings } = useSettings();
 
@@ -49,15 +51,22 @@ export const POSPaymentModal: React.FC<POSPaymentModalProps> = ({
         </div>
 
         <div className="p-6 space-y-4">
-          <div className="bg-gray-50 p-3 rounded-lg">
-            <div className="flex justify-between text-sm">
+          <div className="bg-gray-50 p-3 rounded-lg text-base">
+            <div className="flex justify-between">
               <span>Subtotal:</span>
               <span>{formatCurrency(subtotal, settings)}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between">
               <span>Tax:</span>
               <span>{formatCurrency(tax, settings)}</span>
             </div>
+            {/* Loyalty Discount row (if present) */}
+            {loyaltyDiscount && loyaltyDiscount > 0 && (
+              <div className="flex justify-between text-green-700">
+                <span>Loyalty Discount:</span>
+                <span>-{formatCurrency(loyaltyDiscount, settings)}</span>
+              </div>
+            )}
             <div className="flex justify-between font-medium text-lg border-t border-gray-200 pt-2 mt-2">
               <span>Total:</span>
               <span>{formatCurrency(total, settings)}</span>

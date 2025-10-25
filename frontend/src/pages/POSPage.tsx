@@ -477,6 +477,7 @@ const POSPage: React.FC = () => {
           paymentMethod: split.method,
           amount: split.amount,
         })),
+        loyaltyDiscount,
       };
 
       const sale = await salesAPI.create(saleData);
@@ -632,6 +633,7 @@ const POSPage: React.FC = () => {
           discount: item.discount || 0,
         })),
         paymentMethod,
+        loyaltyDiscount,
       };
 
       // Only include cashReceived for CASH payments
@@ -851,6 +853,7 @@ const POSPage: React.FC = () => {
         onPaymentMethodChange={setPaymentMethod}
         onCashReceivedChange={setCashReceived}
         onConfirm={processPayment}
+        loyaltyDiscount={loyaltyDiscount}
       />
 
       {/* Split Payment Modal */}

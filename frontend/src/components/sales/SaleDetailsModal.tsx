@@ -1,6 +1,7 @@
 import React from "react";
-import { Sale } from "../../types";
 import { useSettings } from "../../context/SettingsContext";
+import { receiptsAPI } from "../../services/api/receiptsAPI";
+import { Sale } from "../../types";
 import { formatCurrency } from "../../utils/currencyUtils";
 
 interface SaleDetailsModalProps {
@@ -28,9 +29,56 @@ export const SaleDetailsModal: React.FC<SaleDetailsModalProps> = ({
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium text-gray-900">Sale Details - #{sale.receiptId}</h3>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-              ✕
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={async () => {
+                  try {
+                    let content = "";
+                    let isThermal = settings?.autoPrintThermal;
+                    if (isThermal) {
+                      content = await receiptsAPI.getThermal(sale.id);
+                      // Optionally wrap in <pre> for monospace/thermal look
+                      content = `<pre style='font-size:16px; font-family:monospace;'>${content}</pre>`;
+                    } else {
+                      content = await receiptsAPI.getHTML(sale.id);
+                    }
+                    const printWindow = window.open(
+                      "",
+                      "_blank",
+                      isThermal ? "width=400,height=600" : "width=800,height=600"
+                    );
+                    if (printWindow) {
+                      printWindow.document.write(content);
+                      printWindow.document.close();
+                      setTimeout(() => printWindow.print(), 500);
+                    }
+                  } catch (err) {
+                    alert("Failed to load receipt for printing.");
+                  }
+                }}
+                className="flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium shadow"
+                title="Print Receipt"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-8 0h8v4H6v-4z"
+                  />
+                </svg>
+                Print Receipt
+              </button>
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                ✕
+              </button>
+            </div>
           </div>
         </div>
 
@@ -106,6 +154,12 @@ export const SaleDetailsModal: React.FC<SaleDetailsModalProps> = ({
                 <span>Tax:</span>
                 <span>{formatCurrency(sale.taxAmount, settings)}</span>
               </div>
+              {(sale.loyaltyDiscount ?? 0) > 0 && (
+                <div className="flex justify-between text-sm text-green-700">
+                  <span>Loyalty Discount:</span>
+                  <span>-{formatCurrency(sale.loyaltyDiscount ?? 0, settings)}</span>
+                </div>
+              )}
               {sale.discountAmount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span>Discount:</span>
