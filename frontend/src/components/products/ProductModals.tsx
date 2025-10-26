@@ -2,6 +2,7 @@ import React from "react";
 import { toast } from "react-hot-toast";
 import { Product, Category, Supplier } from "../../types";
 import { Button } from "../common";
+import { Input, Select } from "../common/Input";
 
 interface ProductModalsProps {
   // Add Modal
@@ -142,156 +143,135 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Name <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Input
                   name="name"
+                  label={"Name"}
                   value={form.name}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. Coca Cola 500ml"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  SKU <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Input
                   name="sku"
+                  label={"SKU"}
                   value={form.sku}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. CC500ML"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Barcode
-                  <span className="text-xs text-gray-400 ml-1">(optional, company default)</span>
-                </label>
-                <input
+                <Input
                   name="barcode"
+                  label={"Barcode (optional, company default)"}
                   value={form.barcode}
                   onChange={handleFormChange}
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 123456789012"
                   maxLength={32}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Category <span className="text-red-500">*</span>
-                </label>
-                <select
+                <Select
                   name="categoryId"
+                  label="Category"
                   value={form.categoryId}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                >
-                  <option value="">Select category</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
+                  fullWidth
+                  options={[
+                    { value: "", label: "Select category" },
+                    ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
+                  ]}
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Supplier</label>
-                <select
+                <Select
                   name="supplierId"
+                  label="Supplier"
                   value={form.supplierId}
                   onChange={handleFormChange}
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                >
-                  <option value="">Select supplier (optional)</option>
-                  {suppliers.map((supplier) => (
-                    <option key={supplier.id} value={supplier.id}>
-                      {supplier.name}
-                    </option>
-                  ))}
-                </select>
+                  fullWidth
+                  options={[
+                    { value: "", label: "Select supplier (optional)" },
+                    ...suppliers.map((supplier) => ({ value: supplier.id, label: supplier.name })),
+                  ]}
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Purchase Price <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Input
                   name="purchasePrice"
+                  label="Purchase Price"
                   type="number"
                   min="0"
                   step="0.01"
                   value={form.purchasePrice}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 10.00"
                 />
                 <span className="text-xs text-gray-400">The cost you pay to acquire this product.</span>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Selling Price <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Input
                   name="sellingPrice"
+                  label="Selling Price"
                   type="number"
                   min="0"
                   step="0.01"
                   value={form.sellingPrice}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 15.00"
                 />
                 <span className="text-xs text-gray-400">The price at which you sell this product.</span>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Stock Quantity <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Input
                   name="stockQuantity"
+                  label="Stock Quantity"
                   type="number"
                   min="0"
                   step="1"
                   value={form.stockQuantity}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 100"
                 />
                 <span className="text-xs text-gray-400">Initial stock available for this product.</span>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Low Stock Threshold</label>
-                <input
+                <Input
                   name="lowStockThreshold"
+                  label="Low Stock Threshold"
                   type="number"
                   min="0"
                   step="1"
                   value={form.lowStockThreshold}
                   onChange={handleFormChange}
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 10"
                 />
                 <span className="text-xs text-gray-400">Get notified when stock falls below this number.</span>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Tax Rate (%)</label>
-                <input
+                <Input
                   name="taxRate"
+                  label="Tax Rate (%)"
                   type="number"
                   min="0"
                   max="100"
                   step="0.01"
                   value={form.taxRate}
                   onChange={handleFormChange}
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 5"
                 />
                 <span className="text-xs text-gray-400">Leave 0 if not applicable.</span>
@@ -299,23 +279,29 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
               <div className="flex space-x-10">
                 <div className="flex items-center mt-2">
                   <input
+                    id="isWeighted"
                     name="isWeighted"
                     type="checkbox"
                     checked={form.isWeighted}
                     onChange={handleFormChange}
                     className="mr-2"
                   />
-                  <label className="text-sm font-medium">Weighted Product</label>
+                  <label htmlFor="isWeighted" className="text-sm font-medium">
+                    Weighted Product
+                  </label>
                 </div>
                 <div className="flex items-center mt-2">
                   <input
+                    id="isActive"
                     name="isActive"
                     type="checkbox"
                     checked={form.isActive}
                     onChange={handleFormChange}
                     className="mr-2"
                   />
-                  <label className="text-sm font-medium">Active</label>
+                  <label htmlFor="isActive" className="text-sm font-medium">
+                    Active
+                  </label>
                 </div>
               </div>
               <div className="md:col-span-2 mt-2">
@@ -382,156 +368,135 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Name <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Input
                   name="name"
+                  label={"Name"}
                   value={form.name}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. Coca Cola 500ml"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  SKU <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Input
                   name="sku"
+                  label={"SKU"}
                   value={form.sku}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. CC500ML"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Barcode
-                  <span className="text-xs text-gray-400 ml-1">(optional, company default)</span>
-                </label>
-                <input
+                <Input
                   name="barcode"
-                  value={form.barcode || ""}
+                  label={"Barcode (optional, company default)"}
+                  value={form.barcode}
                   onChange={handleFormChange}
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 123456789012"
                   maxLength={32}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Category <span className="text-red-500">*</span>
-                </label>
-                <select
+                <Select
                   name="categoryId"
+                  label="Category"
                   value={form.categoryId}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                >
-                  <option value="">Select category</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
+                  fullWidth
+                  options={[
+                    { value: "", label: "Select category" },
+                    ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
+                  ]}
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Supplier</label>
-                <select
+                <Select
                   name="supplierId"
+                  label="Supplier"
                   value={form.supplierId}
                   onChange={handleFormChange}
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
-                >
-                  <option value="">Select supplier (optional)</option>
-                  {suppliers.map((supplier) => (
-                    <option key={supplier.id} value={supplier.id}>
-                      {supplier.name}
-                    </option>
-                  ))}
-                </select>
+                  fullWidth
+                  options={[
+                    { value: "", label: "Select supplier (optional)" },
+                    ...suppliers.map((supplier) => ({ value: supplier.id, label: supplier.name })),
+                  ]}
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Purchase Price <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Input
                   name="purchasePrice"
+                  label="Purchase Price"
                   type="number"
                   min="0"
                   step="0.01"
                   value={form.purchasePrice}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 10.00"
                 />
                 <span className="text-xs text-gray-400">The cost you pay to acquire this product.</span>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Selling Price <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Input
                   name="sellingPrice"
+                  label="Selling Price"
                   type="number"
                   min="0"
                   step="0.01"
                   value={form.sellingPrice}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 15.00"
                 />
                 <span className="text-xs text-gray-400">The price at which you sell this product.</span>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Stock Quantity <span className="text-red-500">*</span>
-                </label>
-                <input
+                <Input
                   name="stockQuantity"
+                  label="Stock Quantity"
                   type="number"
                   min="0"
                   step="1"
                   value={form.stockQuantity}
                   onChange={handleFormChange}
                   required
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 100"
                 />
                 <span className="text-xs text-gray-400">Current stock available for this product.</span>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Low Stock Threshold</label>
-                <input
+                <Input
                   name="lowStockThreshold"
+                  label="Low Stock Threshold"
                   type="number"
                   min="0"
                   step="1"
                   value={form.lowStockThreshold}
                   onChange={handleFormChange}
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 10"
                 />
                 <span className="text-xs text-gray-400">Get notified when stock falls below this number.</span>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Tax Rate (%)</label>
-                <input
+                <Input
                   name="taxRate"
+                  label="Tax Rate (%)"
                   type="number"
                   min="0"
                   max="100"
                   step="0.01"
                   value={form.taxRate}
                   onChange={handleFormChange}
-                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  fullWidth
                   placeholder="e.g. 5"
                 />
                 <span className="text-xs text-gray-400">Leave 0 if not applicable.</span>
@@ -539,23 +504,29 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
               <div className="flex space-x-10">
                 <div className="flex items-center mt-2">
                   <input
+                    id="isWeighted"
                     name="isWeighted"
                     type="checkbox"
                     checked={form.isWeighted}
                     onChange={handleFormChange}
                     className="mr-2"
                   />
-                  <label className="text-sm font-medium">Weighted Product</label>
+                  <label htmlFor="isWeighted" className="text-sm font-medium">
+                    Weighted Product
+                  </label>
                 </div>
                 <div className="flex items-center mt-2">
                   <input
+                    id="isActive"
                     name="isActive"
                     type="checkbox"
                     checked={form.isActive}
                     onChange={handleFormChange}
                     className="mr-2"
                   />
-                  <label className="text-sm font-medium">Active</label>
+                  <label htmlFor="isActive" className="text-sm font-medium">
+                    Active
+                  </label>
                 </div>
               </div>
               <div className="md:col-span-2 mt-2">
