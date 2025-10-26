@@ -236,7 +236,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                             strokeWidth={2}
                             d="M3 10v6a2 2 0 002 2h14a2 2 0 002-2v-6M16 6V4a2 2 0 00-2-2H10a2 2 0 00-2 2v2m4 0v4"
                           />
-                        </svg>restore
+                        </svg>
                       </button>
                     )}
                     <button

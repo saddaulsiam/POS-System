@@ -8,6 +8,7 @@ export const productsAPI = {
     search?: string;
     categoryId?: number;
     isActive?: boolean;
+    showDeleted?: boolean;
   }): Promise<PaginatedResponse<Product>> => {
     const response = await api.get("/products", { params });
     return response.data;

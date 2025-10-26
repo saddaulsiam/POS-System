@@ -65,23 +65,12 @@ const ProductsPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
 
-  // Load data on mount
-  useEffect(() => {
-    loadData();
-    loadCategories();
-    loadSuppliers();
-  }, []);
-
   // Data loading functions
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const productsResponse = await productsAPI.getAll({ page: 1, limit: 50 });
-      let allProducts = productsResponse.data || [];
-      if (!showDeleted) {
-        allProducts = allProducts.filter((p) => !p.isDeleted);
-      }
-      setProducts(allProducts);
+      const productsResponse = await productsAPI.getAll({ page: 1, limit: 50, showDeleted });
+      setProducts(productsResponse.data || []);
     } catch (error) {
       console.error("Failed to load data:", error);
       toast.error("Failed to load products");
@@ -89,6 +78,20 @@ const ProductsPage: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Load data on mount
+  useEffect(() => {
+    loadData();
+    loadCategories();
+    loadSuppliers();
+    // eslint-disable-next-line
+  }, []);
+
+  // Reload products when showDeleted changes
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line
+  }, [showDeleted]);
   // Restore deleted product
   const handleRestoreProduct = async (product: Product) => {
     try {
@@ -398,6 +401,8 @@ const ProductsPage: React.FC = () => {
 
   // Filter products
   const filteredProducts = products.filter((p) => {
+    // If showDeleted is false, hide deleted products
+    if (!showDeleted && p.isDeleted) return false;
     const matchesSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = categoryFilter ? p.categoryId === parseInt(categoryFilter) : true;
