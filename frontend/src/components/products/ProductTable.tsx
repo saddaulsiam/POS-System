@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Product, Category, Supplier } from "../../types";
-import { Button, Badge } from "../common";
 import { useSettings } from "../../context/SettingsContext";
+import { Category, Product, Supplier } from "../../types";
 import { formatCurrency } from "../../utils/currencyUtils";
+import { Badge, Button } from "../common";
 
 interface ProductTableProps {
   products: Product[];
@@ -18,6 +18,7 @@ interface ProductTableProps {
   onDelete: (id: number) => void;
   onAddNew: () => void;
   onQuickSale?: (product: Product) => void;
+  onRestore?: (product: Product) => void;
 }
 
 export const ProductTable: React.FC<ProductTableProps> = ({
@@ -33,6 +34,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
   onDelete,
   onAddNew,
   onQuickSale,
+  onRestore,
 }) => {
   const navigate = useNavigate();
   const { settings } = useSettings();
@@ -85,6 +87,15 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     );
   }
 
+  // Helper to get full image URL
+  const getImageUrl = (imagePath: string | undefined) => {
+    if (!imagePath) return undefined;
+    if (imagePath.startsWith("http")) return imagePath;
+    // Change this to your backend URL if different
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+    return backendUrl + imagePath;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
@@ -122,14 +133,17 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
             {products.map((product) => (
-              <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+              <tr
+                key={product.id}
+                className={`hover:bg-gray-50 transition-colors ${product.isDeleted ? "bg-red-50 text-gray-400" : ""}`}
+              >
                 {/* Product Column */}
                 <td className="px-6 py-4">
                   <div className="flex items-center space-x-3">
                     <div className="flex-shrink-0">
                       {product.image ? (
                         <img
-                          src={product.image}
+                          src={getImageUrl(product.image)}
                           alt={product.name}
                           className="h-12 w-12 rounded-lg object-cover border border-gray-200"
                         />
@@ -209,6 +223,22 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 {/* Actions Column */}
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end space-x-2">
+                    {product.isDeleted && onRestore && (
+                      <button
+                        onClick={() => onRestore(product)}
+                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        title="Restore Product"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 10v6a2 2 0 002 2h14a2 2 0 002-2v-6M16 6V4a2 2 0 00-2-2H10a2 2 0 00-2 2v2m4 0v4"
+                          />
+                        </svg>restore
+                      </button>
+                    )}
                     <button
                       onClick={() => navigate(`/products/${product.id}`)}
                       className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"

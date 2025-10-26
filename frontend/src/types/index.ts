@@ -48,6 +48,7 @@ export interface Product {
   lowStockThreshold: number;
   isWeighted: boolean;
   isActive: boolean;
+  isDeleted: boolean;
   taxRate: number;
   image?: string;
   unit?: string;
@@ -287,6 +288,7 @@ export interface CreateProductRequest {
 
 export interface UpdateProductRequest extends Partial<CreateProductRequest> {
   isActive?: boolean;
+  isDeleted?: boolean;
 }
 
 export interface CreateSupplierRequest {

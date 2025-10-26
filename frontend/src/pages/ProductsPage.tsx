@@ -17,6 +17,9 @@ const ProductsPage: React.FC = () => {
   const { settings } = useSettings();
   const canWrite = user?.role === "ADMIN" || user?.role === "MANAGER";
 
+  // Show deleted toggle (must be inside component)
+  const [showDeleted, setShowDeleted] = useState(false);
+
   // State management
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -46,7 +49,6 @@ const ProductsPage: React.FC = () => {
   const [form, setForm] = useState({
     name: "",
     sku: "",
-    barcode: "",
     categoryId: "",
     supplierId: "",
     purchasePrice: "",
@@ -75,12 +77,26 @@ const ProductsPage: React.FC = () => {
     setIsLoading(true);
     try {
       const productsResponse = await productsAPI.getAll({ page: 1, limit: 50 });
-      setProducts(productsResponse.data || []);
+      let allProducts = productsResponse.data || [];
+      if (!showDeleted) {
+        allProducts = allProducts.filter((p) => !p.isDeleted);
+      }
+      setProducts(allProducts);
     } catch (error) {
       console.error("Failed to load data:", error);
       toast.error("Failed to load products");
     } finally {
       setIsLoading(false);
+    }
+  };
+  // Restore deleted product
+  const handleRestoreProduct = async (product: Product) => {
+    try {
+      await productsAPI.update(product.id, { isDeleted: false, isActive: true });
+      toast.success("Product restored");
+      loadData();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.error || "Failed to restore product");
     }
   };
 
@@ -120,7 +136,6 @@ const ProductsPage: React.FC = () => {
     setForm({
       name: "",
       sku: "",
-      barcode: "",
       categoryId: "",
       supplierId: "",
       purchasePrice: "",
@@ -359,7 +374,6 @@ const ProductsPage: React.FC = () => {
     setForm({
       name: product.name,
       sku: product.sku,
-      barcode: product.barcode || "",
       categoryId: product.categoryId.toString(),
       supplierId: product.supplierId?.toString() || "",
       purchasePrice: product.purchasePrice.toString(),
@@ -415,6 +429,17 @@ const ProductsPage: React.FC = () => {
         </div>
 
         {/* Products Table */}
+        <div className="flex items-center gap-4 mb-2">
+          <label className="flex items-center text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={showDeleted}
+              onChange={() => setShowDeleted((prev) => !prev)}
+              className="mr-2"
+            />
+            Show Deleted Products
+          </label>
+        </div>
         <ProductTable
           products={filteredProducts}
           categories={categories}
@@ -428,6 +453,7 @@ const ProductsPage: React.FC = () => {
           onDelete={handleDeleteProduct}
           onAddNew={() => setShowAddModal(true)}
           onQuickSale={settings?.enableQuickSale ? handleQuickSale : undefined}
+          onRestore={handleRestoreProduct}
         />
 
         {/* All Modals */}

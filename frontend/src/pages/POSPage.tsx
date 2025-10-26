@@ -423,14 +423,15 @@ const POSPage: React.FC = () => {
           costPrice: item.price,
           purchasePrice: item.price,
           sellingPrice: item.price,
-          stockQuantity: 999, // We don't have stock info in parked sale
+          stockQuantity: 999,
           reorderLevel: 0,
           lowStockThreshold: 0,
-          taxRate: item.taxRate || 0, // Use stored tax rate or default to 0
+          taxRate: item.taxRate || 0,
           isActive: true,
           isWeighted: false,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          isDeleted: false,
         } as Product,
         quantity: item.quantity,
         price: item.price,
