@@ -46,6 +46,7 @@ const ProductsPage: React.FC = () => {
   const [form, setForm] = useState({
     name: "",
     sku: "",
+    barcode: "",
     categoryId: "",
     supplierId: "",
     purchasePrice: "",
@@ -74,7 +75,6 @@ const ProductsPage: React.FC = () => {
     setIsLoading(true);
     try {
       const productsResponse = await productsAPI.getAll({ page: 1, limit: 50 });
-      console.log(productsResponse);
       setProducts(productsResponse.data || []);
     } catch (error) {
       console.error("Failed to load data:", error);
@@ -120,6 +120,7 @@ const ProductsPage: React.FC = () => {
     setForm({
       name: "",
       sku: "",
+      barcode: "",
       categoryId: "",
       supplierId: "",
       purchasePrice: "",
@@ -358,6 +359,7 @@ const ProductsPage: React.FC = () => {
     setForm({
       name: product.name,
       sku: product.sku,
+      barcode: product.barcode || "",
       categoryId: product.categoryId.toString(),
       supplierId: product.supplierId?.toString() || "",
       purchasePrice: product.purchasePrice.toString(),

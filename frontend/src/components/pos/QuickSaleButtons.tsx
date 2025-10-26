@@ -167,12 +167,12 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
             <div className="h-full flex items-stretch relative z-10">
               {/* Product Image - Full Height on Left */}
               {item.product && (
-                <div className="w-24 h-full flex-shrink-0 bg-white bg-opacity-20">
+                <div className="w-24 h-full p-2 flex-shrink-0 bg-white bg-opacity-20">
                   {item.product.image ? (
                     <img
                       src={item.product.image}
                       alt={item.product.name || item.displayName}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover rounded-md"
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
                       }}

@@ -169,6 +169,20 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">
+                  Barcode
+                  <span className="text-xs text-gray-400 ml-1">(optional, company default)</span>
+                </label>
+                <input
+                  name="barcode"
+                  value={form.barcode}
+                  onChange={handleFormChange}
+                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  placeholder="e.g. 123456789012"
+                  maxLength={32}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
                   Category <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -391,6 +405,20 @@ export const ProductModals: React.FC<ProductModalsProps> = ({
                   required
                   className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
                   placeholder="e.g. CC500ML"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Barcode
+                  <span className="text-xs text-gray-400 ml-1">(optional, company default)</span>
+                </label>
+                <input
+                  name="barcode"
+                  value={form.barcode || ""}
+                  onChange={handleFormChange}
+                  className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-400"
+                  placeholder="e.g. 123456789012"
+                  maxLength={32}
                 />
               </div>
               <div>

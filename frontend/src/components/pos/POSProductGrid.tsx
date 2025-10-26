@@ -71,12 +71,12 @@ export const POSProductGrid: React.FC<POSProductGridProps> = ({
               >
                 <div className="flex h-28">
                   {/* Product Image - Full Height on Left */}
-                  <div className="w-28 h-full flex-shrink-0 bg-gray-100">
+                  <div className="w-28 p-2.5 h-full flex-shrink-0 bg-gray-100">
                     {product.image ? (
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-md"
                         onError={(e) => {
                           e.currentTarget.src =
                             "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f3f4f6'/%3E%3Ctext x='50' y='50' font-size='40' text-anchor='middle' dy='.3em' fill='%239ca3af'%3E📦%3C/text%3E%3C/svg%3E";
