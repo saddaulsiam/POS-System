@@ -22,8 +22,9 @@ export const ProductVariantList: React.FC<ProductVariantListProps> = ({ product 
   const fetchVariants = async () => {
     try {
       setLoading(true);
-      const data = await productVariantsAPI.getByProduct(product.id);
-      setVariants(data);
+      const response = await productVariantsAPI.getAll({ productId: product.id });
+      const variants = Array.isArray(response) ? response : response.data || [];
+      setVariants(variants);
     } catch (error) {
       console.error("Error fetching variants:", error);
       toast.error("Failed to load product variants");
