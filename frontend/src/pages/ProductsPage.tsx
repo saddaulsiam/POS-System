@@ -399,8 +399,8 @@ const ProductsPage: React.FC = () => {
     setShowPrintModal(true);
   };
 
-  // Filter products
-  const filteredProducts = products.filter((p) => {
+  // Filter and sort products
+  let filteredProducts = products.filter((p) => {
     // If showDeleted is false, hide deleted products
     if (!showDeleted && p.isDeleted) return false;
     const matchesSearch =
@@ -408,6 +408,13 @@ const ProductsPage: React.FC = () => {
     const matchesCategory = categoryFilter ? p.categoryId === parseInt(categoryFilter) : true;
     return matchesSearch && matchesCategory;
   });
+  // If showing deleted, sort so deleted products are on top
+  if (showDeleted) {
+    filteredProducts = [...filteredProducts].sort((a, b) => {
+      if (a.isDeleted === b.isDeleted) return 0;
+      return a.isDeleted ? -1 : 1;
+    });
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
