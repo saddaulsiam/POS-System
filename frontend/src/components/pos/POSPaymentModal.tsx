@@ -61,7 +61,7 @@ export const POSPaymentModal: React.FC<POSPaymentModalProps> = ({
               <span>{formatCurrency(tax, settings)}</span>
             </div>
             {/* Loyalty Discount row (if present) */}
-            {loyaltyDiscount && loyaltyDiscount > 0 && (
+            {typeof loyaltyDiscount === "number" && loyaltyDiscount > 0 && (
               <div className="flex justify-between text-green-700">
                 <span>Loyalty Discount:</span>
                 <span>-{formatCurrency(loyaltyDiscount, settings)}</span>
