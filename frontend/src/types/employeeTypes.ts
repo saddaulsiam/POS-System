@@ -1,4 +1,9 @@
-// Employee-related types
+export interface EmployeeForm {
+  name: string;
+  username: string;
+  pinCode: string;
+  role: "ADMIN" | "MANAGER" | "CASHIER" | "STAFF";
+}
 
 export interface Employee {
   id: number;

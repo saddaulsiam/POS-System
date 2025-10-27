@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { Badge, Button } from "../components/common";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import { employeesAPI } from "../services";
-import { Employee } from "../types";
-import { Button, Badge } from "../components/common";
-
-type EmployeeForm = {
-  name: string;
-  username: string;
-  pinCode: string;
-  role: "ADMIN" | "MANAGER" | "CASHIER" | "STAFF";
-};
+import { Employee, EmployeeForm } from "../types";
 
 const defaultForm: EmployeeForm = {
   name: "",
