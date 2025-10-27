@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { RefreshButton } from "../components/common/RefreshButton";
 import { useAuth } from "../context/AuthContext";
 import { cashDrawerAPI } from "../services";
-import { RefreshButton } from "../components/common/RefreshButton";
 
 interface CashDrawer {
   id: number;
@@ -69,13 +69,18 @@ const CashDrawerPage: React.FC = () => {
   const fetchCurrentDrawer = async () => {
     try {
       const response = await cashDrawerAPI.getCurrent();
-      setCurrentDrawer(response.drawer);
-
-      if (response.drawer) {
+      console.log(response.drawer.openedAt);
+      if (response && response.drawer) {
+        setCurrentDrawer(response.drawer);
         fetchReconciliation(response.drawer.id);
+      } else {
+        setCurrentDrawer(null);
+        setReconciliation(null);
       }
     } catch (err: any) {
       console.error("Error fetching current drawer:", err);
+      setCurrentDrawer(null);
+      setReconciliation(null);
     }
   };
 
@@ -91,12 +96,17 @@ const CashDrawerPage: React.FC = () => {
   const fetchDrawerHistory = async () => {
     try {
       setLoading(true);
-      // Always fetch from page 1 when refreshing
       const response = await cashDrawerAPI.getAll({ page: 1, limit: 10 });
-      setDrawerHistory(response.cashDrawers);
-      setTotalPages(response.pagination.pages);
-      setPage(1);
+      if (response && response.cashDrawers && response.pagination) {
+        setDrawerHistory(response.cashDrawers);
+        setTotalPages(response.pagination.pages);
+        setPage(1);
+        setError("");
+      }
     } catch (err: any) {
+      console.error("Error fetching drawer history:", err);
+      setDrawerHistory([]);
+      setTotalPages(1);
       setError("Failed to fetch drawer history");
     } finally {
       setLoading(false);
@@ -116,14 +126,13 @@ const CashDrawerPage: React.FC = () => {
     try {
       setLoading(true);
       const response = await cashDrawerAPI.open({ openingBalance: parseFloat(openingBalance) });
-
-      setCurrentDrawer(response.data);
+      setCurrentDrawer(response);
       setSuccess("Cash drawer opened successfully");
       setShowOpenForm(false);
       setOpeningBalance("");
-      fetchReconciliation(response.data.id);
+      fetchReconciliation(response.id);
     } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to open cash drawer");
+      setError(err.response?.error);
     } finally {
       setLoading(false);
     }
@@ -159,10 +168,7 @@ const CashDrawerPage: React.FC = () => {
       setCloseNotes("");
       setCurrentDrawer(null);
       setReconciliation(null);
-
-      if (user?.role === "ADMIN" || user?.role === "MANAGER") {
-        fetchDrawerHistory();
-      }
+      fetchDrawerHistory();
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to close cash drawer");
     } finally {
@@ -427,7 +433,14 @@ const CashDrawerPage: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">Duration:</span>
                     <span className="text-sm font-medium">
-                      {Math.floor((Date.now() - new Date(currentDrawer.openedAt).getTime()) / 3600000)}h
+                      {(() => {
+                        const openedAt = new Date(currentDrawer.openedAt);
+                        const diff = Date.now() - openedAt.getTime();
+                        const totalMinutes = Math.floor(diff / 60000);
+                        const hours = Math.floor(totalMinutes / 60);
+                        const minutes = totalMinutes % 60;
+                        return `${hours}h:${minutes}m`;
+                      })()}
                     </span>
                   </div>
                 </>
