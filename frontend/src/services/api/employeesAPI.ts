@@ -2,8 +2,12 @@ import api from "../api";
 import { Employee } from "../../types";
 
 export const employeesAPI = {
-  getAll: async (): Promise<Employee[]> => {
-    const response = await api.get("/employees");
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }): Promise<{ data: Employee[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> => {
+    const response = await api.get("/employees", { params });
     return response.data;
   },
   create: async (data: {
