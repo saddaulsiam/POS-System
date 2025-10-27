@@ -32,9 +32,10 @@ export const VariantSelectorModal: React.FC<VariantSelectorModalProps> = ({
   const loadVariants = async () => {
     try {
       setLoading(true);
-      const data = await productVariantsAPI.getById(product.id);
+      const data = await productVariantsAPI.getAll({ productId: product.id });
       // Only show active variants with stock
-      const activeVariants = data.filter((v: ProductVariant) => v.isActive && (v.stockQuantity || 0) > 0);
+      const variantsArr = Array.isArray(data) ? data : data.data || [];
+      const activeVariants = variantsArr.filter((v: ProductVariant) => v.isActive && (v.stockQuantity || 0) > 0);
       setVariants(activeVariants);
     } catch (error) {
       console.error("Error loading variants:", error);
