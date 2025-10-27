@@ -38,8 +38,7 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
   const handleQuickItemClick = (item: QuickSaleItem) => {
     if (!item.product) return;
 
-    const stock = item.product.stockQuantity ?? 0;
-    if (stock <= 0) {
+    if (item.product.stockQuantity <= 0 && !item.product.hasVariants) {
       toast.error("Product is out of stock");
       return;
     }
@@ -154,12 +153,8 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
           <button
             key={item.id}
             onClick={() => handleQuickItemClick(item)}
-            disabled={item.product ? (item.product.stockQuantity ?? 0) <= 0 : false}
-            className={`relative group overflow-hidden rounded-xl shadow-md transition-all duration-200 transform h-24 ${
-              item.product && (item.product.stockQuantity ?? 0) <= 0
-                ? "opacity-60 cursor-not-allowed"
-                : "hover:shadow-lg hover:scale-105 active:scale-95"
-            }`}
+            disabled={item.product && item.product.stockQuantity <= 0 && !item.product.hasVariants}
+            className={`relative group overflow-hidden rounded-xl shadow-md transition-all duration-200 transform h-24 disabled:cursor-not-allowed disabled:opacity-60 hover:shadow-lg hover:scale-105 active:scale-95 disabled:scale-100`}
             style={{
               backgroundColor: item.color,
             }}
@@ -190,25 +185,30 @@ export const QuickSaleButtons: React.FC<QuickSaleButtonsProps> = ({ onProductSel
                   {item.product?.name || item.displayName}
                 </span>
                 <div className="flex items-center gap-2">
-                  {item.product && (
-                    <span className="text-white text-xs opacity-90 drop-shadow-sm block font-medium">
-                      {formatCurrency(item.product.sellingPrice, settings)}
-                    </span>
-                  )}
                   {item.product?.sku && (
-                    <span className="text-white text-xs opacity-80 block">· SKU: {item.product.sku}</span>
+                    <span className="text-white text-xs opacity-80 block">SKU: {item.product.sku}</span>
                   )}
                 </div>
 
-                {item.product && (
-                  <span className="text-white text-xs opacity-80 block mt-1">
-                    Stock: {item.product.stockQuantity ?? 0}
+                {item.product &&
+                (item.product.hasVariants || (item.product.variants && item.product.variants.length > 0)) ? (
+                  <span className="w-fit bg-purple-100 text-purple-700 text-xs px-2 py-0.5 mt-1 rounded-full font-semibold">
+                    Variant
                   </span>
-                )}
+                ) : item.product ? (
+                  <>
+                    <span className="text-white text-xs opacity-90 drop-shadow-sm block font-medium">
+                      {formatCurrency(item.product.sellingPrice, settings)}
+                    </span>
+                    <span className="text-white text-xs opacity-80 block mt-1">
+                      Stock: {item.product.stockQuantity ?? 0}
+                    </span>
+                  </>
+                ) : null}
               </div>
             </div>
             <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity z-0 pointer-events- none"></div>
-            {item.product && (item.product.stockQuantity ?? 0) <= 0 && (
+            {item.product && item.product.stockQuantity <= 0 && !item.product.hasVariants && (
               <div className="absolute top-2 right-2 z-20 pointer-events-none">
                 <span className="bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded">Out of stock</span>
               </div>

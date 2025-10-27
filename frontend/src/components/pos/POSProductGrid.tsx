@@ -66,7 +66,7 @@ export const POSProductGrid: React.FC<POSProductGridProps> = ({
               <button
                 key={product.id}
                 onClick={() => onProductClick(product)}
-                disabled={product.stockQuantity <= 0}
+                disabled={product.stockQuantity <= 0 && !product.hasVariants}
                 className="p-0 bg-white rounded-xl shadow hover:shadow-lg transition-all border border-gray-200 text-left disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
               >
                 <div className="flex h-28">
@@ -89,20 +89,31 @@ export const POSProductGrid: React.FC<POSProductGridProps> = ({
 
                   {/* Product Info */}
                   <div className="flex-1 min-w-0 p-3.5 flex flex-col justify-center gap-1">
-                    <p className="text-sm font-medium text-gray-900 truncate" title={product.name}>
+                    <p
+                      className="text-sm font-medium text-gray-900 truncate flex items-center gap-2"
+                      title={product.name}
+                    >
                       {product.name}
                     </p>
                     <p className="text-xs text-gray-500 truncate">{product.sku}</p>
-                    <p className="text-sm font-semibold text-green-600 mt-1">
-                      {formatCurrency(product.sellingPrice, settings)}
-                    </p>
-                    <p
-                      className={`text-xs mt-1 ${
-                        product.stockQuantity <= 0 ? "text-red-500 font-medium" : "text-gray-500"
-                      }`}
-                    >
-                      {product.stockQuantity <= 0 ? "Out of Stock" : `Stock: ${product.stockQuantity}`}
-                    </p>
+                    {product.hasVariants || (product.variants && product.variants.length > 0) ? (
+                      <p className="w-fit bg-purple-100 text-purple-700 text-xs px-2 py-0.5 mt-1 rounded-full font-semibold">
+                        Variant
+                      </p>
+                    ) : (
+                      <>
+                        <p className="text-sm font-semibold text-green-600 mt-1">
+                          {formatCurrency(product.sellingPrice, settings)}
+                        </p>
+                        <p
+                          className={`text-xs mt-1 ${
+                            product.stockQuantity <= 0 ? "text-red-500 font-medium" : "text-gray-500"
+                          }`}
+                        >
+                          {product.stockQuantity <= 0 ? "Out of Stock" : `Stock: ${product.stockQuantity}`}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
               </button>

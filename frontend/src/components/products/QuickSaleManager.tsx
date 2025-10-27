@@ -1,25 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { Product } from "../../types";
+import { QuickSaleManagerProps, QuickSaleItem } from "../../types";
 import { quickSaleItemsAPI } from "../../services";
 import { Button } from "../common";
-
-interface QuickSaleItem {
-  id: number;
-  productId: number;
-  displayName: string;
-  color: string;
-  sortOrder: number;
-  isActive: boolean;
-  product?: Product;
-}
-
-interface QuickSaleManagerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  product?: Product | null;
-  onSuccess: () => void;
-}
 
 const COLOR_OPTIONS = [
   { value: "#3B82F6", label: "Blue", class: "bg-blue-500" },

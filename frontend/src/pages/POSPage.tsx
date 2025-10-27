@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
+import { CustomerModal } from "../components/customers/CustomerModal";
+import { RedeemPointsDialog } from "../components/loyalty";
+import { POSBarcodeScanner } from "../components/pos/POSBarcodeScanner";
+import { POSCart } from "../components/pos/POSCart";
+import { POSCustomerSearch } from "../components/pos/POSCustomerSearch";
+import { POSPaymentModal } from "../components/pos/POSPaymentModal";
+import { POSProductGrid } from "../components/pos/POSProductGrid";
+import { ParkSaleDialog } from "../components/pos/ParkSaleDialog";
+import { ParkedSalesList } from "../components/pos/ParkedSalesList";
+import { QuickSaleButtons } from "../components/pos/QuickSaleButtons";
+import { SplitPaymentDialog } from "../components/pos/SplitPaymentDialog";
+import { VariantSelectorModal } from "../components/pos/VariantSelectorModal";
 import { useAuth } from "../context/AuthContext";
 import { useSettings } from "../context/SettingsContext";
 import {
-  productsAPI,
-  customersAPI,
-  salesAPI,
   categoriesAPI,
+  customersAPI,
   parkedSalesAPI,
+  productsAPI,
   productVariantsAPI,
   receiptsAPI,
+  salesAPI,
 } from "../services";
-import { Product, Customer, Category, CartItem, ParkedSale, CreateCustomerRequest, ProductVariant } from "../types";
-import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
-import { POSBarcodeScanner } from "../components/pos/POSBarcodeScanner";
-import { POSProductGrid } from "../components/pos/POSProductGrid";
-import { POSCustomerSearch } from "../components/pos/POSCustomerSearch";
-import { POSCart } from "../components/pos/POSCart";
-import { POSPaymentModal } from "../components/pos/POSPaymentModal";
-import { QuickSaleButtons } from "../components/pos/QuickSaleButtons";
-import { ParkSaleDialog } from "../components/pos/ParkSaleDialog";
-import { ParkedSalesList } from "../components/pos/ParkedSalesList";
-import { SplitPaymentDialog } from "../components/pos/SplitPaymentDialog";
-import { VariantSelectorModal } from "../components/pos/VariantSelectorModal";
-import { RedeemPointsDialog } from "../components/loyalty";
-import { CustomerModal } from "../components/customers/CustomerModal";
-import { calculateSubtotal, calculateTax, calculateTotal, calculateChange } from "../utils/posUtils";
+import { CartItem, Category, CreateCustomerRequest, Customer, ParkedSale, Product, ProductVariant } from "../types";
 import { formatCurrency } from "../utils/currencyUtils";
+import { calculateChange, calculateSubtotal, calculateTax, calculateTotal } from "../utils/posUtils";
 
 const POSPage: React.FC = () => {
   const { user, logout } = useAuth();

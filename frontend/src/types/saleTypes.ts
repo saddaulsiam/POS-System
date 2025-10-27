@@ -43,6 +43,21 @@ export interface SaleItem {
   productVariant?: ProductVariant;
 }
 
+export interface ParkedSale {
+  id: number;
+  employeeId: number;
+  customerId?: number;
+  items: any[];
+  subtotal: number;
+  taxAmount: number;
+  discountAmount: number;
+  notes?: string;
+  parkedAt: string;
+  expiresAt: string;
+  employee?: any;
+  customer?: any;
+}
+
 export type PaymentMethod = "CASH" | "CARD" | "MOBILE_PAYMENT" | "STORE_CREDIT" | "MIXED";
 
 export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
@@ -81,4 +96,21 @@ export interface WeighingScaleReading {
   weight: number;
   unit: "kg" | "lb";
   stable: boolean;
+}
+
+export interface QuickSaleItem {
+  id: number;
+  productId: number;
+  displayName: string;
+  color: string;
+  sortOrder: number;
+  isActive: boolean;
+  product?: Product;
+}
+
+export interface QuickSaleManagerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  product?: Product | null;
+  onSuccess: () => void;
 }
