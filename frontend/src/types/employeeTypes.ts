@@ -3,6 +3,13 @@ export interface EmployeeForm {
   username: string;
   pinCode: string;
   role: "ADMIN" | "MANAGER" | "CASHIER" | "STAFF";
+  email?: string;
+  phone?: string;
+  photo?: string;
+  joinedDate?: string;
+  salary?: number;
+  contractDetails?: string;
+  notes?: string;
 }
 
 export interface Employee {
@@ -13,4 +20,11 @@ export interface Employee {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  email?: string;
+  phone?: string;
+  photo?: string;
+  joinedDate?: string;
+  salary?: number;
+  contractDetails?: string;
+  notes?: string;
 }

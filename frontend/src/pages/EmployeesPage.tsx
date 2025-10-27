@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Button } from "../components/common";
-import { EmployeeModal } from "../components/employees/EmployeeModal";
+import EmployeeModal from "../components/employees/EmployeeModal";
 import { EmployeeSearch } from "../components/employees/EmployeeSearch";
 import { EmployeesTable } from "../components/employees/EmployeesTable";
+import { Pagination } from "../components/sales/Pagination";
 import { employeesAPI } from "../services";
 import { Employee } from "../types";
-import { Pagination } from "../components/sales/Pagination";
-import { EmployeeDetailModal } from "../components/employees/EmployeeDetailModal";
+
+import EmployeeDetailsView from "../components/employees/EmployeeDetailsView";
 
 interface EmployeeFormData {
   name: string;
@@ -22,7 +23,6 @@ const EmployeesPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [viewingEmployee, setViewingEmployee] = useState<Employee | null>(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -53,7 +53,7 @@ const EmployeesPage: React.FC = () => {
   const handleEdit = (employee: Employee) => {
     setEditingEmployee(employee);
     setShowModal(true);
-    setShowDetailModal(false);
+    setViewingEmployee(null);
   };
 
   const handleSubmit = async (formData: EmployeeFormData) => {
@@ -90,9 +90,18 @@ const EmployeesPage: React.FC = () => {
   };
 
   // View details handler
-  const handleViewDetails = (employee: Employee) => {
-    setViewingEmployee(employee);
-    setShowDetailModal(true);
+
+  const handleViewDetails = async (employee: Employee) => {
+    try {
+      const fullEmployee = await employeesAPI.getById(employee.id);
+      setViewingEmployee(fullEmployee);
+    } catch (error: any) {
+      toast.error("Failed to load employee details");
+    }
+  };
+
+  const handleCloseDetails = () => {
+    setViewingEmployee(null);
   };
 
   // PIN reset handler
@@ -109,6 +118,17 @@ const EmployeesPage: React.FC = () => {
       toast.error(error.response?.data?.error || "Failed to reset PIN");
     }
   };
+
+  if (viewingEmployee) {
+    return (
+      <EmployeeDetailsView
+        employee={viewingEmployee}
+        onBack={handleCloseDetails}
+        onEdit={handleEdit}
+        onResetPin={handleResetPin}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -139,14 +159,6 @@ const EmployeesPage: React.FC = () => {
         editingEmployee={editingEmployee}
         onClose={() => setShowModal(false)}
         onSubmit={handleSubmit}
-      />
-
-      <EmployeeDetailModal
-        isOpen={showDetailModal}
-        employee={viewingEmployee}
-        onClose={() => setShowDetailModal(false)}
-        onEdit={handleEdit}
-        onResetPin={handleResetPin}
       />
     </div>
   );

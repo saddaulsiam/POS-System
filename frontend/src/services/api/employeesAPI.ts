@@ -10,6 +10,10 @@ export const employeesAPI = {
     const response = await api.get("/employees", { params });
     return response.data;
   },
+  getById: async (id: number): Promise<Employee> => {
+    const response = await api.get(`/employees/${id}`);
+    return response.data;
+  },
   create: async (data: {
     name: string;
     username: string;
@@ -35,6 +39,16 @@ export const employeesAPI = {
   delete: async (id: number): Promise<void> => {
     await api.delete(`/employees/${id}`);
   },
+
+  uploadPhoto: async (id: number, file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append("photo", file);
+    const response = await api.post(`/employees/${id}/photo`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
+
   resetPin: async (id: number, newPin: string): Promise<{ message: string }> => {
     const response = await api.put(`/employees/${id}/reset-pin`, { newPin });
     return response.data;
