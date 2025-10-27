@@ -56,95 +56,97 @@ const AuditLogsPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Audit Log</h2>
-      <div className="flex flex-wrap gap-2 mb-4">
-        <input
-          className="input input-bordered"
-          name="userId"
-          placeholder="User ID"
-          value={filters.userId}
-          onChange={handleFilterChange}
-        />
-        <input
-          className="input input-bordered"
-          name="action"
-          placeholder="Action"
-          value={filters.action}
-          onChange={handleFilterChange}
-        />
-        <input
-          className="input input-bordered"
-          name="entity"
-          placeholder="Entity"
-          value={filters.entity}
-          onChange={handleFilterChange}
-        />
-      </div>
-      <div className="overflow-x-auto bg-white rounded shadow">
-        <table className="min-w-full text-sm">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2">ID</th>
-              <th className="p-2">User</th>
-              <th className="p-2">Action</th>
-              <th className="p-2">Entity</th>
-              <th className="p-2">Entity ID</th>
-              <th className="p-2">Details</th>
-              <th className="p-2">IP</th>
-              <th className="p-2">User Agent</th>
-              <th className="p-2">Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={9} className="text-center p-4">
-                  Loading...
-                </td>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h2 className="text-2xl font-bold mb-4">Audit Log</h2>
+        <div className="flex flex-wrap gap-2 mb-4">
+          <input
+            className="input input-bordered"
+            name="userId"
+            placeholder="User ID"
+            value={filters.userId}
+            onChange={handleFilterChange}
+          />
+          <input
+            className="input input-bordered"
+            name="action"
+            placeholder="Action"
+            value={filters.action}
+            onChange={handleFilterChange}
+          />
+          <input
+            className="input input-bordered"
+            name="entity"
+            placeholder="Entity"
+            value={filters.entity}
+            onChange={handleFilterChange}
+          />
+        </div>
+        <div className="overflow-x-auto bg-white rounded shadow">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="p-2">ID</th>
+                <th className="p-2">User</th>
+                <th className="p-2">Action</th>
+                <th className="p-2">Entity</th>
+                <th className="p-2">Entity ID</th>
+                <th className="p-2">Details</th>
+                <th className="p-2">IP</th>
+                <th className="p-2">User Agent</th>
+                <th className="p-2">Time</th>
               </tr>
-            ) : logs.length === 0 ? (
-              <tr>
-                <td colSpan={9} className="text-center p-4">
-                  No logs found.
-                </td>
-              </tr>
-            ) : (
-              logs.map((log) => (
-                <tr key={log.id} className="border-b">
-                  <td className="p-2">{log.id}</td>
-                  <td className="p-2">
-                    {log.user?.name} ({log.user?.username})
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={9} className="text-center p-4">
+                    Loading...
                   </td>
-                  <td className="p-2">{log.action}</td>
-                  <td className="p-2">{log.entity}</td>
-                  <td className="p-2">{log.entityId}</td>
-                  <td className="p-2 max-w-xs truncate" title={log.details}>
-                    {log.details}
-                  </td>
-                  <td className="p-2">{log.ipAddress}</td>
-                  <td className="p-2 max-w-xs truncate" title={log.userAgent}>
-                    {log.userAgent}
-                  </td>
-                  <td className="p-2">{new Date(log.createdAt).toLocaleString()}</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex justify-between items-center mt-4">
-        <span>
-          Showing {logs.length} of {total} logs
-        </span>
-        <div className="flex gap-2">
-          <button className="btn btn-sm" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
-            Prev
-          </button>
-          <span>Page {page}</span>
-          <button className="btn btn-sm" disabled={page * limit >= total} onClick={() => setPage((p) => p + 1)}>
-            Next
-          </button>
+              ) : logs.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="text-center p-4">
+                    No logs found.
+                  </td>
+                </tr>
+              ) : (
+                logs.map((log) => (
+                  <tr key={log.id} className="border-b">
+                    <td className="p-2">{log.id}</td>
+                    <td className="p-2">
+                      {log.user?.name} ({log.user?.username})
+                    </td>
+                    <td className="p-2">{log.action}</td>
+                    <td className="p-2">{log.entity}</td>
+                    <td className="p-2">{log.entityId}</td>
+                    <td className="p-2 max-w-xs truncate" title={log.details}>
+                      {log.details}
+                    </td>
+                    <td className="p-2">{log.ipAddress}</td>
+                    <td className="p-2 max-w-xs truncate" title={log.userAgent}>
+                      {log.userAgent}
+                    </td>
+                    <td className="p-2">{new Date(log.createdAt).toLocaleString()}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex justify-between items-center mt-4">
+          <span>
+            Showing {logs.length} of {total} logs
+          </span>
+          <div className="flex gap-2">
+            <button className="btn btn-sm" disabled={page === 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+              Prev
+            </button>
+            <span>Page {page}</span>
+            <button className="btn btn-sm" disabled={page * limit >= total} onClick={() => setPage((p) => p + 1)}>
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>

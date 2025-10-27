@@ -183,355 +183,357 @@ const LoyaltyAdminPage: React.FC = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-          <Gift className="text-blue-600" />
-          Loyalty Program Management
-        </h1>
-        <p className="mt-2 text-gray-600">Manage tiers, offers, and track loyalty program performance</p>
-      </div>
-
-      {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveTab("overview")}
-            className={`${
-              activeTab === "overview"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
-          >
-            <TrendingUp size={18} />
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab("tiers")}
-            className={`${
-              activeTab === "tiers"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
-          >
-            <Trophy size={18} />
-            Tier Configuration
-          </button>
-          <button
-            onClick={() => setActiveTab("offers")}
-            className={`${
-              activeTab === "offers"
-                ? "border-blue-500 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
-          >
-            <Star size={18} />
-            Special Offers
-          </button>
-        </nav>
-      </div>
-
-      {/* Overview Tab */}
-      {activeTab === "overview" && stats && (
-        <div className="space-y-6">
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Total Points Issued</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{stats.pointsIssued.toLocaleString()}</p>
-                </div>
-                <div className="bg-green-100 p-3 rounded-full">
-                  <Award className="text-green-600" size={24} />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Points Redeemed</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{stats.pointsRedeemed.toLocaleString()}</p>
-                </div>
-                <div className="bg-blue-100 p-3 rounded-full">
-                  <Gift className="text-blue-600" size={24} />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Active Offers</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{stats.activeOffers}</p>
-                </div>
-                <div className="bg-purple-100 p-3 rounded-full">
-                  <Star className="text-purple-600" size={24} />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Redemption Rate</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">
-                    {stats.pointsIssued > 0 ? ((stats.pointsRedeemed / stats.pointsIssued) * 100).toFixed(1) : 0}%
-                  </p>
-                </div>
-                <div className="bg-orange-100 p-3 rounded-full">
-                  <Target className="text-orange-600" size={24} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Customers by Tier */}
-          <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Users size={20} />
-              Customers by Tier
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {["BRONZE", "SILVER", "GOLD", "PLATINUM"].map((tier) => (
-                <div key={tier} className={`p-4 rounded-lg border-2 ${getTierColor(tier)}`}>
-                  <div className="text-3xl mb-2">{getTierIcon(tier)}</div>
-                  <p className="font-semibold">{tier}</p>
-                  <p className="text-2xl font-bold">{stats.customersByTier[tier] || 0}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Top Customers */}
-          <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Trophy size={20} />
-              Top Loyalty Customers
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rank</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tier</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Points</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {stats.topCustomers.map((customer, index) => (
-                    <tr key={customer.id}>
-                      <td className="px-4 py-3">
-                        <span className="text-lg font-bold text-gray-600">#{index + 1}</span>
-                      </td>
-                      <td className="px-4 py-3 font-medium text-gray-900">{customer.name}</td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${getTierColor(
-                            customer.loyaltyTier
-                          )}`}
-                        >
-                          {getTierIcon(customer.loyaltyTier)} {customer.loyaltyTier}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 font-semibold text-gray-900">
-                        {customer.loyaltyPoints.toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <Gift className="text-blue-600" />
+            Loyalty Program Management
+          </h1>
+          <p className="mt-2 text-gray-600">Manage tiers, offers, and track loyalty program performance</p>
         </div>
-      )}
 
-      {/* Tier Configuration Tab */}
-      {activeTab === "tiers" && (
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Tier Benefits Configuration</h3>
-            </div>
+        {/* Tabs */}
+        <div className="border-b border-gray-200 mb-6">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`${
+                activeTab === "overview"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            >
+              <TrendingUp size={18} />
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab("tiers")}
+              className={`${
+                activeTab === "tiers"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            >
+              <Trophy size={18} />
+              Tier Configuration
+            </button>
+            <button
+              onClick={() => setActiveTab("offers")}
+              className={`${
+                activeTab === "offers"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+            >
+              <Star size={18} />
+              Special Offers
+            </button>
+          </nav>
+        </div>
 
-            <div className="space-y-4">
-              {tiers.map((tier) => (
-                <div key={tier.tier} className={`p-6 rounded-lg border-2 ${getTierColor(tier.tier)}`}>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="text-4xl">{getTierIcon(tier.tier)}</span>
-                        <div>
-                          <h4 className="text-xl font-bold">{tier.tier}</h4>
-                          <p className="text-sm opacity-75">{tier.description}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                        <div>
-                          <p className="text-xs opacity-75 mb-1">Minimum Points</p>
-                          <p className="font-bold">{tier.minimumPoints.toLocaleString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs opacity-75 mb-1">Points Multiplier</p>
-                          <p className="font-bold">{tier.pointsMultiplier}x</p>
-                        </div>
-                        <div>
-                          <p className="text-xs opacity-75 mb-1">Discount</p>
-                          <p className="font-bold">{tier.discountPercentage}%</p>
-                        </div>
-                        <div>
-                          <p className="text-xs opacity-75 mb-1">Birthday Bonus</p>
-                          <p className="font-bold">{tier.birthdayBonus} pts</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        setEditingTier(tier);
-                        setShowTierModal(true);
-                      }}
-                      className="ml-4 p-2 text-gray-600 hover:text-blue-600 hover:bg-white/50 rounded-lg transition-colors"
-                    >
-                      <Edit2 size={18} />
-                    </button>
+        {/* Overview Tab */}
+        {activeTab === "overview" && stats && (
+          <div className="space-y-6">
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Total Points Issued</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">{stats.pointsIssued.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-green-100 p-3 rounded-full">
+                    <Award className="text-green-600" size={24} />
                   </div>
                 </div>
-              ))}
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Points Redeemed</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">{stats.pointsRedeemed.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-blue-100 p-3 rounded-full">
+                    <Gift className="text-blue-600" size={24} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Active Offers</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">{stats.activeOffers}</p>
+                  </div>
+                  <div className="bg-purple-100 p-3 rounded-full">
+                    <Star className="text-purple-600" size={24} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Redemption Rate</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">
+                      {stats.pointsIssued > 0 ? ((stats.pointsRedeemed / stats.pointsIssued) * 100).toFixed(1) : 0}%
+                    </p>
+                  </div>
+                  <div className="bg-orange-100 p-3 rounded-full">
+                    <Target className="text-orange-600" size={24} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Customers by Tier */}
+            <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Users size={20} />
+                Customers by Tier
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {["BRONZE", "SILVER", "GOLD", "PLATINUM"].map((tier) => (
+                  <div key={tier} className={`p-4 rounded-lg border-2 ${getTierColor(tier)}`}>
+                    <div className="text-3xl mb-2">{getTierIcon(tier)}</div>
+                    <p className="font-semibold">{tier}</p>
+                    <p className="text-2xl font-bold">{stats.customersByTier[tier] || 0}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Top Customers */}
+            <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Trophy size={20} />
+                Top Loyalty Customers
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rank</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tier</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Points</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {stats.topCustomers.map((customer, index) => (
+                      <tr key={customer.id}>
+                        <td className="px-4 py-3">
+                          <span className="text-lg font-bold text-gray-600">#{index + 1}</span>
+                        </td>
+                        <td className="px-4 py-3 font-medium text-gray-900">{customer.name}</td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getTierColor(
+                              customer.loyaltyTier
+                            )}`}
+                          >
+                            {getTierIcon(customer.loyaltyTier)} {customer.loyaltyTier}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 font-semibold text-gray-900">
+                          {customer.loyaltyPoints.toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Offers Tab */}
-      {activeTab === "offers" && (
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Special Offers</h3>
-              <button
-                onClick={() => {
-                  setEditingOffer(null);
-                  setShowOfferModal(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus size={18} />
-                Create Offer
-              </button>
-            </div>
+        {/* Tier Configuration Tab */}
+        {activeTab === "tiers" && (
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Tier Benefits Configuration</h3>
+              </div>
 
-            <div className="space-y-4">
-              {offers.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <Star size={48} className="mx-auto mb-4 opacity-50" />
-                  <p>No special offers created yet</p>
-                  <p className="text-sm mt-2">Click "Create Offer" to add your first offer</p>
-                </div>
-              ) : (
-                offers.map((offer) => (
-                  <div
-                    key={offer.id}
-                    className="p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
-                  >
+              <div className="space-y-4">
+                {tiers.map((tier) => (
+                  <div key={tier.tier} className={`p-6 rounded-lg border-2 ${getTierColor(tier.tier)}`}>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <div className="flex items-start gap-3 mb-2">
-                          <Star className={offer.isActive ? "text-yellow-500" : "text-gray-400"} size={24} />
+                        <div className="flex items-center gap-3 mb-3">
+                          <span className="text-4xl">{getTierIcon(tier.tier)}</span>
                           <div>
-                            <h4 className="text-lg font-bold text-gray-900">{offer.title}</h4>
-                            <p className="text-gray-600 text-sm mt-1">{offer.description}</p>
+                            <h4 className="text-xl font-bold">{tier.tier}</h4>
+                            <p className="text-sm opacity-75">{tier.description}</p>
                           </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-4 mt-4 text-sm">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                           <div>
-                            <span className="text-gray-500">Type:</span>
-                            <span className="ml-2 font-medium">{offer.offerType}</span>
-                          </div>
-                          {offer.discountValue && (
-                            <div>
-                              <span className="text-gray-500">Value:</span>
-                              <span className="ml-2 font-medium">${offer.discountValue}</span>
-                            </div>
-                          )}
-                          {offer.minimumPurchase && (
-                            <div>
-                              <span className="text-gray-500">Min. Purchase:</span>
-                              <span className="ml-2 font-medium">${offer.minimumPurchase}</span>
-                            </div>
-                          )}
-                          {offer.requiredTier && (
-                            <div>
-                              <span className="text-gray-500">Tier:</span>
-                              <span
-                                className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${getTierColor(
-                                  offer.requiredTier
-                                )}`}
-                              >
-                                {offer.requiredTier}
-                              </span>
-                            </div>
-                          )}
-                          <div>
-                            <span className="text-gray-500">Period:</span>
-                            <span className="ml-2 font-medium">
-                              {new Date(offer.startDate).toLocaleDateString()} -{" "}
-                              {new Date(offer.endDate).toLocaleDateString()}
-                            </span>
+                            <p className="text-xs opacity-75 mb-1">Minimum Points</p>
+                            <p className="font-bold">{tier.minimumPoints.toLocaleString()}</p>
                           </div>
                           <div>
-                            <span className="text-gray-500">Status:</span>
-                            <span
-                              className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
-                                offer.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                              }`}
-                            >
-                              {offer.isActive ? "Active" : "Inactive"}
-                            </span>
+                            <p className="text-xs opacity-75 mb-1">Points Multiplier</p>
+                            <p className="font-bold">{tier.pointsMultiplier}x</p>
+                          </div>
+                          <div>
+                            <p className="text-xs opacity-75 mb-1">Discount</p>
+                            <p className="font-bold">{tier.discountPercentage}%</p>
+                          </div>
+                          <div>
+                            <p className="text-xs opacity-75 mb-1">Birthday Bonus</p>
+                            <p className="font-bold">{tier.birthdayBonus} pts</p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex gap-2 ml-4">
-                        <button
-                          onClick={() => {
-                            setEditingOffer(offer);
-                            setShowOfferModal(true);
-                          }}
-                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteOffer(offer.id)}
-                          className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => {
+                          setEditingTier(tier);
+                          setShowTierModal(true);
+                        }}
+                        className="ml-4 p-2 text-gray-600 hover:text-blue-600 hover:bg-white/50 rounded-lg transition-colors"
+                      >
+                        <Edit2 size={18} />
+                      </button>
                     </div>
                   </div>
-                ))
-              )}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Tier Edit Modal */}
-      {showTierModal && editingTier && (
-        <TierEditModal tier={editingTier} onClose={() => setShowTierModal(false)} onSave={handleSaveTier} />
-      )}
+        {/* Offers Tab */}
+        {activeTab === "offers" && (
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Special Offers</h3>
+                <button
+                  onClick={() => {
+                    setEditingOffer(null);
+                    setShowOfferModal(true);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Plus size={18} />
+                  Create Offer
+                </button>
+              </div>
 
-      {/* Offer Modal */}
-      {showOfferModal && (
-        <OfferModal offer={editingOffer} onClose={() => setShowOfferModal(false)} onSave={handleSaveOffer} />
-      )}
+              <div className="space-y-4">
+                {offers.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <Star size={48} className="mx-auto mb-4 opacity-50" />
+                    <p>No special offers created yet</p>
+                    <p className="text-sm mt-2">Click "Create Offer" to add your first offer</p>
+                  </div>
+                ) : (
+                  offers.map((offer) => (
+                    <div
+                      key={offer.id}
+                      className="p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-start gap-3 mb-2">
+                            <Star className={offer.isActive ? "text-yellow-500" : "text-gray-400"} size={24} />
+                            <div>
+                              <h4 className="text-lg font-bold text-gray-900">{offer.title}</h4>
+                              <p className="text-gray-600 text-sm mt-1">{offer.description}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-4 mt-4 text-sm">
+                            <div>
+                              <span className="text-gray-500">Type:</span>
+                              <span className="ml-2 font-medium">{offer.offerType}</span>
+                            </div>
+                            {offer.discountValue && (
+                              <div>
+                                <span className="text-gray-500">Value:</span>
+                                <span className="ml-2 font-medium">${offer.discountValue}</span>
+                              </div>
+                            )}
+                            {offer.minimumPurchase && (
+                              <div>
+                                <span className="text-gray-500">Min. Purchase:</span>
+                                <span className="ml-2 font-medium">${offer.minimumPurchase}</span>
+                              </div>
+                            )}
+                            {offer.requiredTier && (
+                              <div>
+                                <span className="text-gray-500">Tier:</span>
+                                <span
+                                  className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${getTierColor(
+                                    offer.requiredTier
+                                  )}`}
+                                >
+                                  {offer.requiredTier}
+                                </span>
+                              </div>
+                            )}
+                            <div>
+                              <span className="text-gray-500">Period:</span>
+                              <span className="ml-2 font-medium">
+                                {new Date(offer.startDate).toLocaleDateString()} -{" "}
+                                {new Date(offer.endDate).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Status:</span>
+                              <span
+                                className={`ml-2 px-2 py-1 rounded text-xs font-semibold ${
+                                  offer.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                                }`}
+                              >
+                                {offer.isActive ? "Active" : "Inactive"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 ml-4">
+                          <button
+                            onClick={() => {
+                              setEditingOffer(offer);
+                              setShowOfferModal(true);
+                            }}
+                            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteOffer(offer.id)}
+                            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tier Edit Modal */}
+        {showTierModal && editingTier && (
+          <TierEditModal tier={editingTier} onClose={() => setShowTierModal(false)} onSave={handleSaveTier} />
+        )}
+
+        {/* Offer Modal */}
+        {showOfferModal && (
+          <OfferModal offer={editingOffer} onClose={() => setShowOfferModal(false)} onSave={handleSaveOffer} />
+        )}
+      </div>
     </div>
   );
 };
