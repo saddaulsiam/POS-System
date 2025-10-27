@@ -7,6 +7,7 @@ import { EmployeesTable } from "../components/employees/EmployeesTable";
 import { employeesAPI } from "../services";
 import { Employee } from "../types";
 import { Pagination } from "../components/sales/Pagination";
+import { EmployeeDetailModal } from "../components/employees/EmployeeDetailModal";
 
 interface EmployeeFormData {
   name: string;
@@ -20,6 +21,8 @@ const EmployeesPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [viewingEmployee, setViewingEmployee] = useState<Employee | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -50,6 +53,7 @@ const EmployeesPage: React.FC = () => {
   const handleEdit = (employee: Employee) => {
     setEditingEmployee(employee);
     setShowModal(true);
+    setShowDetailModal(false);
   };
 
   const handleSubmit = async (formData: EmployeeFormData) => {
@@ -85,6 +89,27 @@ const EmployeesPage: React.FC = () => {
     }
   };
 
+  // View details handler
+  const handleViewDetails = (employee: Employee) => {
+    setViewingEmployee(employee);
+    setShowDetailModal(true);
+  };
+
+  // PIN reset handler
+  const handleResetPin = async (employee: Employee) => {
+    const newPin = prompt("Enter new PIN for this employee (4-8 digits):");
+    if (!newPin || newPin.length < 4 || newPin.length > 8) {
+      toast.error("PIN must be 4-8 digits");
+      return;
+    }
+    try {
+      await employeesAPI.resetPin(employee.id, newPin);
+      toast.success("PIN reset successfully");
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to reset PIN");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -98,7 +123,13 @@ const EmployeesPage: React.FC = () => {
         <EmployeeSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
-          <EmployeesTable employees={employees} isLoading={isLoading} onEdit={handleEdit} onDelete={handleDelete} />
+          <EmployeesTable
+            employees={employees}
+            isLoading={isLoading}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onViewDetails={handleViewDetails}
+          />
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       </div>
@@ -108,6 +139,14 @@ const EmployeesPage: React.FC = () => {
         editingEmployee={editingEmployee}
         onClose={() => setShowModal(false)}
         onSubmit={handleSubmit}
+      />
+
+      <EmployeeDetailModal
+        isOpen={showDetailModal}
+        employee={viewingEmployee}
+        onClose={() => setShowDetailModal(false)}
+        onEdit={handleEdit}
+        onResetPin={handleResetPin}
       />
     </div>
   );

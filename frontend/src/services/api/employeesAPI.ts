@@ -35,4 +35,8 @@ export const employeesAPI = {
   delete: async (id: number): Promise<void> => {
     await api.delete(`/employees/${id}`);
   },
+  resetPin: async (id: number, newPin: string): Promise<{ message: string }> => {
+    const response = await api.put(`/employees/${id}/reset-pin`, { newPin });
+    return response.data;
+  },
 };
