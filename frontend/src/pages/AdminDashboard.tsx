@@ -9,44 +9,74 @@ import { QuickActionsGrid } from "../components/dashboard/QuickActionsGrid";
 import { AlertsSection } from "../components/dashboard/AlertsSection";
 import { useSettings } from "../context/SettingsContext";
 import { formatCurrency } from "../utils/currencyUtils";
+import { DashboardStats } from "../types/dashboardTypes";
 
-interface DashboardStats {
-  todaySales: number;
-  yesterdaySales: number;
-  weekSales: number;
-  monthSales: number;
-  totalProducts: number;
-  activeProducts: number;
-  lowStockCount: number;
-  outOfStockCount: number;
-  totalCustomers: number;
-  newCustomersThisWeek: number;
-  todayTransactions: number;
-  weekTransactions: number;
-  averageOrderValue: number;
-  topSellingProducts: Array<{
-    id: number;
-    name: string;
-    totalSold: number;
-    revenue: number;
-  }>;
-  recentTransactions: Array<{
-    id: number;
-    total: number;
-    createdAt: string;
-    customerName?: string;
-    itemCount: number;
-  }>;
-  salesByCategory: Array<{
-    category: string;
-    sales: number;
-    percentage: number;
-  }>;
-  hourlySales: Array<{
-    hour: number;
-    sales: number;
-  }>;
-}
+const quickActions = [
+  {
+    name: "Add Product",
+    href: "/products/new",
+    icon: "📦",
+    color: "blue",
+    description: "Add new inventory items",
+    gradient: "from-blue-500 to-blue-600",
+  },
+  {
+    name: "Process Sale",
+    href: "/",
+    icon: "💰",
+    color: "green",
+    description: "Go to POS terminal",
+    gradient: "from-green-500 to-emerald-600",
+  },
+  {
+    name: "View Reports",
+    href: "/reports",
+    icon: "📊",
+    color: "purple",
+    description: "Detailed analytics",
+    gradient: "from-purple-500 to-purple-600",
+  },
+  {
+    name: "Manage Staff",
+    href: "/employees",
+    icon: "👥",
+    color: "indigo",
+    description: "Employee management",
+    gradient: "from-indigo-500 to-indigo-600",
+  },
+  {
+    name: "Customer List",
+    href: "/customers",
+    icon: "👤",
+    color: "pink",
+    description: "Customer database",
+    gradient: "from-pink-500 to-rose-600",
+  },
+  {
+    name: "Inventory",
+    href: "/inventory",
+    icon: "📋",
+    color: "yellow",
+    description: "Stock management",
+    gradient: "from-yellow-500 to-orange-600",
+  },
+  {
+    name: "Settings",
+    href: "/settings",
+    icon: "⚙️",
+    color: "gray",
+    description: "System configuration",
+    gradient: "from-gray-500 to-gray-600",
+  },
+  {
+    name: "Analytics",
+    href: "/analytics",
+    icon: "📈",
+    color: "teal",
+    description: "Advanced insights",
+    gradient: "from-teal-500 to-cyan-600",
+  },
+];
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -209,73 +239,6 @@ const AdminDashboard: React.FC = () => {
       {children}
     </div>
   );
-
-  const quickActions = [
-    {
-      name: "Add Product",
-      href: "/products/new",
-      icon: "📦",
-      color: "blue",
-      description: "Add new inventory items",
-      gradient: "from-blue-500 to-blue-600",
-    },
-    {
-      name: "Process Sale",
-      href: "/",
-      icon: "💰",
-      color: "green",
-      description: "Go to POS terminal",
-      gradient: "from-green-500 to-emerald-600",
-    },
-    {
-      name: "View Reports",
-      href: "/reports",
-      icon: "📊",
-      color: "purple",
-      description: "Detailed analytics",
-      gradient: "from-purple-500 to-purple-600",
-    },
-    {
-      name: "Manage Staff",
-      href: "/employees",
-      icon: "👥",
-      color: "indigo",
-      description: "Employee management",
-      gradient: "from-indigo-500 to-indigo-600",
-    },
-    {
-      name: "Customer List",
-      href: "/customers",
-      icon: "👤",
-      color: "pink",
-      description: "Customer database",
-      gradient: "from-pink-500 to-rose-600",
-    },
-    {
-      name: "Inventory",
-      href: "/inventory",
-      icon: "📋",
-      color: "yellow",
-      description: "Stock management",
-      gradient: "from-yellow-500 to-orange-600",
-    },
-    {
-      name: "Settings",
-      href: "/settings",
-      icon: "⚙️",
-      color: "gray",
-      description: "System configuration",
-      gradient: "from-gray-500 to-gray-600",
-    },
-    {
-      name: "Analytics",
-      href: "/analytics",
-      icon: "📈",
-      color: "teal",
-      description: "Advanced insights",
-      gradient: "from-teal-500 to-cyan-600",
-    },
-  ];
 
   if (user?.role === "CASHIER") {
     return (
