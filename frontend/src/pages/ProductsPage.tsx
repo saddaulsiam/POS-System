@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { productsAPI, categoriesAPI, suppliersAPI } from "../services";
-import { Product, Category, Supplier } from "../types";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { ExcelImportDialog } from "../components/products/ExcelImportDialog";
+import { ProductActions } from "../components/products/ProductActions";
+import { ProductFilters } from "../components/products/ProductFilters";
+import { ProductModals } from "../components/products/ProductModals";
+import { ProductTable } from "../components/products/ProductTable";
+import { QuickSaleManager } from "../components/products/QuickSaleManager";
 import { useAuth } from "../context/AuthContext";
 import { useSettings } from "../context/SettingsContext";
-import toast from "react-hot-toast";
-import { ProductFilters } from "../components/products/ProductFilters";
-import { ProductActions } from "../components/products/ProductActions";
-import { ProductTable } from "../components/products/ProductTable";
-import { ProductModals } from "../components/products/ProductModals";
-import { ExcelImportDialog } from "../components/products/ExcelImportDialog";
-import { QuickSaleManager } from "../components/products/QuickSaleManager";
+import { categoriesAPI, productsAPI, suppliersAPI } from "../services";
+import { Category, Product, Supplier } from "../types";
 import { printBarcodeLabel } from "../utils/productUtils";
 
 const ProductsPage: React.FC = () => {

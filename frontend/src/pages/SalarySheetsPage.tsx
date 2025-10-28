@@ -208,11 +208,18 @@ const SalarySheetsPage: React.FC = () => {
           })}
         </select>
 
-        <button className="bg-green-600 text-white px-4 py-1 rounded" onClick={openCreateModal} type="button">
-          + Add Salary Sheet
+        <button
+          className="bg-green-600 text-white px-4 py-1 rounded flex items-center"
+          onClick={openCreateModal}
+          type="button"
+        >
+          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Add Salary Sheet
         </button>
         <button
-          className="bg-orange-600 text-white px-4 py-1 rounded"
+          className="flex items-center bg-orange-600 text-white px-4 py-1 rounded"
           type="button"
           onClick={async () => {
             if (!month || !year) {
@@ -251,10 +258,13 @@ const SalarySheetsPage: React.FC = () => {
             }
           }}
         >
+          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
           Generate Salary Sheets
         </button>
         <button
-          className="bg-gray-800 text-white px-4 py-1 rounded"
+          className="flex items-center bg-gray-800 text-white px-4 py-1 rounded"
           type="button"
           onClick={() => {
             if (!salarySheets.length) {
@@ -271,6 +281,14 @@ const SalarySheetsPage: React.FC = () => {
             }
           }}
         >
+          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+            />
+          </svg>
           Print All Salary Slips
         </button>
       </div>
@@ -324,14 +342,16 @@ const SalarySheetsPage: React.FC = () => {
                     </button>
                   )}
                   <button
-                    className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
+                    className="bg-blue-500 text-white px-3 py-1 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => openEditModal(sheet)}
+                    disabled={sheet.paid}
                   >
                     Edit
                   </button>
                   <button
-                    className="bg-red-500 text-white px-3 py-1 rounded text-xs"
+                    className="bg-red-500 text-white px-3 py-1 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={() => handleDelete(sheet.id)}
+                    disabled={sheet.paid}
                   >
                     Delete
                   </button>
