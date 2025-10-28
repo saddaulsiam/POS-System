@@ -2,9 +2,10 @@ import React from "react";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import { Modal } from "../components/common/Modal";
-import { employeesAPI } from "../services/api/employeesAPI";
-import { SalarySheet, salarySheetsAPI } from "../services/api/salarySheetsAPI";
-import { Employee } from "../types/employeeTypes";
+import SalarySheetForm from "../components/salarySheet/SalarySheetForm";
+import SalarySheetsTable from "../components/salarySheet/SalarySheetsTable";
+import { useSalarySheets } from "../hooks/useSalarySheets";
+import { salarySheetsAPI } from "../services/api/salarySheetsAPI";
 import { generateAllSalarySlipsHTML, generateSalarySlipHTML } from "../utils/SalarySlipGenerator";
 
 const months = [
@@ -24,12 +25,10 @@ const months = [
 
 const SalarySheetsPage: React.FC = () => {
   const now = new Date();
-  const [salarySheets, setSalarySheets] = React.useState<SalarySheet[]>([]);
-  const [loading, setLoading] = React.useState(false);
   const [month, setMonth] = React.useState<number | "">(now.getMonth() + 1);
   const [year, setYear] = React.useState<number | "">(now.getFullYear());
   const [showModal, setShowModal] = React.useState(false);
-  const [editingSheet, setEditingSheet] = React.useState<SalarySheet | null>(null);
+  const [editingSheet, setEditingSheet] = React.useState<any>(null);
   const [form, setForm] = React.useState({
     employeeId: "",
     month: "",
@@ -38,26 +37,7 @@ const SalarySheetsPage: React.FC = () => {
     bonus: "",
     deduction: "",
   });
-  const [employees, setEmployees] = React.useState<Employee[]>([]);
-  const [empLoading, setEmpLoading] = React.useState(false);
-  const [empError, setEmpError] = React.useState<string | null>(null);
-
-  // Fetch employees for dropdown
-  React.useEffect(() => {
-    const fetchEmployees = async () => {
-      setEmpLoading(true);
-      setEmpError(null);
-      try {
-        const res = await employeesAPI.getAll({ limit: 1000 });
-        setEmployees(res.data);
-      } catch (err: any) {
-        setEmpError("Failed to load employees");
-      } finally {
-        setEmpLoading(false);
-      }
-    };
-    fetchEmployees();
-  }, []);
+  const { salarySheets, loading, employees, empLoading, empError, fetchSalarySheets } = useSalarySheets();
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -75,7 +55,6 @@ const SalarySheetsPage: React.FC = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     try {
       const payload = {
         employeeId: Number(form.employeeId),
@@ -91,11 +70,9 @@ const SalarySheetsPage: React.FC = () => {
         await salarySheetsAPI.create(payload);
       }
       setShowModal(false);
-      fetchSalarySheets();
+      fetchSalarySheets(month, year);
     } catch (err: any) {
       toast.error(err.message || "Failed to save salary sheet");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -105,7 +82,7 @@ const SalarySheetsPage: React.FC = () => {
     setShowModal(true);
   };
 
-  const openEditModal = (sheet: SalarySheet) => {
+  const openEditModal = (sheet: any) => {
     setEditingSheet(sheet);
     setForm({
       employeeId: sheet.employeeId.toString(),
@@ -120,45 +97,23 @@ const SalarySheetsPage: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Are you sure you want to delete this salary sheet?")) return;
-    setLoading(true);
     try {
       await salarySheetsAPI.delete(id);
-      fetchSalarySheets();
+      fetchSalarySheets(month, year);
     } catch (err: any) {
       toast.error(err.message || "Failed to delete salary sheet");
-    } finally {
-      setLoading(false);
     }
   };
 
   React.useEffect(() => {
-    fetchSalarySheets();
+    fetchSalarySheets(month, year);
     // eslint-disable-next-line
-  }, [month, year]);
-
-  const fetchSalarySheets = async () => {
-    setLoading(true);
-    try {
-      const params: any = {};
-      if (month !== "") params.month = month;
-      if (year !== "") params.year = year;
-      // Remove employeeId if present in any form
-      if ("employeeId" in params) {
-        delete params.employeeId;
-      }
-      const res = await salarySheetsAPI.getAll(params);
-      setSalarySheets(res);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to fetch salary sheets");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [month, year, fetchSalarySheets]);
 
   const handleMarkAsPaid = async (id: number) => {
     try {
       await salarySheetsAPI.markAsPaid(id);
-      fetchSalarySheets();
+      fetchSalarySheets(month, year);
     } catch (err: any) {
       toast.error(err.message || "Failed to mark as paid");
     }
@@ -216,10 +171,9 @@ const SalarySheetsPage: React.FC = () => {
               toast.error("Select month and year to generate and print salary sheets.");
               return;
             }
-            setLoading(true);
             try {
               await salarySheetsAPI.bulkGenerate({ month: Number(month), year: Number(year) });
-              await fetchSalarySheets();
+              await fetchSalarySheets(month, year);
               toast.success("Salary sheets generated successfully.");
             } catch (err: any) {
               let backendMsg = undefined;
@@ -231,8 +185,6 @@ const SalarySheetsPage: React.FC = () => {
               } else if (err.message && !err.message.startsWith("Request failed with status code")) {
                 toast.error(err.message, { id: "salary-bulk-generate-error" });
               }
-            } finally {
-              setLoading(false);
             }
           }}
         >
@@ -271,108 +223,36 @@ const SalarySheetsPage: React.FC = () => {
         </button>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border rounded shadow">
-          <thead>
-            <tr>
-              <th className="px-4 py-2 border">Employee</th>
-              <th className="px-4 py-2 border">Month</th>
-              <th className="px-4 py-2 border">Year</th>
-              <th className="px-4 py-2 border">Base Salary</th>
-              <th className="px-4 py-2 border">Bonus</th>
-              <th className="px-4 py-2 border">Deduction</th>
-              <th className="px-4 py-2 border">Total</th>
-              <th className="px-4 py-2 border">Status</th>
-              <th className="px-4 py-2 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {salarySheets.map((sheet) => (
-              <tr key={sheet.id} className="text-center">
-                <td className="px-4 py-2 border flex items-center gap-2">
-                  {sheet.employee.photoUrl && (
-                    <img src={sheet.employee.photoUrl} alt="" className="w-8 h-8 rounded-full object-cover" />
-                  )}
-                  <span>{sheet.employee.name}</span>
-                </td>
-                <td className="px-4 py-2 border">{months[sheet.month - 1]}</td>
-                <td className="px-4 py-2 border">{sheet.year}</td>
-                <td className="px-4 py-2 border">${sheet.baseSalary.toLocaleString()}</td>
-                <td className="px-4 py-2 border">${sheet.bonus.toLocaleString()}</td>
-                <td className="px-4 py-2 border">${sheet.deduction.toLocaleString()}</td>
-                <td className="px-4 py-2 border font-semibold">
-                  ${(sheet.baseSalary + sheet.bonus - sheet.deduction).toLocaleString()}
-                </td>
-                <td className="px-4 py-2 border">
-                  {sheet.paid ? (
-                    <span className="text-green-600 font-semibold">Paid</span>
-                  ) : (
-                    <span className="text-yellow-600 font-semibold">Unpaid</span>
-                  )}
-                </td>
-                <td className="px-4 py-2 border flex gap-2 justify-center">
-                  {!sheet.paid && (
-                    <button
-                      className="bg-green-500 text-white px-3 py-1 rounded text-xs"
-                      onClick={() => handleMarkAsPaid(sheet.id)}
-                    >
-                      Mark as Paid
-                    </button>
-                  )}
-                  <button
-                    className="bg-blue-500 text-white px-3 py-1 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={() => openEditModal(sheet)}
-                    disabled={sheet.paid}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="bg-red-500 text-white px-3 py-1 rounded text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={() => handleDelete(sheet.id)}
-                    disabled={sheet.paid}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    className="bg-gray-700 text-white px-3 py-1 rounded text-xs"
-                    onClick={() => {
-                      let emp = employees.find((e) => e.id === sheet.employeeId);
-                      if (!emp) {
-                        emp = {
-                          id: sheet.employeeId,
-                          name: sheet.employee?.name || "Unknown",
-                          username: "",
-                          role: "STAFF",
-                          isActive: true,
-                          createdAt: new Date().toISOString(),
-                          updatedAt: new Date().toISOString(),
-                        };
-                      }
-                      const html = generateSalarySlipHTML(sheet, emp);
-                      const printWindow = window.open("", "", "width=600,height=800");
-                      if (printWindow) {
-                        printWindow.document.write(html);
-                        printWindow.document.close();
-                        printWindow.focus();
-                        setTimeout(() => printWindow.print(), 300);
-                      }
-                    }}
-                  >
-                    Print
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {salarySheets.length === 0 && !loading && (
-              <tr>
-                <td colSpan={9} className="text-center py-8 text-gray-500">
-                  No salary sheets found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <SalarySheetsTable
+        salarySheets={salarySheets}
+        months={months}
+        loading={loading}
+        onMarkAsPaid={handleMarkAsPaid}
+        onEdit={openEditModal}
+        onDelete={handleDelete}
+        onPrint={(sheet) => {
+          let emp = employees.find((e) => e.id === sheet.employeeId);
+          if (!emp) {
+            emp = {
+              id: sheet.employeeId,
+              name: sheet.employee?.name || "Unknown",
+              username: "",
+              role: "STAFF",
+              isActive: true,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+          }
+          const html = generateSalarySlipHTML(sheet, emp);
+          const printWindow = window.open("", "", "width=600,height=800");
+          if (printWindow) {
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 300);
+          }
+        }}
+      />
 
       {/* Modal for create/edit salary sheet */}
       {showModal && (
@@ -387,165 +267,15 @@ const SalarySheetsPage: React.FC = () => {
           ) : empError ? (
             <div className="text-red-500">{empError}</div>
           ) : (
-            <form onSubmit={handleFormSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Employee</label>
-                <select
-                  name="employeeId"
-                  value={form.employeeId}
-                  onChange={handleFormChange}
-                  required
-                  className="w-full border rounded px-3 py-2"
-                >
-                  <option value="">Select employee</option>
-                  {employees.map((emp) => (
-                    <option key={emp.id} value={emp.id}>
-                      {emp.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">Year</label>
-                  {(() => {
-                    const now = new Date();
-                    const currentMonth = now.getMonth() + 1;
-                    const currentYear = now.getFullYear();
-                    let prevMonth = currentMonth - 1;
-                    let prevYear = currentYear;
-                    if (prevMonth === 0) {
-                      prevMonth = 12;
-                      prevYear = currentYear - 1;
-                    }
-                    return (
-                      <select
-                        name="year"
-                        value={form.year}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full border rounded px-3 py-2"
-                      >
-                        <option value="">Select year</option>
-                        {(() => {
-                          let nextMonth = currentMonth + 1;
-                          let nextYear = currentYear;
-                          if (nextMonth === 13) {
-                            nextMonth = 1;
-                            nextYear = currentYear + 1;
-                          }
-                          return Array.from({ length: 6 }, (_, i) => {
-                            const year = new Date().getFullYear() - 5 + i;
-                            const enableYear = year === currentYear || year === prevYear || year === nextYear;
-                            return (
-                              <option key={year} value={year} disabled={!enableYear}>
-                                {year}
-                              </option>
-                            );
-                          });
-                        })()}
-                      </select>
-                    );
-                  })()}
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">Month</label>
-                  {(() => {
-                    // Calculate allowed months/years (current and previous month)
-                    const now = new Date();
-                    const currentMonth = now.getMonth() + 1;
-                    const currentYear = now.getFullYear();
-                    let prevMonth = currentMonth - 1;
-                    let prevYear = currentYear;
-                    if (prevMonth === 0) {
-                      prevMonth = 12;
-                      prevYear = currentYear - 1;
-                    }
-                    return (
-                      <select
-                        name="month"
-                        value={form.month}
-                        onChange={handleFormChange}
-                        required
-                        className="w-full border rounded px-3 py-2"
-                      >
-                        <option value="">Select month</option>
-                        {(() => {
-                          // Calculate nextMonth/nextYear in this scope
-                          let nextMonth = currentMonth + 1;
-                          let nextYear = currentYear;
-                          if (nextMonth === 13) {
-                            nextMonth = 1;
-                            nextYear = currentYear + 1;
-                          }
-                          return months.map((m, idx) => {
-                            const mNum = idx + 1;
-                            let isDisabled = true;
-                            if (
-                              (Number(form.year) === currentYear && mNum === currentMonth) ||
-                              (Number(form.year) === prevYear && mNum === prevMonth) ||
-                              (Number(form.year) === nextYear && mNum === nextMonth)
-                            ) {
-                              isDisabled = false;
-                            }
-                            return (
-                              <option key={mNum} value={mNum} disabled={isDisabled}>
-                                {m}
-                              </option>
-                            );
-                          });
-                        })()}
-                      </select>
-                    );
-                  })()}
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">Base Salary</label>
-                  <input
-                    type="number"
-                    name="baseSalary"
-                    value={form.baseSalary}
-                    onChange={handleFormChange}
-                    required
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">Bonus</label>
-                  <input
-                    type="number"
-                    name="bonus"
-                    value={form.bonus}
-                    onChange={handleFormChange}
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">Deduction</label>
-                  <input
-                    type="number"
-                    name="deduction"
-                    value={form.deduction}
-                    onChange={handleFormChange}
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-                  {editingSheet ? "Update" : "Create"}
-                </button>
-              </div>
-            </form>
+            <SalarySheetForm
+              form={form}
+              employees={employees}
+              months={months}
+              onChange={handleFormChange}
+              onSubmit={handleFormSubmit}
+              onCancel={() => setShowModal(false)}
+              editingSheet={!!editingSheet}
+            />
           )}
         </Modal>
       )}
