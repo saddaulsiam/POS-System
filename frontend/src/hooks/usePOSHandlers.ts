@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 import type { Product, ParkedSale, CartItem } from "../types";
 import { customersAPI, parkedSalesAPI, productsAPI, productVariantsAPI } from "../services";
@@ -6,6 +6,7 @@ import { formatCurrency } from "../utils/currencyUtils";
 
 interface UsePOSHandlersArgs {
   salesAPI?: any;
+  receiptsAPI?: any; // Optional, for testability and type safety
   cart: CartItem[];
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
   customer: any;
@@ -31,6 +32,13 @@ interface UsePOSHandlersArgs {
 
 export function usePOSHandlers(args: UsePOSHandlersArgs) {
   const { addToCart, addVariantToCart } = args;
+
+  // Use a ref to always have the latest cart
+  const cartRef = useRef(args.cart);
+  useEffect(() => {
+    cartRef.current = args.cart;
+  }, [args.cart]);
+
   // Handler: Barcode submit (matches POSBarcodeScanner prop signature)
   const handleBarcodeSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -132,15 +140,20 @@ export function usePOSHandlers(args: UsePOSHandlersArgs) {
 
   // Handler: Confirm park sale (matches ParkSaleDialog prop signature)
   const confirmParkSale = useCallback(async (notes: string) => {
+    // Always use the latest cart state
+    const cart = cartRef.current;
+    console.log("[DEBUG] Cart at start of confirmParkSale:", cart);
+    if (!cart || cart.length === 0) {
+      toast.error("Cannot park an empty cart. Please add items first.");
+      console.error("[DEBUG] Attempted to park sale with empty cart:", cart);
+      return;
+    }
     try {
-      const subtotal = args.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const tax = args.cart.reduce(
-        (sum, item) => sum + ((item.product.taxRate || 0) * item.price * item.quantity) / 100,
-        0
-      );
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const tax = cart.reduce((sum, item) => sum + ((item.product.taxRate || 0) * item.price * item.quantity) / 100, 0);
       const parkData = {
         customerId: args.customer?.id,
-        items: args.cart.map((item) => ({
+        items: cart.map((item) => ({
           productId: item.product.id,
           productName: item.product.name,
           productSku: item.product.sku,
@@ -158,6 +171,8 @@ export function usePOSHandlers(args: UsePOSHandlersArgs) {
         discountAmount: 0,
         notes,
       };
+      // Debug: log parkData before sending to backend
+      console.log("[DEBUG] parkData sent to backend:", parkData);
       await parkedSalesAPI.create(parkData);
       toast.success("Sale parked successfully");
       args.setCart([]);
@@ -226,11 +241,12 @@ export function usePOSHandlers(args: UsePOSHandlersArgs) {
 
   // Handler: Confirm split payment (matches SplitPaymentDialog prop signature)
   const handleConfirmSplitPayment = useCallback(async (splits: any[]) => {
-    // You may want to add isProcessingPayment logic here if needed
+    // Always use the latest cart
+    const cart = cartRef.current;
     try {
       const saleData = {
         customerId: args.customer?.id,
-        items: args.cart.map((item) => ({
+        items: cart.map((item) => ({
           productId: item.product.id,
           productVariantId: item.variant?.id,
           quantity: item.quantity,
@@ -245,39 +261,72 @@ export function usePOSHandlers(args: UsePOSHandlersArgs) {
         loyaltyDiscount: args.loyaltyDiscount || 0,
       };
 
-      // You may want to use salesAPI and receiptsAPI from args if needed
+      // @ts-ignore: salesAPI should be available in your context or pass as arg
+      const sale = await (args.salesAPI || (window as any).salesAPI).create(saleData);
+      toast.success(`Sale completed! Receipt ID: ${sale.receiptId || sale.id || ""}`);
+
+      // Auto-print receipt if enabled
       try {
-        // @ts-ignore: salesAPI should be available in your context or pass as arg
-        const sale = await (args.salesAPI || (window as any).salesAPI).create(saleData);
-        toast.success(`Sale completed! Receipt ID: ${sale.receiptId || sale.id || ""}`);
-        args.setCart([]);
-        args.setCustomer(null);
-        args.setCustomerPhone("");
-        args.setShowSplitPaymentModal(false);
-        args.setLoyaltyDiscount(0);
-        args.loadProducts(args.selectedCategory || undefined);
-      } catch (error: any) {
-        let errorMessage = "Failed to process payment";
-        if (error?.response?.data?.errors && error.response.data.errors.length > 0) {
-          const firstError = error.response.data.errors[0];
-          errorMessage = firstError.msg || errorMessage;
-        } else if (error?.response?.data?.error) {
-          errorMessage = error.response.data.error;
-        } else if (error?.message) {
-          errorMessage = error.message;
+        const settings = args.settings;
+        // Dynamically import receiptsAPI if not present in args
+        const receiptsAPI =
+          args.receiptsAPI || (window as any).receiptsAPI || (await import("../services")).receiptsAPI;
+        if (settings?.printReceiptAuto) {
+          try {
+            const htmlContent = await receiptsAPI.getHTML(sale.id);
+            const printWindow = window.open("", "_blank", "width=800,height=600");
+            if (printWindow) {
+              printWindow.document.write(htmlContent);
+              printWindow.document.close();
+              setTimeout(() => {
+                printWindow.print();
+              }, 500);
+            }
+            toast.success("Receipt ready to print", { duration: 2000, icon: "🖨️" });
+          } catch (printError) {
+            console.error("Error printing receipt:", printError);
+            toast.error("Failed to open receipt for printing");
+          }
         }
-        toast.error(errorMessage);
+        if (settings?.autoPrintThermal) {
+          try {
+            let thermalContent = await receiptsAPI.getThermal(sale.id);
+            const currencySymbol = settings?.currencySymbol || "$";
+            thermalContent = thermalContent.replace(/\$(\d+[.,]?\d*)/g, `${currencySymbol}$1`);
+            const printWindow = window.open("", "_blank", "width=400,height=600");
+            if (printWindow) {
+              printWindow.document.write(`<pre style='font-size:16px; font-family:monospace;'>${thermalContent}</pre>`);
+              printWindow.document.close();
+              setTimeout(() => {
+                printWindow.print();
+              }, 300);
+            }
+            toast.success("Thermal receipt ready to print", { icon: "🧾" });
+          } catch (err) {
+            toast.error("Failed to print thermal receipt");
+          }
+        }
+      } catch (autoPrintErr) {
+        // Ignore auto print errors
       }
-      // You may want to use salesAPI and receiptsAPI from args if needed
-      toast.success(`Sale completed!`);
+
       args.setCart([]);
       args.setCustomer(null);
       args.setCustomerPhone("");
       args.setShowSplitPaymentModal(false);
       args.setLoyaltyDiscount(0);
       args.loadProducts(args.selectedCategory || undefined);
-    } catch (error) {
-      toast.error("Failed to process payment");
+    } catch (error: any) {
+      let errorMessage = "Failed to process payment";
+      if (error?.response?.data?.errors && error.response.data.errors.length > 0) {
+        const firstError = error.response.data.errors[0];
+        errorMessage = firstError.msg || errorMessage;
+      } else if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
     }
   }, []);
 
