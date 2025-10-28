@@ -21,13 +21,24 @@ export interface SalarySheet {
 }
 
 export const salarySheetsAPI = {
+  create: async (data: Omit<SalarySheet, "id" | "employee" | "paid" | "paidAt" | "createdAt">) => {
+    const response = await api.post("/salary-sheets", data);
+    return response.data;
+  },
   getAll: async (params?: { month?: number; year?: number }) => {
-    const response = await api.get("/employees/salary-sheets", { params });
+    const response = await api.get("/salary-sheets", { params });
     return response.data;
   },
   markAsPaid: async (id: number) => {
-    const response = await api.post(`/employees/salary-sheets/${id}/pay`);
+    const response = await api.post(`/salary-sheets/${id}/pay`);
     return response.data;
   },
-  // Add more methods as needed (create, update, delete)
+  update: async (id: number, data: Partial<Omit<SalarySheet, "id" | "employee" | "paid" | "paidAt" | "createdAt">>) => {
+    const response = await api.put(`/salary-sheets/${id}`, data);
+    return response.data;
+  },
+  delete: async (id: number) => {
+    const response = await api.delete(`/salary-sheets/${id}`);
+    return response.data;
+  },
 };
