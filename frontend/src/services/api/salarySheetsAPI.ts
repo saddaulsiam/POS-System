@@ -41,4 +41,8 @@ export const salarySheetsAPI = {
     const response = await api.delete(`/salary-sheets/${id}`);
     return response.data;
   },
+  bulkGenerate: async (data: { month: number; year: number }) => {
+    const response = await api.post("/salary-sheets/bulk-generate", data);
+    return response.data;
+  },
 };
