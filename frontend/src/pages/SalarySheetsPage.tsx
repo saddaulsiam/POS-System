@@ -1,4 +1,5 @@
 import React from "react";
+import toast from "react-hot-toast";
 import { employeesAPI } from "../services/api/employeesAPI";
 import { SalarySheet, salarySheetsAPI } from "../services/api/salarySheetsAPI";
 import { Employee } from "../types/employeeTypes";
@@ -23,7 +24,6 @@ const SalarySheetsPage: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [month, setMonth] = React.useState<number | "">("");
   const [year, setYear] = React.useState<number | "">("");
-  const [error, setError] = React.useState<string | null>(null);
   const [showModal, setShowModal] = React.useState(false);
   const [editingSheet, setEditingSheet] = React.useState<SalarySheet | null>(null);
   const [form, setForm] = React.useState({
@@ -71,6 +71,17 @@ const SalarySheetsPage: React.FC = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const duplicate = salarySheets.find(
+      (sheet) =>
+        sheet.employeeId === Number(form.employeeId) &&
+        sheet.month === Number(form.month) &&
+        sheet.year === Number(form.year) &&
+        (!editingSheet || sheet.id !== editingSheet.id)
+    );
+    if (duplicate) {
+      toast.error("A salary sheet for this employee, month, and year already exists.");
+      return;
+    }
     setLoading(true);
     try {
       const payload = {
@@ -89,7 +100,7 @@ const SalarySheetsPage: React.FC = () => {
       setShowModal(false);
       fetchSalarySheets();
     } catch (err: any) {
-      setError(err.message || "Failed to save salary sheet");
+      toast.error(err.message || "Failed to save salary sheet");
     } finally {
       setLoading(false);
     }
@@ -121,7 +132,7 @@ const SalarySheetsPage: React.FC = () => {
       await salarySheetsAPI.delete(id);
       fetchSalarySheets();
     } catch (err: any) {
-      setError(err.message || "Failed to delete salary sheet");
+      toast.error(err.message || "Failed to delete salary sheet");
     } finally {
       setLoading(false);
     }
@@ -134,7 +145,6 @@ const SalarySheetsPage: React.FC = () => {
 
   const fetchSalarySheets = async () => {
     setLoading(true);
-    setError(null);
     try {
       const params: any = {};
       if (month !== "") params.month = month;
@@ -146,7 +156,7 @@ const SalarySheetsPage: React.FC = () => {
       const res = await salarySheetsAPI.getAll(params);
       setSalarySheets(res);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch salary sheets");
+      toast.error(err.message || "Failed to fetch salary sheets");
     } finally {
       setLoading(false);
     }
@@ -157,7 +167,7 @@ const SalarySheetsPage: React.FC = () => {
       await salarySheetsAPI.markAsPaid(id);
       fetchSalarySheets();
     } catch (err: any) {
-      setError(err.message || "Failed to mark as paid");
+      toast.error(err.message || "Failed to mark as paid");
     }
   };
 
@@ -167,6 +177,47 @@ const SalarySheetsPage: React.FC = () => {
       <div className="flex gap-4 mb-4">
         <button className="bg-green-600 text-white px-4 py-1 rounded" onClick={openCreateModal} type="button">
           + Add Salary Sheet
+        </button>
+        <button
+          className="bg-orange-600 text-white px-4 py-1 rounded"
+          type="button"
+          onClick={async () => {
+            if (!month || !year) {
+              setError("Select month and year to auto-generate salary sheets.");
+              return;
+            }
+            setLoading(true);
+            setError(null);
+            let createdCount = 0;
+            for (const emp of employees) {
+              const exists = salarySheets.some(sheet =>
+                sheet.employeeId === emp.id &&
+                sheet.month === month &&
+                sheet.year === year
+              );
+              if (!exists && typeof emp.salary === 'number') {
+                try {
+                  await salarySheetsAPI.create({
+                    employeeId: emp.id,
+                    month,
+                    year,
+                    baseSalary: emp.salary,
+                    bonus: 0,
+                    deduction: 0,
+                  });
+                  createdCount++;
+                } catch (err) {
+                  // Optionally handle per-employee error
+                }
+              }
+            }
+            fetchSalarySheets();
+            if (createdCount === 0) {
+              setError("No new salary sheets were created. All employees already have sheets for this period or missing salary.");
+            }
+          }}
+        >
+          Auto-generate for all employees
         </button>
         <select
           className="border rounded px-2 py-1"
@@ -199,7 +250,6 @@ const SalarySheetsPage: React.FC = () => {
           Filter
         </button>
       </div>
-      {error && <div className="text-red-500 mb-2">{error}</div>}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border rounded shadow">
           <thead>
@@ -367,7 +417,6 @@ const SalarySheetsPage: React.FC = () => {
                       name="bonus"
                       value={form.bonus}
                       onChange={handleFormChange}
-                      required
                       className="w-full border rounded px-3 py-2"
                     />
                   </div>
@@ -378,7 +427,6 @@ const SalarySheetsPage: React.FC = () => {
                       name="deduction"
                       value={form.deduction}
                       onChange={handleFormChange}
-                      required
                       className="w-full border rounded px-3 py-2"
                     />
                   </div>
