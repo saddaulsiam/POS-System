@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { employeesAPI } from "../services/api/employeesAPI";
 import { SalarySheet, salarySheetsAPI } from "../services/api/salarySheetsAPI";
 import { Employee } from "../types/employeeTypes";
+import { generateAllSalarySlipsHTML, generateSalarySlipHTML } from "../utils/SalarySlipGenerator";
 
 const months = [
   "January",
@@ -174,7 +175,28 @@ const SalarySheetsPage: React.FC = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Salary Sheets</h1>
-      <div className="flex gap-4 mb-4">
+      <div className="flex gap-4 mb-4 no-print">
+        <button
+          className="bg-gray-800 text-white px-4 py-1 rounded"
+          type="button"
+          onClick={() => {
+            if (!salarySheets.length) {
+              toast.error("No salary sheets to print.");
+              return;
+            }
+            const html = generateAllSalarySlipsHTML(salarySheets, employees);
+            const printWindow = window.open("", "", "width=800,height=1000");
+            if (printWindow) {
+              printWindow.document.write(html);
+              printWindow.document.close();
+              printWindow.focus();
+              setTimeout(() => printWindow.print(), 400);
+            }
+          }}
+        >
+          Print All Salary Slips
+        </button>
+
         <button className="bg-green-600 text-white px-4 py-1 rounded" onClick={openCreateModal} type="button">
           + Add Salary Sheet
         </button>
@@ -183,19 +205,16 @@ const SalarySheetsPage: React.FC = () => {
           type="button"
           onClick={async () => {
             if (!month || !year) {
-              setError("Select month and year to auto-generate salary sheets.");
+              toast.error("Select month and year to generate and print salary sheets.");
               return;
             }
             setLoading(true);
-            setError(null);
             let createdCount = 0;
             for (const emp of employees) {
-              const exists = salarySheets.some(sheet =>
-                sheet.employeeId === emp.id &&
-                sheet.month === month &&
-                sheet.year === year
+              const exists = salarySheets.some(
+                (sheet) => sheet.employeeId === emp.id && sheet.month === month && sheet.year === year
               );
-              if (!exists && typeof emp.salary === 'number') {
+              if (!exists && typeof emp.salary === "number") {
                 try {
                   await salarySheetsAPI.create({
                     employeeId: emp.id,
@@ -211,13 +230,17 @@ const SalarySheetsPage: React.FC = () => {
                 }
               }
             }
-            fetchSalarySheets();
+            await fetchSalarySheets();
+            setLoading(false);
             if (createdCount === 0) {
-              setError("No new salary sheets were created. All employees already have sheets for this period or missing salary.");
+              toast.error(
+                "No new salary sheets were created. All employees already have sheets for this period or missing salary."
+              );
+              return;
             }
           }}
         >
-          Auto-generate for all employees
+          Generate Salary Sheets
         </button>
         <select
           className="border rounded px-2 py-1"
@@ -309,6 +332,33 @@ const SalarySheetsPage: React.FC = () => {
                     onClick={() => handleDelete(sheet.id)}
                   >
                     Delete
+                  </button>
+                  <button
+                    className="bg-gray-700 text-white px-3 py-1 rounded text-xs"
+                    onClick={() => {
+                      let emp = employees.find((e) => e.id === sheet.employeeId);
+                      if (!emp) {
+                        emp = {
+                          id: sheet.employeeId,
+                          name: sheet.employee?.name || "Unknown",
+                          username: "",
+                          role: "STAFF",
+                          isActive: true,
+                          createdAt: new Date().toISOString(),
+                          updatedAt: new Date().toISOString(),
+                        };
+                      }
+                      const html = generateSalarySlipHTML(sheet, emp);
+                      const printWindow = window.open("", "", "width=600,height=800");
+                      if (printWindow) {
+                        printWindow.document.write(html);
+                        printWindow.document.close();
+                        printWindow.focus();
+                        setTimeout(() => printWindow.print(), 300);
+                      }
+                    }}
+                  >
+                    Print
                   </button>
                 </td>
               </tr>
