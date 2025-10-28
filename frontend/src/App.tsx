@@ -5,6 +5,7 @@ import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import { useAuth } from "./context/AuthContext";
 import AdminDashboard from "./pages/AdminDashboard";
+import SalarySheetsPage from "./pages/SalarySheetsPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import AuditLogsPage from "./pages/AuditLogsPage";
 import CashDrawerPage from "./pages/CashDrawerPage";
@@ -36,6 +37,7 @@ const adminPaths = [
   "/analytics",
   "/inventory",
   "/employees",
+  "/salary-sheets",
   "/profile",
   "/audit-logs",
   "/loyalty-admin",
@@ -86,6 +88,7 @@ const App: React.FC = () => {
                 <Route path="/categories" element={<CategoriesPage />} />
                 <Route path="/suppliers" element={<SuppliersPage />} />
                 <Route path="/employees" element={<EmployeesPage />} />
+                <Route path="/salary-sheets" element={<SalarySheetsPage />} />
                 <Route path="/customers" element={<CustomersPage />} />
                 <Route path="/sales" element={<SalesPage />} />
                 <Route path="/reports" element={<ReportsPage />} />

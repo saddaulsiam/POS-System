@@ -14,7 +14,8 @@ const navLinks = [
   { to: "/reports", label: "Reports", icon: "📊", roles: ["ADMIN", "MANAGER"] },
   { to: "/analytics", label: "Analytics", icon: "📈", roles: ["ADMIN", "MANAGER"] },
   { to: "/loyalty-admin", label: "Loyalty Program", icon: "🎁", roles: ["ADMIN", "MANAGER"] },
-  { to: "/employees", label: "Employees", icon: "👥", roles: ["ADMIN"] },
+  { to: "/employees", label: "Employees", icon: "👥", roles: ["ADMIN", "MANAGER"] },
+  { to: "/salary-sheets", label: "Salary Sheets", icon: "💵", roles: ["ADMIN", "MANAGER"] },
   { to: "/customers", label: "Customers", icon: "🧑‍🤝‍🧑", roles: ["ADMIN", "MANAGER", "CASHIER"] },
   { to: "/audit-logs", label: "Audit Logs", icon: "📜", roles: ["ADMIN", "MANAGER"] },
 ];
