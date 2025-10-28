@@ -34,6 +34,11 @@ const SalarySheetsPage: React.FC = () => {
       const params: any = {};
       if (month !== "") params.month = month;
       if (year !== "") params.year = year;
+      // Remove employeeId if present in any form
+      if ("employeeId" in params) {
+        delete params.employeeId;
+      }
+      console.log("[SalarySheetsPage] Fetching salary sheets with params:", params);
       const res = await salarySheetsAPI.getAll(params);
       setSalarySheets(res.data);
     } catch (err: any) {
