@@ -5,6 +5,7 @@ import { customersAPI, parkedSalesAPI, productsAPI, productVariantsAPI } from ".
 import { formatCurrency } from "../utils/currencyUtils";
 
 interface UsePOSHandlersArgs {
+  salesAPI?: any;
   cart: CartItem[];
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
   customer: any;
@@ -15,6 +16,7 @@ interface UsePOSHandlersArgs {
   setShowParkSaleDialog: (open: boolean) => void;
   setShowSplitPaymentModal: (open: boolean) => void;
   setLoyaltyDiscount: (amount: number) => void;
+  loyaltyDiscount: number;
   settings: any;
   selectedCategory: number | null;
   loadProducts: (categoryId?: number) => void;
@@ -240,8 +242,32 @@ export function usePOSHandlers(args: UsePOSHandlersArgs) {
           paymentMethod: split.method,
           amount: split.amount,
         })),
-        loyaltyDiscount: args.settings?.loyaltyDiscount || 0,
+        loyaltyDiscount: args.loyaltyDiscount || 0,
       };
+
+      // You may want to use salesAPI and receiptsAPI from args if needed
+      try {
+        // @ts-ignore: salesAPI should be available in your context or pass as arg
+        const sale = await (args.salesAPI || (window as any).salesAPI).create(saleData);
+        toast.success(`Sale completed! Receipt ID: ${sale.receiptId || sale.id || ""}`);
+        args.setCart([]);
+        args.setCustomer(null);
+        args.setCustomerPhone("");
+        args.setShowSplitPaymentModal(false);
+        args.setLoyaltyDiscount(0);
+        args.loadProducts(args.selectedCategory || undefined);
+      } catch (error: any) {
+        let errorMessage = "Failed to process payment";
+        if (error?.response?.data?.errors && error.response.data.errors.length > 0) {
+          const firstError = error.response.data.errors[0];
+          errorMessage = firstError.msg || errorMessage;
+        } else if (error?.response?.data?.error) {
+          errorMessage = error.response.data.error;
+        } else if (error?.message) {
+          errorMessage = error.message;
+        }
+        toast.error(errorMessage);
+      }
       // You may want to use salesAPI and receiptsAPI from args if needed
       toast.success(`Sale completed!`);
       args.setCart([]);

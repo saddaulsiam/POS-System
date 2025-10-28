@@ -138,6 +138,8 @@ const POSPage: React.FC = () => {
     setShowParkSaleDialog,
     setShowSplitPaymentModal,
     setLoyaltyDiscount,
+    loyaltyDiscount,
+    salesAPI,
     settings,
     selectedCategory,
     loadProducts,
