@@ -1,6 +1,22 @@
 import { SalarySheet } from "../services/api/salarySheetsAPI";
 import { Employee } from "../types/employeeTypes";
 
+// Month names for display
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 export function generateAllSalarySlipsHTML(sheets: SalarySheet[], employees: Employee[]) {
   const store = {
     name: "POS System",
@@ -8,7 +24,7 @@ export function generateAllSalarySlipsHTML(sheets: SalarySheet[], employees: Emp
     phone: "(123) 456-7890",
   };
   const currency = "$";
-  // Build table rows
+
   const rows = sheets
     .map((sheet) => {
       let emp = employees.find((e) => e.id === sheet.employeeId);
@@ -24,13 +40,14 @@ export function generateAllSalarySlipsHTML(sheets: SalarySheet[], employees: Emp
         };
       }
       const joinDate = emp.joinedDate || emp.createdAt;
-      const joinDateStr = joinDate ? new Date(joinDate).toLocaleDateString() : "N/A";
+      const joinDateObj = joinDate ? new Date(joinDate) : null;
+      const joinDateStr = joinDateObj ? `${monthNames[joinDateObj.getMonth()]} ${joinDateObj.getFullYear()}` : "N/A";
+      const monthName = monthNames[sheet.month - 1] || sheet.month;
       return `<tr>
-      <td>${emp.name}</td>
       <td>${emp.id}</td>
+      <td>${emp.name}</td>
       <td>${joinDateStr}</td>
-      <td>${sheet.month}</td>
-      <td>${sheet.year}</td>
+      <td>${monthName} ${sheet.year}</td>
       <td>${currency}${sheet.baseSalary.toLocaleString()}</td>
       <td>${currency}${sheet.bonus.toLocaleString()}</td>
       <td>${currency}${sheet.deduction.toLocaleString()}</td>
@@ -41,16 +58,16 @@ export function generateAllSalarySlipsHTML(sheets: SalarySheet[], employees: Emp
     .join("");
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>All Salary Slips</title>
     <style>
-      body { font-family: Arial, sans-serif; background: #eee; }
+      body { font-family: 'Segoe UI', Arial, sans-serif; background: #fafafa; }
       .receipt-table-container {
-        width: 100%;
-        max-width: 100%;
+        width: 100vw;
+        max-width: 100vw;
         margin: 0 auto;
         background: #fff;
-        border-radius: 0;
-        box-shadow: none;
-        padding: 32px 8px;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px 0 rgba(0,0,0,0.07);
         box-sizing: border-box;
+        padding: 40px 32px 32px 32px;
       }
       @media print {
         body, html {
@@ -61,35 +78,86 @@ export function generateAllSalarySlipsHTML(sheets: SalarySheet[], employees: Emp
           max-width: 100vw;
           min-width: 100vw;
           margin: 0;
-          padding: 32px 8px;
+          padding: 40px 32px 32px 32px;
           border-radius: 0;
           box-shadow: none;
         }
       }
-      .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-      .store-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-      .store-info { font-size: 13px; color: #555; }
-      .title { text-align:center; font-size:18px; font-weight:bold; margin-top:10px; }
-      table { width: 100%; border-collapse: collapse; margin-top: 24px; }
-      th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 15px; }
-      th { background: #f5f5f5; font-weight: bold; }
-      .footer { text-align: center; font-size: 13px; color: #666; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px; }
+      .header {
+        text-align: center;
+        border-bottom: 2px solid #222;
+        padding-bottom: 18px;
+        margin-bottom: 32px;
+      }
+      .store-name {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #111;
+      }
+      .store-info {
+        font-size: 14px;
+        color: #444;
+        margin-top: 2px;
+      }
+      .title {
+        text-align:center;
+        font-size: 22px;
+        font-weight: 600;
+        margin-top: 14px;
+        color: #111;
+        letter-spacing: 0.5px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 28px;
+        background: #fff;
+      }
+      th, td {
+        border: 1px solid #bbb;
+        padding: 12px 8px;
+        text-align: center;
+        font-size: 16px;
+        color: #111;
+      }
+      th {
+        background: #f5f5f5;
+        font-weight: bold;
+        color: #111;
+        font-size: 17px;
+        letter-spacing: 0.2px;
+      }
+      tr:nth-child(even) td {
+        background: #fafbfc;
+      }
+      tr:hover td {
+        background: #f0f0f0;
+      }
+      .footer {
+        text-align: center;
+        font-size: 15px;
+        color: #444;
+        margin-top: 36px;
+        border-top: 1px solid #bbb;
+        padding-top: 18px;
+        letter-spacing: 0.2px;
+      }
     </style>
     </head><body>
       <div class="receipt-table-container">
         <div class="header">
           <div class="store-name">${store.name}</div>
           <div class="store-info">${store.address}<br>Phone: ${store.phone}</div>
-          <div class="title">Salary Slip</div>
+          <div class="title">All Salary Slips</div>
         </div>
         <table>
           <thead>
             <tr>
+            <th>Employee ID</th>
               <th>Employee</th>
-              <th>Employee ID</th>
               <th>Join Date</th>
-              <th>Month</th>
-              <th>Year</th>
+              <th>Pay Period</th>
               <th>Base Salary</th>
               <th>Bonus</th>
               <th>Deduction</th>
@@ -101,7 +169,7 @@ export function generateAllSalarySlipsHTML(sheets: SalarySheet[], employees: Emp
             ${rows}
           </tbody>
         </table>
-        <div class="footer">Thank you for your service!</div>
+        <div class="footer">This is a computer-generated salary sheet.<br>Thank you for your dedication and hard work!</div>
       </div>
     </body></html>`;
 }
@@ -113,21 +181,7 @@ export function generateSalarySlipHTML(sheet: SalarySheet, employee: Employee) {
     phone: "(123) 456-7890",
   };
   const currency = "$";
-  // Month names for display
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+
   const joinDate = employee.joinedDate || employee.createdAt;
   // Format join date as: 28 October 2025
   const joinDateObj = joinDate ? new Date(joinDate) : null;
