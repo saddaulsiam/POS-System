@@ -23,10 +23,11 @@ const months = [
 ];
 
 const SalarySheetsPage: React.FC = () => {
+  const now = new Date();
   const [salarySheets, setSalarySheets] = React.useState<SalarySheet[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [month, setMonth] = React.useState<number | "">("");
-  const [year, setYear] = React.useState<number | "">("");
+  const [month, setMonth] = React.useState<number | "">(now.getMonth() + 1);
+  const [year, setYear] = React.useState<number | "">(now.getFullYear());
   const [showModal, setShowModal] = React.useState(false);
   const [editingSheet, setEditingSheet] = React.useState<SalarySheet | null>(null);
   const [form, setForm] = React.useState({
@@ -74,11 +75,38 @@ const SalarySheetsPage: React.FC = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Allow only previous, current, and next month
+    const now = new Date();
+    const selectedMonth = Number(form.month);
+    const selectedYear = Number(form.year);
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    // Calculate previous and next month/year
+    let prevMonth = currentMonth - 1;
+    let prevYear = currentYear;
+    if (prevMonth === 0) {
+      prevMonth = 12;
+      prevYear = currentYear - 1;
+    }
+    let nextMonth = currentMonth + 1;
+    let nextYear = currentYear;
+    if (nextMonth === 13) {
+      nextMonth = 1;
+      nextYear = currentYear + 1;
+    }
+    const isAllowed =
+      (selectedYear === currentYear && selectedMonth === currentMonth) ||
+      (selectedYear === prevYear && selectedMonth === prevMonth) ||
+      (selectedYear === nextYear && selectedMonth === nextMonth);
+    if (!isAllowed) {
+      toast.error("You can only create salary sheets for the previous, current, or next month.");
+      return;
+    }
     const duplicate = salarySheets.find(
       (sheet) =>
         sheet.employeeId === Number(form.employeeId) &&
-        sheet.month === Number(form.month) &&
-        sheet.year === Number(form.year) &&
+        sheet.month === selectedMonth &&
+        sheet.year === selectedYear &&
         (!editingSheet || sheet.id !== editingSheet.id)
     );
     if (duplicate) {
@@ -89,8 +117,8 @@ const SalarySheetsPage: React.FC = () => {
     try {
       const payload = {
         employeeId: Number(form.employeeId),
-        month: Number(form.month),
-        year: Number(form.year),
+        month: selectedMonth,
+        year: selectedYear,
         baseSalary: Number(form.baseSalary),
         bonus: Number(form.bonus),
         deduction: Number(form.deduction),
@@ -226,18 +254,44 @@ const SalarySheetsPage: React.FC = () => {
               toast.error("Select month and year to generate and print salary sheets.");
               return;
             }
+            // Allow only previous, current, and next month
+            const now = new Date();
+            const selectedMonth = Number(month);
+            const selectedYear = Number(year);
+            const currentMonth = now.getMonth() + 1;
+            const currentYear = now.getFullYear();
+            let prevMonth = currentMonth - 1;
+            let prevYear = currentYear;
+            if (prevMonth === 0) {
+              prevMonth = 12;
+              prevYear = currentYear - 1;
+            }
+            let nextMonth = currentMonth + 1;
+            let nextYear = currentYear;
+            if (nextMonth === 13) {
+              nextMonth = 1;
+              nextYear = currentYear + 1;
+            }
+            const isAllowed =
+              (selectedYear === currentYear && selectedMonth === currentMonth) ||
+              (selectedYear === prevYear && selectedMonth === prevMonth) ||
+              (selectedYear === nextYear && selectedMonth === nextMonth);
+            if (!isAllowed) {
+              toast.error("You can only generate salary sheets for the previous, current, or next month.");
+              return;
+            }
             setLoading(true);
             let createdCount = 0;
             for (const emp of employees) {
               const exists = salarySheets.some(
-                (sheet) => sheet.employeeId === emp.id && sheet.month === month && sheet.year === year
+                (sheet) => sheet.employeeId === emp.id && sheet.month === selectedMonth && sheet.year === selectedYear
               );
               if (!exists && typeof emp.salary === "number") {
                 try {
                   await salarySheetsAPI.create({
                     employeeId: emp.id,
-                    month,
-                    year,
+                    month: selectedMonth,
+                    year: selectedYear,
                     baseSalary: emp.salary,
                     bonus: 0,
                     deduction: 0,
@@ -430,40 +484,96 @@ const SalarySheetsPage: React.FC = () => {
               <div className="flex gap-2">
                 <div className="flex-1">
                   <label className="block text-sm font-medium mb-1">Month</label>
-                  <select
-                    name="month"
-                    value={form.month}
-                    onChange={handleFormChange}
-                    required
-                    className="w-full border rounded px-3 py-2"
-                  >
-                    <option value="">Select month</option>
-                    {months.map((m, idx) => (
-                      <option key={idx + 1} value={idx + 1}>
-                        {m}
-                      </option>
-                    ))}
-                  </select>
+                  {(() => {
+                    // Calculate allowed months/years (current and previous month)
+                    const now = new Date();
+                    const currentMonth = now.getMonth() + 1;
+                    const currentYear = now.getFullYear();
+                    let prevMonth = currentMonth - 1;
+                    let prevYear = currentYear;
+                    if (prevMonth === 0) {
+                      prevMonth = 12;
+                      prevYear = currentYear - 1;
+                    }
+                    return (
+                      <select
+                        name="month"
+                        value={form.month}
+                        onChange={handleFormChange}
+                        required
+                        className="w-full border rounded px-3 py-2"
+                      >
+                        <option value="">Select month</option>
+                        {(() => {
+                          // Calculate nextMonth/nextYear in this scope
+                          let nextMonth = currentMonth + 1;
+                          let nextYear = currentYear;
+                          if (nextMonth === 13) {
+                            nextMonth = 1;
+                            nextYear = currentYear + 1;
+                          }
+                          return months.map((m, idx) => {
+                            const mNum = idx + 1;
+                            let isDisabled = true;
+                            if (
+                              (Number(form.year) === currentYear && mNum === currentMonth) ||
+                              (Number(form.year) === prevYear && mNum === prevMonth) ||
+                              (Number(form.year) === nextYear && mNum === nextMonth)
+                            ) {
+                              isDisabled = false;
+                            }
+                            return (
+                              <option key={mNum} value={mNum} disabled={isDisabled}>
+                                {m}
+                              </option>
+                            );
+                          });
+                        })()}
+                      </select>
+                    );
+                  })()}
                 </div>
                 <div className="flex-1">
                   <label className="block text-sm font-medium mb-1">Year</label>
-                  <select
-                    name="year"
-                    value={form.year}
-                    onChange={handleFormChange}
-                    required
-                    className="w-full border rounded px-3 py-2"
-                  >
-                    <option value="">Select year</option>
-                    {Array.from({ length: 6 }, (_, i) => {
-                      const year = new Date().getFullYear() - 5 + i;
-                      return (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      );
-                    })}
-                  </select>
+                  {(() => {
+                    const now = new Date();
+                    const currentMonth = now.getMonth() + 1;
+                    const currentYear = now.getFullYear();
+                    let prevMonth = currentMonth - 1;
+                    let prevYear = currentYear;
+                    if (prevMonth === 0) {
+                      prevMonth = 12;
+                      prevYear = currentYear - 1;
+                    }
+                    return (
+                      <select
+                        name="year"
+                        value={form.year}
+                        onChange={handleFormChange}
+                        required
+                        className="w-full border rounded px-3 py-2"
+                      >
+                        <option value="">Select year</option>
+                        {(() => {
+                          let nextMonth = currentMonth + 1;
+                          let nextYear = currentYear;
+                          if (nextMonth === 13) {
+                            nextMonth = 1;
+                            nextYear = currentYear + 1;
+                          }
+                          return Array.from({ length: 6 }, (_, i) => {
+                            const year = new Date().getFullYear() - 5 + i;
+                            const enableYear = year === currentYear || year === prevYear || year === nextYear;
+                            return (
+                              <option key={year} value={year} disabled={!enableYear}>
+                                {year}
+                              </option>
+                            );
+                          });
+                        })()}
+                      </select>
+                    );
+                  })()}
                 </div>
               </div>
               <div className="flex gap-2">
