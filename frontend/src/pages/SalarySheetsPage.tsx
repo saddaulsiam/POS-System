@@ -1,5 +1,7 @@
 import React from "react";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import { Modal } from "../components/common/Modal";
 import { employeesAPI } from "../services/api/employeesAPI";
 import { SalarySheet, salarySheetsAPI } from "../services/api/salarySheetsAPI";
 import { Employee } from "../types/employeeTypes";
@@ -172,30 +174,39 @@ const SalarySheetsPage: React.FC = () => {
     }
   };
 
+  if (loading) return <LoadingSpinner />;
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Salary Sheets</h1>
       <div className="flex gap-4 mb-4 no-print">
-        <button
-          className="bg-gray-800 text-white px-4 py-1 rounded"
-          type="button"
-          onClick={() => {
-            if (!salarySheets.length) {
-              toast.error("No salary sheets to print.");
-              return;
-            }
-            const html = generateAllSalarySlipsHTML(salarySheets, employees);
-            const printWindow = window.open("", "", "width=800,height=1000");
-            if (printWindow) {
-              printWindow.document.write(html);
-              printWindow.document.close();
-              printWindow.focus();
-              setTimeout(() => printWindow.print(), 400);
-            }
-          }}
+        <select
+          className="border rounded px-2 py-1"
+          value={month}
+          onChange={(e) => setMonth(e.target.value ? Number(e.target.value) : "")}
         >
-          Print All Salary Slips
-        </button>
+          <option value="">All Months</option>
+          {months.map((m, idx) => (
+            <option key={idx + 1} value={idx + 1}>
+              {m}
+            </option>
+          ))}
+        </select>
+        <select
+          className="border rounded px-2 py-1 w-24"
+          value={year}
+          onChange={(e) => setYear(e.target.value ? Number(e.target.value) : "")}
+        >
+          <option value="">All Years</option>
+          {Array.from({ length: 6 }, (_, i) => {
+            const y = new Date().getFullYear() - 5 + i;
+            return (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            );
+          })}
+        </select>
 
         <button className="bg-green-600 text-white px-4 py-1 rounded" onClick={openCreateModal} type="button">
           + Add Salary Sheet
@@ -242,37 +253,28 @@ const SalarySheetsPage: React.FC = () => {
         >
           Generate Salary Sheets
         </button>
-        <select
-          className="border rounded px-2 py-1"
-          value={month}
-          onChange={(e) => setMonth(e.target.value ? Number(e.target.value) : "")}
+        <button
+          className="bg-gray-800 text-white px-4 py-1 rounded"
+          type="button"
+          onClick={() => {
+            if (!salarySheets.length) {
+              toast.error("No salary sheets to print.");
+              return;
+            }
+            const html = generateAllSalarySlipsHTML(salarySheets, employees);
+            const printWindow = window.open("", "", "width=800,height=1000");
+            if (printWindow) {
+              printWindow.document.write(html);
+              printWindow.document.close();
+              printWindow.focus();
+              setTimeout(() => printWindow.print(), 400);
+            }
+          }}
         >
-          <option value="">All Months</option>
-          {months.map((m, idx) => (
-            <option key={idx + 1} value={idx + 1}>
-              {m}
-            </option>
-          ))}
-        </select>
-        <select
-          className="border rounded px-2 py-1 w-24"
-          value={year}
-          onChange={(e) => setYear(e.target.value ? Number(e.target.value) : "")}
-        >
-          <option value="">All Years</option>
-          {Array.from({ length: 6 }, (_, i) => {
-            const y = new Date().getFullYear() - 5 + i;
-            return (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            );
-          })}
-        </select>
-        <button className="bg-blue-600 text-white px-4 py-1 rounded" onClick={fetchSalarySheets} disabled={loading}>
-          Filter
+          Print All Salary Slips
         </button>
       </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border rounded shadow">
           <thead>
@@ -373,130 +375,125 @@ const SalarySheetsPage: React.FC = () => {
           </tbody>
         </table>
       </div>
-      {loading && <div className="mt-4 text-gray-500">Loading...</div>}
 
       {/* Modal for create/edit salary sheet */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
-            <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700"
-              onClick={() => setShowModal(false)}
-            >
-              &times;
-            </button>
-            <h2 className="text-xl font-bold mb-4">{editingSheet ? "Edit Salary Sheet" : "Add Salary Sheet"}</h2>
-            {empLoading ? (
-              <div className="text-gray-500">Loading employees...</div>
-            ) : empError ? (
-              <div className="text-red-500">{empError}</div>
-            ) : (
-              <form onSubmit={handleFormSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Employee</label>
+        <Modal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          title={editingSheet ? "Edit Salary Sheet" : "Add Salary Sheet"}
+          size="md"
+        >
+          {empLoading ? (
+            <div className="text-gray-500">Loading employees...</div>
+          ) : empError ? (
+            <div className="text-red-500">{empError}</div>
+          ) : (
+            <form onSubmit={handleFormSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Employee</label>
+                <select
+                  name="employeeId"
+                  value={form.employeeId}
+                  onChange={handleFormChange}
+                  required
+                  className="w-full border rounded px-3 py-2"
+                >
+                  <option value="">Select employee</option>
+                  {employees.map((emp) => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-1">Month</label>
                   <select
-                    name="employeeId"
-                    value={form.employeeId}
+                    name="month"
+                    value={form.month}
                     onChange={handleFormChange}
                     required
                     className="w-full border rounded px-3 py-2"
                   >
-                    <option value="">Select employee</option>
-                    {employees.map((emp) => (
-                      <option key={emp.id} value={emp.id}>
-                        {emp.name}
+                    <option value="">Select month</option>
+                    {months.map((m, idx) => (
+                      <option key={idx + 1} value={idx + 1}>
+                        {m}
                       </option>
                     ))}
                   </select>
                 </div>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium mb-1">Month</label>
-                    <select
-                      name="month"
-                      value={form.month}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full border rounded px-3 py-2"
-                    >
-                      <option value="">Select month</option>
-                      {months.map((m, idx) => (
-                        <option key={idx + 1} value={idx + 1}>
-                          {m}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium mb-1">Year</label>
-                    <select
-                      name="year"
-                      value={form.year}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full border rounded px-3 py-2"
-                    >
-                      <option value="">Select year</option>
-                      {Array.from({ length: 6 }, (_, i) => {
-                        const year = new Date().getFullYear() - 5 + i;
-                        return (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium mb-1">Base Salary</label>
-                    <input
-                      type="number"
-                      name="baseSalary"
-                      value={form.baseSalary}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full border rounded px-3 py-2"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium mb-1">Bonus</label>
-                    <input
-                      type="number"
-                      name="bonus"
-                      value={form.bonus}
-                      onChange={handleFormChange}
-                      className="w-full border rounded px-3 py-2"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium mb-1">Deduction</label>
-                    <input
-                      type="number"
-                      name="deduction"
-                      value={form.deduction}
-                      onChange={handleFormChange}
-                      className="w-full border rounded px-3 py-2"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <button
-                    type="button"
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
-                    onClick={() => setShowModal(false)}
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-1">Year</label>
+                  <select
+                    name="year"
+                    value={form.year}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border rounded px-3 py-2"
                   >
-                    Cancel
-                  </button>
-                  <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-                    {editingSheet ? "Update" : "Create"}
-                  </button>
+                    <option value="">Select year</option>
+                    {Array.from({ length: 6 }, (_, i) => {
+                      const year = new Date().getFullYear() - 5 + i;
+                      return (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      );
+                    })}
+                  </select>
                 </div>
-              </form>
-            )}
-          </div>
-        </div>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-1">Base Salary</label>
+                  <input
+                    type="number"
+                    name="baseSalary"
+                    value={form.baseSalary}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border rounded px-3 py-2"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-1">Bonus</label>
+                  <input
+                    type="number"
+                    name="bonus"
+                    value={form.bonus}
+                    onChange={handleFormChange}
+                    className="w-full border rounded px-3 py-2"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-1">Deduction</label>
+                  <input
+                    type="number"
+                    name="deduction"
+                    value={form.deduction}
+                    onChange={handleFormChange}
+                    className="w-full border rounded px-3 py-2"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
+                  {editingSheet ? "Update" : "Create"}
+                </button>
+              </div>
+            </form>
+          )}
+        </Modal>
       )}
     </div>
   );
