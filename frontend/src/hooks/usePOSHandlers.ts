@@ -46,7 +46,8 @@ export function usePOSHandlers(args: UsePOSHandlersArgs) {
               args.setBarcode && args.setBarcode("");
               return;
             }
-          } catch (variantError) {
+          } catch (variantError: any) {
+            // Only show error if it's a server error (not 404)
             if (
               typeof variantError === "object" &&
               variantError &&
@@ -55,22 +56,14 @@ export function usePOSHandlers(args: UsePOSHandlersArgs) {
             ) {
               toast.error("Error looking up variant");
             }
+            // If 404, fall through to product lookup
           }
         }
+        // Try product lookup if variant not found or not a number barcode
         let product;
-        if (barcode.match(/^\d+$/)) {
-          try {
-            product = await productsAPI.getByBarcode(barcode);
-          } catch {
-            const searchResults = await productsAPI.getAll({ search: barcode, isActive: true, limit: 1 });
-            if (searchResults.data && searchResults.data.length > 0) {
-              product = searchResults.data[0];
-            } else {
-              toast.error("Product not found");
-              return;
-            }
-          }
-        } else {
+        try {
+          product = await productsAPI.getByBarcode(barcode);
+        } catch {
           const searchResults = await productsAPI.getAll({ search: barcode, isActive: true, limit: 1 });
           if (searchResults.data && searchResults.data.length > 0) {
             product = searchResults.data[0];
@@ -79,7 +72,13 @@ export function usePOSHandlers(args: UsePOSHandlersArgs) {
             return;
           }
         }
-        addToCart(product);
+        // If product has variants, show variant selector modal
+        if (product.hasVariants && args.setShowVariantSelector && args.setSelectedProductForVariant) {
+          args.setSelectedProductForVariant(product);
+          args.setShowVariantSelector(true);
+        } else {
+          addToCart(product);
+        }
         args.setBarcode && args.setBarcode("");
       } catch (error) {
         console.error("Error searching product:", error);

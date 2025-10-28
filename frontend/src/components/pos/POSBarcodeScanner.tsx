@@ -70,26 +70,33 @@ export const POSBarcodeScanner: React.FC<POSBarcodeScannerProps> = ({
   }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!showSuggestions || suggestions.length === 0) return;
-
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : prev));
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0));
-        break;
-      case "Enter":
-        if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
+    if (showSuggestions && suggestions.length > 0) {
+      switch (e.key) {
+        case "ArrowDown":
           e.preventDefault();
-          handleSelectSuggestion(suggestions[selectedIndex]);
-        }
-        break;
-      case "Escape":
-        setShowSuggestions(false);
-        break;
+          setSelectedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : prev));
+          return;
+        case "ArrowUp":
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+          return;
+        case "Enter":
+          if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
+            e.preventDefault();
+            handleSelectSuggestion(suggestions[selectedIndex]);
+            return;
+          }
+          // If no suggestion is selected, allow form submit
+          break;
+        case "Escape":
+          setShowSuggestions(false);
+          return;
+      }
+    }
+    // If Enter is pressed and no suggestion is selected, allow form submit
+    if (e.key === "Enter" && (selectedIndex === -1 || !showSuggestions || suggestions.length === 0)) {
+      // Let the form's onSubmit handle it
+      return;
     }
   };
 
@@ -115,6 +122,7 @@ export const POSBarcodeScanner: React.FC<POSBarcodeScannerProps> = ({
           <input
             ref={inputRef}
             type="text"
+            name="barcode"
             value={barcode}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}

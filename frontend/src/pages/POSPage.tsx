@@ -323,7 +323,7 @@ const POSPage: React.FC = () => {
           {/* Quick Sale Buttons - conditionally shown */}
           {settings?.enableQuickSale && (
             <div className="px-4 pt-2">
-              <QuickSaleButtons onProductSelect={addToCart} />
+              <QuickSaleButtons onProductSelect={handleAddToCart} />
             </div>
           )}
 

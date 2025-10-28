@@ -1,5 +1,5 @@
 import api from "../api";
-import { Product, PaginatedResponse, CreateProductRequest, UpdateProductRequest } from "../../types";
+import { Product, PaginatedResponse } from "../../types";
 
 export const productsAPI = {
   getAll: async (params?: {
@@ -20,8 +20,14 @@ export const productsAPI = {
   },
 
   getByBarcode: async (barcode: string): Promise<Product> => {
-    const response = await api.get(`/products/lookup/${barcode}`);
-    return response.data;
+    // Correct endpoint for product lookup (not variant)
+    // If you have a dedicated endpoint for product barcode lookup, use it. Otherwise, fallback to search.
+    const response = await api.get(`/products`, { params: { barcode } });
+    if (response.data && response.data.length > 0) {
+      return response.data[0];
+    } else {
+      throw new Error("Product not found");
+    }
   },
 
   create: async (data: CreateProductRequest): Promise<Product> => {
